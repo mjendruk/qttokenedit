@@ -60,7 +60,7 @@ void RemoveButton::mouseReleaseEvent(QMouseEvent *event) {
 void RemoveButton::initSize()
 {
   auto fm = fontMetrics();
-  auto s = static_cast<int>(std::lround(fm.height()));
+  auto s = static_cast<int>(std::lround(fm.height()* 0.8));
   _size = QSize{s, s};
 }
 

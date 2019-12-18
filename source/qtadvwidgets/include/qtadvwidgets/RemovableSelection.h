@@ -4,6 +4,8 @@
 
 #include <QWidget>
 
+class QFontMetrics;
+
 class QTADVWIDGETS_API RemovableSelection : public QWidget {
   Q_OBJECT
 

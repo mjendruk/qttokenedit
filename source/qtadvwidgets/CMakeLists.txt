@@ -51,6 +51,7 @@ set(headers
     ${include_path}/RemovableSelection.h
     ${include_path}/RemoveButton.h
     ${include_path}/MultiSelectionEdit.h
+    ${include_path}/FlexLayout.h
 )
 
 set(sources
@@ -59,6 +60,7 @@ set(sources
     ${source_path}/RemovableSelection.cpp
     ${source_path}/RemoveButton.cpp
     ${source_path}/MultiSelectionEdit.cpp
+    ${source_path}/FlexLayout.cpp
 )
 
 # Group source files

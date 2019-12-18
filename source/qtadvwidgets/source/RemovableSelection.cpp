@@ -1,5 +1,7 @@
 #include <qtadvwidgets/RemovableSelection.h>
 
+#include <cmath>
+
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPainterPath>

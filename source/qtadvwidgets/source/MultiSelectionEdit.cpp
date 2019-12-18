@@ -1,3 +1,4 @@
+#include <qtadvwidgets/FlexLayout.h>
 #include <qtadvwidgets/MultiSelectionEdit.h>
 #include <qtadvwidgets/RemovableSelection.h>
 
@@ -8,61 +9,35 @@
 #include <QStyleOptionFrame>
 
 MultiSelectionEdit::MultiSelectionEdit(QWidget* parent) : QScrollArea{parent} {
-
   auto mainWidget = new QWidget{};
 
-  auto mainLayout = new QBoxLayout{QBoxLayout::TopToBottom};
-  mainLayout->setMargin(2);
-  mainLayout->setSpacing(2);
+  auto entries = std::vector{
+      "S+U Potsdamer Platz", "Stendaler Str.", "Walther-Schreiber-Platz",
+      "S+U Berlin Hbf",      "U Spichernstr.", "U Berliner Str.",
+      "S+U Bundesallee",
+  };
+
+  _layout = new FlexLayout{4, 4, 4};
 
   _lineEdit = new QLineEdit{this};
   _lineEdit->setFrame(false);
-  _lineEdit->setMinimumSize(QSize{100, 0});
+  _lineEdit->setMinimumSize(QSize{120, 0});
   _lineEdit->setPlaceholderText("Weiteres Element ...");
+  _lineEdit->setTextMargins(QMargins{});
 
-  auto firstRowLayout = new QBoxLayout{QBoxLayout::LeftToRight};
-  firstRowLayout->setMargin(0);
-  firstRowLayout->setSpacing(2);
-  firstRowLayout->setSizeConstraint(QLayout::SetMaximumSize);
+  for (auto entry : entries) {
+    auto selection = new RemovableSelection{entry, this};
+    _layout->addWidget(selection);
 
-  fillRow({"S+U Potsdamer Platz", "Stendaler Str.", "Walther-Schreiber-Platz"},
-           firstRowLayout);
-  firstRowLayout->addStretch();
+    connect(selection, &RemovableSelection::removeClicked,
+            [=]() { delete selection; updateHeight(); });
 
-  auto secondRowLayout = new QBoxLayout{QBoxLayout::LeftToRight};
-  secondRowLayout->setMargin(0);
-  secondRowLayout->setSpacing(2);
-  secondRowLayout->setSizeConstraint(QLayout::SetMaximumSize);
+    _selections.append(selection);
+  }
 
-  fillRow({"S+U Berlin Hbf", "U Spichernstr.", "U Berliner Str."},
-          secondRowLayout);
-  secondRowLayout->addStretch();
+  _layout->addWidget(_lineEdit);
 
-  auto fourthRowLayout = new QBoxLayout{QBoxLayout::LeftToRight};
-  fourthRowLayout->setMargin(0);
-  fourthRowLayout->setSpacing(2);
-  fourthRowLayout->setSizeConstraint(QLayout::SetMaximumSize);
-
-  fillRow({"S+U Potsdamer Platz", "Stendaler Str.", "Walther-Schreiber-Platz"},
-          fourthRowLayout);
-  fourthRowLayout->addStretch();
-
-  auto thirdRowLayout = new QBoxLayout{QBoxLayout::LeftToRight};
-  thirdRowLayout->setMargin(0);
-  thirdRowLayout->setSpacing(2);
-  thirdRowLayout->setSizeConstraint(QLayout::SetMaximumSize);
-
-  fillRow({"S+U Bundesallee"}, thirdRowLayout);
-  thirdRowLayout->addWidget(_lineEdit);
-
-  mainLayout->addLayout(firstRowLayout);
-  mainLayout->addLayout(secondRowLayout);
-  mainLayout->addLayout(fourthRowLayout);
-  mainLayout->addLayout(thirdRowLayout);
-  mainLayout->addStretch();
-  
-
-  mainWidget->setLayout(mainLayout);
+  mainWidget->setLayout(_layout);
 
   mainWidget->setStyleSheet("#mainWidget { background-color: white; }");
   mainWidget->setObjectName("mainWidget");
@@ -75,16 +50,36 @@ MultiSelectionEdit::MultiSelectionEdit(QWidget* parent) : QScrollArea{parent} {
 
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-  setMaximumHeight(secondRowLayout->sizeHint().height() * 3 + 10);
+  setMaxRows(3);
 }
 
-void MultiSelectionEdit::fillRow(QVector<QString> const& entries, QBoxLayout* layout) 
-{
-  for (auto const& entry : entries) {
-    auto selection = new RemovableSelection{entry, this};
-    layout->addWidget(selection);
+int MultiSelectionEdit::maxRows() const { return _maxRows; }
 
-    connect(selection, &RemovableSelection::removeClicked,
-            [=]() { delete selection; });
+void MultiSelectionEdit::setMaxRows(int rows) {
+  _maxRows = rows;
+
+  updateHeight();
+}
+
+void MultiSelectionEdit::resizeEvent(QResizeEvent* event) {
+  QScrollArea::resizeEvent(event);
+  updateHeight();
+}
+
+void MultiSelectionEdit::updateHeight() {
+  auto const actualMaxRows = _maxRows <= 0 ? 3 : _maxRows;
+  auto const actualRows = std::min(actualMaxRows, _layout->numRows());
+
+  auto const spacing = 4;
+
+  auto height = spacing;
+
+  for (auto i = 0; i < actualRows; ++i) {
+    height += _layout->rowHeight(i);
+    height += spacing;
   }
+  
+  height += 2;
+
+  setFixedHeight(height);
 }
