@@ -16,7 +16,6 @@ RemovableSelection::RemovableSelection(QString const& text, QWidget* parent) : Q
   
   auto label = new QLabel{text};
   label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-//  label->setTextInteractionFlags(Qt::TextSelectableByMouse);
   auto smallerFont = label->font();
   smallerFont.setPointSizeF(label->fontInfo().pointSizeF() * 0.8);
   label->setFont(smallerFont);
@@ -26,7 +25,7 @@ RemovableSelection::RemovableSelection(QString const& text, QWidget* parent) : Q
   layout->addWidget(label, 1, Qt::AlignVCenter);
   layout->addWidget(button, 0, Qt::AlignVCenter);
   layout->setContentsMargins(4, 2, 4, 2);
-  setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+  setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setLayout(layout);
   setCursor(Qt::ArrowCursor);
   
@@ -39,15 +38,15 @@ void RemovableSelection::paintEvent(QPaintEvent* event) {
   auto rect = QRectF{QPointF{0.0,0.0}, QSizeF{size()}};
 
   auto path = QPainterPath{};
-  path.addRoundedRect(rect, 3.0, 3.0);
+  path.addRect(rect);
 
   auto painter = QPainter{this};
   
   auto palette = this->palette();
   
-  auto const fillRole = _selected ? QPalette::Highlight : QPalette::Window;
-  painter.setBrush(palette.brush(fillRole));
-  painter.setPen(QPen{palette.color(QPalette::Dark)});
+  auto const penRole = _selected ? QPalette::WindowText : QPalette::Shadow;
+  painter.setBrush(palette.brush(QPalette::Button));
+  painter.setPen(QPen{palette.color(penRole)});
   
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(clippingRect);

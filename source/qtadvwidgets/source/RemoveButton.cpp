@@ -20,7 +20,7 @@ void RemoveButton::paintEvent(QPaintEvent *event) {
   auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF{_size}};
   auto const palette = this->palette();
   
-  auto fillRole = _pressed ? QPalette::Dark : QPalette::Mid;
+  auto fillRole = _pressed ? QPalette::Shadow : QPalette::Dark;
   
   auto painter = QPainter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
@@ -60,7 +60,7 @@ void RemoveButton::mouseReleaseEvent(QMouseEvent *event) {
 void RemoveButton::initSize()
 {
   auto fm = fontMetrics();
-  auto s = static_cast<int>(std::lround(fm.height() * 0.7));
+  auto s = static_cast<int>(std::lround(fm.height()));
   _size = QSize{s, s};
 }
 
