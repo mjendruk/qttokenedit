@@ -1,0 +1,91 @@
+#include <qtadvwidgets/RemoveButton.h>
+
+#include <QPaintEvent>
+#include <QPainter>
+#include <QPainterPath>
+#include <cmath>
+
+RemoveButton::RemoveButton(QWidget *parent) : QWidget{parent}, _pressed{false} {
+  setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  setCursor(Qt::PointingHandCursor);
+  
+  initSize();
+  initButtonShapePath();
+}
+
+QSize RemoveButton::sizeHint() const { return _size; }
+
+void RemoveButton::paintEvent(QPaintEvent *event) {
+  auto const clippingRect = QRectF{event->rect()};
+  auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF{_size}};
+  auto const palette = this->palette();
+  
+  auto fillRole = _pressed ? QPalette::Dark : QPalette::Mid;
+  
+  auto painter = QPainter{this};
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  painter.setBrush(palette.brush(fillRole));
+  painter.setPen(Qt::NoPen);
+  painter.setClipRect(clippingRect);
+  
+  painter.translate(+rect.center());
+  painter.rotate(45.0);
+  painter.translate(-rect.center());
+  
+  painter.drawPath(_path);
+}
+
+void RemoveButton::enterEvent(QEvent *event) {}
+
+void RemoveButton::leaveEvent(QEvent *event) {
+  update();
+  _pressed = false;
+}
+
+void RemoveButton::mousePressEvent(QMouseEvent *event) {
+  if (event->button() == Qt::LeftButton) {
+    _pressed = true;
+    update();
+  }
+}
+
+void RemoveButton::mouseReleaseEvent(QMouseEvent *event) {
+  if (event->button() == Qt::LeftButton && _pressed) {
+    _pressed = false;
+    update();
+    emit clicked();
+  }
+}
+
+void RemoveButton::initSize()
+{
+  auto fm = fontMetrics();
+  auto s = static_cast<int>(std::lround(fm.height() * 0.7));
+  _size = QSize{s, s};
+}
+
+void RemoveButton::initButtonShapePath()
+{
+  auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF{_size}};
+  
+  auto circlePath = QPainterPath{};
+  
+  auto circleRect = rect;
+  auto const circleSize = rect.size() * 0.95;
+  circleRect.setSize(circleSize);
+  circleRect.moveCenter(rect.center());
+  circlePath.addEllipse(circleRect);
+
+  auto crossPath = QPainterPath{};
+  crossPath.setFillRule(Qt::WindingFill);
+
+  auto const crossMargin = rect.height() * 0.2;
+  auto const crossLength = rect.height() * 0.6;
+  auto const crossLineWidth = rect.height() * 0.2;
+  crossPath.addRect(rect.center().x() - (crossLineWidth * 0.5), crossMargin,
+                    crossLineWidth, crossLength);
+  crossPath.addRect(crossMargin, rect.center().y() - (crossLineWidth * 0.5),
+                    crossLength, crossLineWidth);
+
+  _path = circlePath - crossPath;
+}
