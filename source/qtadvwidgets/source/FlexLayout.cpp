@@ -1,6 +1,8 @@
 #include <qtadvwidgets/FlexLayout.h>
 
 #include <QWidget>
+#include <QWidgetItem>
+#include <QLayoutItem>
 
 FlexLayout::FlexLayout(QWidget *parent) : FlexLayout{-1, -1, -1, parent} {}
 
@@ -14,7 +16,9 @@ FlexLayout::~FlexLayout() {
   while ((item = takeAt(0))) delete item;
 }
 
-void FlexLayout::addItem(QLayoutItem *item) { _itemList.append(item); }
+void FlexLayout::addItem(QLayoutItem *item) { 
+  insertItem(-1, item);
+}
 
 int FlexLayout::horizontalSpacing() const {
   if (_hSpacing >= 0) {
@@ -41,7 +45,7 @@ QLayoutItem *FlexLayout::itemAt(int index) const {
 QLayoutItem *FlexLayout::takeAt(int index) {
   if (index >= 0 && index < _itemList.size()) { 
     auto item = _itemList.takeAt(index);
-    activate();
+    invalidate();
     return item;
   }
   return nullptr;
@@ -80,6 +84,22 @@ QSize FlexLayout::minimumSize() const {
   return size;
 }
 
+void FlexLayout::insertItem(int index, QLayoutItem *item)
+{
+  _itemList.insert(index, item);
+  invalidate();
+}
+
+void FlexLayout::insertLayout(int index, QLayout *layout)
+{
+  insertItem(index, layout);
+}
+
+void FlexLayout::insertWidget(int index, QWidget *widget)
+{
+  insertItem(index, new QWidgetItem{widget});
+}
+
 int FlexLayout::doLayout(const QRect &rect, bool testOnly) const {
   int left, top, right, bottom;
   getContentsMargins(&left, &top, &right, &bottom);
@@ -87,8 +107,8 @@ int FlexLayout::doLayout(const QRect &rect, bool testOnly) const {
   int x = effectiveRect.x();
   int y = effectiveRect.y();
   
-  int rowHeight = 0;
-  _rowHeights.clear();
+  int lineHeight = 0;
+  _lineHeights.clear();
 
   for (QLayoutItem *item : qAsConst(_itemList)) {
     const QWidget *wid = item->widget();
@@ -102,23 +122,23 @@ int FlexLayout::doLayout(const QRect &rect, bool testOnly) const {
           QSizePolicy::PushButton, QSizePolicy::PushButton, Qt::Vertical);
 
     int nextX = x + item->sizeHint().width() + spaceX;
-    if (nextX - spaceX > effectiveRect.right() && rowHeight > 0) {
+    if (nextX - spaceX > effectiveRect.right() && lineHeight > 0) {
       x = effectiveRect.x();
-      y = y + rowHeight + spaceY;
+      y = y + lineHeight + spaceY;
       nextX = x + item->sizeHint().width() + spaceX;
-      _rowHeights.append(rowHeight);
-      rowHeight = 0;
+      _lineHeights.append(lineHeight);
+      lineHeight = 0;
     }
 
     if (!testOnly) item->setGeometry(QRect(QPoint(x, y), item->sizeHint()));
 
     x = nextX;
-    rowHeight = qMax(rowHeight, item->sizeHint().height());
+    lineHeight = qMax(lineHeight, item->sizeHint().height());
   }
   
-  _rowHeights.append(rowHeight);
+  _lineHeights.append(lineHeight);
   
-  return y + rowHeight - rect.y() + bottom;
+  return y + lineHeight - rect.y() + bottom;
 }
 
 int FlexLayout::smartSpacing(QStyle::PixelMetric pm) const {
@@ -133,11 +153,12 @@ int FlexLayout::smartSpacing(QStyle::PixelMetric pm) const {
   }
 }
 
-int FlexLayout::numRows() const
+int FlexLayout::lineCount() const
 {
-  return _rowHeights.size();
+  return _lineHeights.size();
 }
-int FlexLayout::rowHeight(int index) const
+
+int FlexLayout::lineHeight(int index) const
 {
-  return _rowHeights.at(index);
+  return _lineHeights.at(index);
 }

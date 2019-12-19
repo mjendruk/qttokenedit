@@ -13,6 +13,7 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   ~FlexLayout();
 
   void addItem(QLayoutItem *item) override;
+  
   int horizontalSpacing() const;
   int verticalSpacing() const;
   Qt::Orientations expandingDirections() const override;
@@ -25,8 +26,12 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   QSize sizeHint() const override;
   QLayoutItem *takeAt(int index) override;
   
-  int numRows() const;
-  int rowHeight(int index) const;
+  void insertItem(int index, QLayoutItem *item);
+  void insertLayout(int index, QLayout *layout);
+  void insertWidget(int index, QWidget *widget);
+
+  int lineCount() const;
+  int lineHeight(int index) const;
 
  private:
   int doLayout(const QRect &rect, bool testOnly) const;
@@ -35,5 +40,5 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   QList<QLayoutItem *> _itemList;
   int _hSpacing;
   int _vSpacing;
-  mutable QVector<int> _rowHeights;
+  mutable QVector<int> _lineHeights;
 };

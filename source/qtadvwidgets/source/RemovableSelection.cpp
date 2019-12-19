@@ -12,28 +12,55 @@
 
 #include <qtadvwidgets/RemoveButton.h>
 
-RemovableSelection::RemovableSelection(QString const& text, QWidget* parent) : QWidget{parent}, _selected{false} {
-  
-  auto layout = new QBoxLayout{QBoxLayout::LeftToRight};
-  
-  auto label = new QLabel{text};
-  label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  
-  auto const labelHeight = label->sizeHint().height();
+RemovableSelection::RemovableSelection(QString const& text, QWidget* parent)
+    : RemovableSelection{text, {}, parent} {}
 
-  auto button = new RemoveButton{labelHeight, this};
+RemovableSelection::RemovableSelection(QString const& text, QVariant const& userData,
+                   QWidget* parent)
+    : QWidget{parent}, _text{text}, _userData{userData}, _selected{false} {
+  auto layout = new QBoxLayout{QBoxLayout::LeftToRight};
+
+  _label = new QLabel{text};
+  _label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+  auto const labelHeight = _label->sizeHint().height();
+
+  _button = new RemoveButton{labelHeight, this};
 
   auto const margin = std::lround(labelHeight / 3.0);
   auto const marginLeft = std::lround(labelHeight * 0.5);
-  
-  layout->addWidget(label, 1, Qt::AlignVCenter);
-  layout->addWidget(button, 0, Qt::AlignVCenter);
   layout->setContentsMargins(marginLeft, margin, margin, margin);
+
+  layout->addWidget(_label, 1, Qt::AlignVCenter);
+  layout->addWidget(_button, 0, Qt::AlignVCenter);
+
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setLayout(layout);
   setCursor(Qt::ArrowCursor);
-  
-  connect(button, &RemoveButton::clicked, this, &RemovableSelection::removeClicked);
+
+  connect(_button, &RemoveButton::clicked, this,
+          &RemovableSelection::removeClicked);
+}
+
+QString const& RemovableSelection::text() const
+{
+  return _text;
+}
+
+void RemovableSelection::setText(QString const& text)
+{
+  _text = text;
+  _label->setText(_text);
+}
+
+QVariant const& RemovableSelection::userData() const
+{
+  return _userData;
+}
+
+void RemovableSelection::setUserData(QVariant const& data)
+{
+  _userData = data;
 }
 
 void RemovableSelection::paintEvent(QPaintEvent* event) {

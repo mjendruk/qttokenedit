@@ -2,7 +2,7 @@
 #include <qtadvwidgets/MultiSelectionEdit.h>
 #include <qtadvwidgets/RemovableSelection.h>
 
-#include <QBoxLayout>
+#include <QtGlobal>
 #include <QLineEdit>
 #include <QPaintEvent>
 #include <QPainter>
@@ -11,30 +11,16 @@
 MultiSelectionEdit::MultiSelectionEdit(QWidget* parent) : QScrollArea{parent} {
   auto mainWidget = new QWidget{};
 
-  auto entries = std::vector{
-      "S+U Potsdamer Platz", "Stendaler Str.", "Walther-Schreiber-Platz",
-      "S+U Berlin Hbf",      "U Spichernstr.", "U Berliner Str.",
-      "S+U Bundesallee",
-  };
-
   _layout = new FlexLayout{4, 4, 4};
-
-  for (auto entry : entries) {
-    auto selection = new RemovableSelection{entry, this};
-    _layout->addWidget(selection);
-
-    connect(selection, &RemovableSelection::removeClicked,
-            [=]() { delete selection; updateHeight(); });
-
-    _selections.append(selection);
-  }
 
   _lineEdit = new QLineEdit{this};
   _lineEdit->setFrame(false);
   _lineEdit->setMinimumSize(QSize{120, 0});
   _lineEdit->setPlaceholderText("Halt hinzufuegen");
   _lineEdit->setTextMargins(QMargins{});
-  _lineEdit->setFixedHeight(_selections.front()->sizeHint().height());
+
+  auto dummyItem = QScopedPointer{new RemovableSelection{"dummy"}};
+  _lineEdit->setFixedHeight(dummyItem->sizeHint().height());
 
   _layout->addWidget(_lineEdit);
 
@@ -51,15 +37,83 @@ MultiSelectionEdit::MultiSelectionEdit(QWidget* parent) : QScrollArea{parent} {
 
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-  setMaxRows(3);
+  updateHeight();
 }
 
-int MultiSelectionEdit::maxRows() const { return _maxRows; }
+int MultiSelectionEdit::maxLineCount() const { return _maxLineCount; }
 
-void MultiSelectionEdit::setMaxRows(int rows) {
-  _maxRows = rows;
+void MultiSelectionEdit::setMaxLineCount(int count) {
+  _maxLineCount = count;
+  updateHeight();
+}
+
+void MultiSelectionEdit::addItem(QString const& text,
+                                 QVariant const& userData) {
+  auto item = new RemovableSelection{text, userData, this};
+  auto index = std::max(0, _items.size());
+
+  _items.append(item);
+  _layout->insertWidget(index, item);
+
+  connect(item, &RemovableSelection::removeClicked, [=]() {
+    auto index = _items.indexOf(item);
+    removeItem(index);
+  });
 
   updateHeight();
+}
+
+void MultiSelectionEdit::addItems(QStringList const& texts)
+{
+  for (auto const& text : texts) {
+    addItem(text);
+  }
+}
+
+void MultiSelectionEdit::setItemData(int index, QVariant const& value)
+{
+  auto item = _items.at(index);
+  item->setUserData(value);
+}
+
+void MultiSelectionEdit::setItemText(int index, QString const& text)
+{
+  auto item = _items.at(index);
+  item->setText(text);
+  _layout->activate();
+  updateHeight();
+}
+
+void MultiSelectionEdit::removeItem(int index)
+{
+  auto item = _items.takeAt(index);
+  auto layoutItem = _layout->takeAt(index);
+  emit itemAboutToBeRemoved(index);
+  delete layoutItem;
+  delete item;
+  updateHeight();
+}
+
+QString MultiSelectionEdit::itemText(int index) const
+{
+  auto item = _items.at(index);
+  return item->text();
+}
+
+QVariant MultiSelectionEdit::itemData(int index) const
+{
+  auto item = _items.at(index);
+  return item->userData();
+}
+
+int MultiSelectionEdit::count() const
+{
+  return _items.size();
+}
+
+QLineEdit* MultiSelectionEdit::lineEdit() 
+{
+  return _lineEdit;
 }
 
 void MultiSelectionEdit::resizeEvent(QResizeEvent* event) {
@@ -68,15 +122,15 @@ void MultiSelectionEdit::resizeEvent(QResizeEvent* event) {
 }
 
 void MultiSelectionEdit::updateHeight() {
-  auto const actualMaxRows = _maxRows <= 0 ? 3 : _maxRows;
-  auto const actualRows = std::min(actualMaxRows, _layout->numRows());
+  auto const actualMaxRows = _maxLineCount <= 0 ? 3 : _maxLineCount;
+  auto const actualRows = std::min(actualMaxRows, _layout->lineCount());
 
   auto const spacing = 4;
 
   auto height = spacing;
 
   for (auto i = 0; i < actualRows; ++i) {
-    height += _layout->rowHeight(i);
+    height += _layout->lineHeight(i);
     height += spacing;
   }
   
