@@ -1,6 +1,7 @@
 #include <qtadvwidgets/FlexLayout.h>
 #include <qtadvwidgets/MultiSelectionEdit.h>
 #include <qtadvwidgets/RemovableSelection.h>
+#include <qtadvwidgets/MultiSelectionLineEdit.h>
 
 #include <QtGlobal>
 #include <QLineEdit>
@@ -13,11 +14,17 @@ MultiSelectionEdit::MultiSelectionEdit(QWidget* parent) : QScrollArea{parent} {
 
   _layout = new FlexLayout{4, 4, 4};
 
-  _lineEdit = new QLineEdit{this};
+  _lineEdit = new MultiSelectionLineEdit{this};
   _lineEdit->setFrame(false);
   _lineEdit->setMinimumSize(QSize{120, 0});
   _lineEdit->setPlaceholderText("Halt hinzufuegen");
   _lineEdit->setTextMargins(QMargins{});
+
+  connect(_lineEdit, &MultiSelectionLineEdit::backspaceAtBeginning, [=]() {
+    if (!_items.empty()) {
+      removeItem(_items.size() - 1);
+    }
+  });
 
   auto dummyItem = QScopedPointer{new RemovableSelection{"dummy"}};
   _lineEdit->setFixedHeight(dummyItem->sizeHint().height());
@@ -30,6 +37,8 @@ MultiSelectionEdit::MultiSelectionEdit(QWidget* parent) : QScrollArea{parent} {
   mainWidget->setObjectName("mainWidget");
 
   setWidget(mainWidget);
+  
+  setFocusProxy(_lineEdit);
 
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);

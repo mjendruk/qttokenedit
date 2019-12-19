@@ -11,6 +11,7 @@ class QLineEdit;
 
 class RemovableSelection;
 class FlexLayout;
+class MultiSelectionLineEdit;
 
 class QTADVWIDGETS_API MultiSelectionEdit : public QScrollArea {
   Q_OBJECT
@@ -47,7 +48,7 @@ class QTADVWIDGETS_API MultiSelectionEdit : public QScrollArea {
 
  private:
   QVector<RemovableSelection*> _items;
-  QLineEdit* _lineEdit;
+  MultiSelectionLineEdit* _lineEdit;
   FlexLayout* _layout;
   int _maxLineCount;
 };
