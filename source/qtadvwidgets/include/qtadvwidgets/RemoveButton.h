@@ -8,7 +8,7 @@ class QTADVWIDGETS_API RemoveButton : public QWidget {
   Q_OBJECT
 
  public:
-  RemoveButton(QWidget *parent = nullptr);
+  RemoveButton(int diameter, QWidget *parent = nullptr);
 
   QSize sizeHint() const override;
   
@@ -28,6 +28,8 @@ private:
 
 private:
   bool _pressed;
+  bool _hovered;
+  int _diameter;
   QSize _size;
   QPainterPath _path;
 };

@@ -19,12 +19,6 @@ MultiSelectionEdit::MultiSelectionEdit(QWidget* parent) : QScrollArea{parent} {
 
   _layout = new FlexLayout{4, 4, 4};
 
-  _lineEdit = new QLineEdit{this};
-  _lineEdit->setFrame(false);
-  _lineEdit->setMinimumSize(QSize{120, 0});
-  _lineEdit->setPlaceholderText("Weiteres Element ...");
-  _lineEdit->setTextMargins(QMargins{});
-
   for (auto entry : entries) {
     auto selection = new RemovableSelection{entry, this};
     _layout->addWidget(selection);
@@ -34,6 +28,13 @@ MultiSelectionEdit::MultiSelectionEdit(QWidget* parent) : QScrollArea{parent} {
 
     _selections.append(selection);
   }
+
+  _lineEdit = new QLineEdit{this};
+  _lineEdit->setFrame(false);
+  _lineEdit->setMinimumSize(QSize{120, 0});
+  _lineEdit->setPlaceholderText("Halt hinzufuegen");
+  _lineEdit->setTextMargins(QMargins{});
+  _lineEdit->setFixedHeight(_selections.front()->sizeHint().height());
 
   _layout->addWidget(_lineEdit);
 

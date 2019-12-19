@@ -5,7 +5,7 @@
 #include <QPainterPath>
 #include <cmath>
 
-RemoveButton::RemoveButton(QWidget *parent) : QWidget{parent}, _pressed{false} {
+RemoveButton::RemoveButton(int diameter, QWidget *parent) : QWidget{parent}, _diameter{diameter}, _pressed{false}, _hovered{false} {
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setCursor(Qt::PointingHandCursor);
   
@@ -20,7 +20,7 @@ void RemoveButton::paintEvent(QPaintEvent *event) {
   auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF{_size}};
   auto const palette = this->palette();
   
-  auto fillRole = _pressed ? QPalette::Shadow : QPalette::Dark;
+  auto fillRole = _hovered ? QPalette::Shadow : QPalette::Dark;
   
   auto painter = QPainter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
@@ -35,11 +35,15 @@ void RemoveButton::paintEvent(QPaintEvent *event) {
   painter.drawPath(_path);
 }
 
-void RemoveButton::enterEvent(QEvent *event) {}
+void RemoveButton::enterEvent(QEvent *event) {
+  _hovered = true;
+  update();
+}
 
 void RemoveButton::leaveEvent(QEvent *event) {
-  update();
+  _hovered = false;
   _pressed = false;
+  update();
 }
 
 void RemoveButton::mousePressEvent(QMouseEvent *event) {
@@ -59,9 +63,7 @@ void RemoveButton::mouseReleaseEvent(QMouseEvent *event) {
 
 void RemoveButton::initSize()
 {
-  auto fm = fontMetrics();
-  auto s = static_cast<int>(std::lround(fm.height()* 0.8));
-  _size = QSize{s, s};
+  _size = QSize{_diameter, _diameter};
 }
 
 void RemoveButton::initButtonShapePath()
@@ -81,7 +83,7 @@ void RemoveButton::initButtonShapePath()
 
   auto const crossMargin = rect.height() * 0.2;
   auto const crossLength = rect.height() * 0.6;
-  auto const crossLineWidth = rect.height() * 0.2;
+  auto const crossLineWidth = rect.height() * 0.1;
   crossPath.addRect(rect.center().x() - (crossLineWidth * 0.5), crossMargin,
                     crossLineWidth, crossLength);
   crossPath.addRect(crossMargin, rect.center().y() - (crossLineWidth * 0.5),
