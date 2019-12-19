@@ -97,6 +97,9 @@ void FlexLayout::insertLayout(int index, QLayout *layout)
 
 void FlexLayout::insertWidget(int index, QWidget *widget)
 {
+  Q_ASSERT(widget);
+  
+  addChildWidget(widget);
   insertItem(index, new QWidgetItem{widget});
 }
 
