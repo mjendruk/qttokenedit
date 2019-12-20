@@ -149,18 +149,6 @@ void Token::keyPressEvent(QKeyEvent* event) {
     return;
   }
 
-  if (event->key() == Qt::Key_Left) {
-    if (auto prev = chainElement()->previousElement()) {
-      prev->widget()->setFocus();
-    }
-  }
-
-  if (event->key() == Qt::Key_Right) {
-    if (auto next = chainElement()->nextElement()) {
-      next->widget()->setFocus();
-    }
-  }
-
   QWidget::keyPressEvent(event);
 }
 

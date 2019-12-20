@@ -2,11 +2,13 @@
 
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+#include <QObject>
 #include <QWidget>
 
-class QTADVWIDGETS_API TokenChainElement {
+class QTADVWIDGETS_API TokenChainElement : public QObject {
+  Q_OBJECT
  public:
-  TokenChainElement(QWidget* widget);
+  TokenChainElement(QWidget* widget, bool isToken = true);
 
   TokenChainElement* previousElement() const;
   void setPreviousElement(TokenChainElement* element);
@@ -15,6 +17,9 @@ class QTADVWIDGETS_API TokenChainElement {
   void setNextElement(TokenChainElement* element);
 
   QWidget* widget() const;
+
+ protected:
+  bool eventFilter(QObject* watched, QEvent* event) override;
 
  private:
   TokenChainElement* _previousElement = nullptr;

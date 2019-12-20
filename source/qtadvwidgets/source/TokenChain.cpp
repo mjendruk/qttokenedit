@@ -1,10 +1,11 @@
 #include <qtadvwidgets/TokenChain.h>
 #include <qtadvwidgets/TokenChainElement.h>
 
+#include <QWidget>
 #include <QtGlobal>
 
 TokenChain::TokenChain(QWidget* last)
-    : _last{std::make_unique<TokenChainElement>(last)} {}
+    : _last{std::make_unique<TokenChainElement>(last, false)} {}
 
 TokenChain::~TokenChain() = default;
 
@@ -35,5 +36,11 @@ void TokenChain::remove(TokenChainElement* element) {
 
   if (next) {
     next->setPreviousElement(prev);
+  }
+
+  if (prev) {
+    prev->widget()->setFocus();
+  } else if (next) {
+    next->widget()->setFocus();
   }
 }
