@@ -49,7 +49,7 @@ set(headers
     ${include_path}/DarkStyle.h
     ${include_path}/Token.h
     ${include_path}/RemoveButton.h
-    ${include_path}/MultiSelectionEdit.h
+    ${include_path}/TokenEdit.h
     ${include_path}/MultiSelectionLineEdit.h
     ${include_path}/FlexLayout.h
 )
@@ -59,7 +59,7 @@ set(sources
     ${source_path}/DarkStyle.cpp
     ${source_path}/Token.cpp
     ${source_path}/RemoveButton.cpp
-    ${source_path}/MultiSelectionEdit.cpp
+    ${source_path}/TokenEdit.cpp
     ${source_path}/MultiSelectionLineEdit.cpp
     ${source_path}/FlexLayout.cpp
 )

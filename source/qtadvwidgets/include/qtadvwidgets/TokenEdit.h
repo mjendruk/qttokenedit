@@ -13,11 +13,11 @@ class Token;
 class FlexLayout;
 class MultiSelectionLineEdit;
 
-class QTADVWIDGETS_API MultiSelectionEdit : public QScrollArea {
+class QTADVWIDGETS_API TokenEdit : public QScrollArea {
   Q_OBJECT
 
  public:
-  MultiSelectionEdit(QWidget* parent = nullptr);
+  TokenEdit(QWidget* parent = nullptr);
 
   int maxLineCount() const;
   void setMaxLineCount(int count);

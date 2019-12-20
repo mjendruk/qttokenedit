@@ -9,7 +9,7 @@
 
 #include "ui_MainWindow.h"
 
-#include <qtadvwidgets/MultiSelectionEdit.h>
+#include <qtadvwidgets/TokenEdit.h>
 #include <qtadvwidgets/Token.h>
 
 
@@ -19,10 +19,10 @@ MainWindow::MainWindow()
     // Setup UI
     m_ui->setupUi(this);
 
-    auto multiSelectionEdit = new MultiSelectionEdit{this};
-    m_ui->formLayout->addRow("MultiSelectionEdit", multiSelectionEdit);
+    auto tokenEdit = new TokenEdit{this};
+    m_ui->formLayout->addRow("TokenEdit", tokenEdit);
 
-    multiSelectionEdit->addItems({
+    tokenEdit->addItems({
         "S+U Potsdamer Platz",
         "Stendaler Str.",
         "Walther-Schreiber-Platz",
@@ -32,10 +32,10 @@ MainWindow::MainWindow()
         "S+U Bundesallee",
     });
 
-    auto lineEdit = multiSelectionEdit->lineEdit();
+    auto lineEdit = tokenEdit->lineEdit();
 
     connect(lineEdit, &QLineEdit::returnPressed, [=]() {
-        multiSelectionEdit->addItem(lineEdit->text());
+        tokenEdit->addItem(lineEdit->text());
         lineEdit->clear();
     });
 

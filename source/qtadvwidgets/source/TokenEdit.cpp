@@ -1,5 +1,5 @@
 #include <qtadvwidgets/FlexLayout.h>
-#include <qtadvwidgets/MultiSelectionEdit.h>
+#include <qtadvwidgets/TokenEdit.h>
 #include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/MultiSelectionLineEdit.h>
 
@@ -9,7 +9,7 @@
 #include <QPainter>
 #include <QStyleOptionFrame>
 
-MultiSelectionEdit::MultiSelectionEdit(QWidget* parent) : QScrollArea{parent} {
+TokenEdit::TokenEdit(QWidget* parent) : QScrollArea{parent} {
   auto mainWidget = new QWidget{};
 
   _layout = new FlexLayout{4, 4, 4};
@@ -49,14 +49,14 @@ MultiSelectionEdit::MultiSelectionEdit(QWidget* parent) : QScrollArea{parent} {
   updateHeight();
 }
 
-int MultiSelectionEdit::maxLineCount() const { return _maxLineCount; }
+int TokenEdit::maxLineCount() const { return _maxLineCount; }
 
-void MultiSelectionEdit::setMaxLineCount(int count) {
+void TokenEdit::setMaxLineCount(int count) {
   _maxLineCount = count;
   updateHeight();
 }
 
-void MultiSelectionEdit::addItem(QString const& text,
+void TokenEdit::addItem(QString const& text,
                                  QVariant const& userData) {
   auto item = new Token{text, userData, this};
   auto index = std::max(0, _items.size());
@@ -72,20 +72,20 @@ void MultiSelectionEdit::addItem(QString const& text,
   updateHeight();
 }
 
-void MultiSelectionEdit::addItems(QStringList const& texts)
+void TokenEdit::addItems(QStringList const& texts)
 {
   for (auto const& text : texts) {
     addItem(text);
   }
 }
 
-void MultiSelectionEdit::setItemData(int index, QVariant const& value)
+void TokenEdit::setItemData(int index, QVariant const& value)
 {
   auto item = _items.at(index);
   item->setUserData(value);
 }
 
-void MultiSelectionEdit::setItemText(int index, QString const& text)
+void TokenEdit::setItemText(int index, QString const& text)
 {
   auto item = _items.at(index);
   item->setText(text);
@@ -93,7 +93,7 @@ void MultiSelectionEdit::setItemText(int index, QString const& text)
   updateHeight();
 }
 
-void MultiSelectionEdit::removeItem(int index)
+void TokenEdit::removeItem(int index)
 {
   auto item = _items.takeAt(index);
   auto layoutItem = _layout->takeAt(index);
@@ -103,34 +103,34 @@ void MultiSelectionEdit::removeItem(int index)
   updateHeight();
 }
 
-QString MultiSelectionEdit::itemText(int index) const
+QString TokenEdit::itemText(int index) const
 {
   auto item = _items.at(index);
   return item->text();
 }
 
-QVariant MultiSelectionEdit::itemData(int index) const
+QVariant TokenEdit::itemData(int index) const
 {
   auto item = _items.at(index);
   return item->userData();
 }
 
-int MultiSelectionEdit::count() const
+int TokenEdit::count() const
 {
   return _items.size();
 }
 
-QLineEdit* MultiSelectionEdit::lineEdit() 
+QLineEdit* TokenEdit::lineEdit() 
 {
   return _lineEdit;
 }
 
-void MultiSelectionEdit::resizeEvent(QResizeEvent* event) {
+void TokenEdit::resizeEvent(QResizeEvent* event) {
   QScrollArea::resizeEvent(event);
   updateHeight();
 }
 
-void MultiSelectionEdit::updateHeight() {
+void TokenEdit::updateHeight() {
   auto const actualMaxRows = _maxLineCount <= 0 ? 3 : _maxLineCount;
   auto const actualRows = std::min(actualMaxRows, _layout->lineCount());
 
