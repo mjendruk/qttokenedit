@@ -36,6 +36,7 @@ class QTADVWIDGETS_API Token : public QWidget {
   void mouseReleaseEvent(QMouseEvent *event) override;
   void leaveEvent(QEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
 
   int contentHeight() const;
   int horizontalTextMargin() const;

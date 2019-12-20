@@ -4,6 +4,7 @@
 #include <QBoxLayout>
 #include <QLabel>
 #include <QMouseEvent>
+#include <QKeyEvent>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPainterPath>
@@ -17,6 +18,7 @@ Token::Token(QString const& text, QVariant const& userData, QWidget* parent)
     : QWidget{parent}, _text{text}, _userData{userData}, _selected{false} {
   setCursor(Qt::ArrowCursor);
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  setFocusPolicy(Qt::ClickFocus);
 
   _button = new RemoveButton{contentHeight(), this};
 
@@ -84,8 +86,8 @@ void Token::paintEvent(QPaintEvent* event) {
 
   painter.save();
 
-  auto const penRole = _selected ? QPalette::WindowText : QPalette::Shadow;
-  painter.setBrush(palette.brush(QPalette::Window));
+  auto const penRole = hasFocus() ? QPalette::Highlight : QPalette::Shadow;
+  painter.setBrush(palette.brush(QPalette::Base));
   painter.setPen(QPen{palette.color(penRole)});
   //  painter.setPen(Qt::NoPen);
 
@@ -129,6 +131,16 @@ void Token::resizeEvent(QResizeEvent* event) {
   QWidget::resizeEvent(event);
   updateElidedText(event->size());
   updateButtonPosition(event->size());
+}
+
+void Token::keyPressEvent(QKeyEvent* event) {
+  if (event->key() == Qt::Key_Backspace) {
+    emit removeClicked();
+    event->accept();
+    return;
+  }
+
+  QWidget::keyPressEvent(event);
 }
 
 void Token::updateElidedText(QSize size) {
