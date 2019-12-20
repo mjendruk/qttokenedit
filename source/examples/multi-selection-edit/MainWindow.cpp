@@ -10,6 +10,7 @@
 #include "ui_MainWindow.h"
 
 #include <qtadvwidgets/MultiSelectionEdit.h>
+#include <qtadvwidgets/RemovableSelection.h>
 
 
 MainWindow::MainWindow()
@@ -37,6 +38,8 @@ MainWindow::MainWindow()
         multiSelectionEdit->addItem(lineEdit->text());
         lineEdit->clear();
     });
+
+    m_ui->formLayout->addRow("RemovableSelection", new RemovableSelection{"S+U Potsdamer Platz"});
 }
 
 MainWindow::~MainWindow()
