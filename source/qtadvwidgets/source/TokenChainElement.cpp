@@ -3,7 +3,7 @@
 #include <QEvent>
 #include <QKeyEvent>
 
-TokenChainElement::TokenChainElement(QWidget* widget, bool isToken) : _widget{widget} {
+TokenChainElement::TokenChainElement(QWidget* widget, bool isToken) : QObject{widget}, _widget{widget} {
   if (isToken) {
     widget->installEventFilter(this);
   }

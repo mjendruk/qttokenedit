@@ -1,11 +1,12 @@
 #include <qtadvwidgets/TokenChain.h>
 #include <qtadvwidgets/TokenChainElement.h>
+#include <qtadvwidgets/LineEditChainElement.h>
 
 #include <QWidget>
 #include <QtGlobal>
 
-TokenChain::TokenChain(QWidget* last)
-    : _last{std::make_unique<TokenChainElement>(last, false)} {}
+TokenChain::TokenChain(QLineEdit* last)
+    : _last{std::make_unique<LineEditChainElement>(last)} {}
 
 TokenChain::~TokenChain() = default;
 

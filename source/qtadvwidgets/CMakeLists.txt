@@ -54,6 +54,7 @@ set(headers
     ${include_path}/FlexLayout.h
     ${include_path}/TokenChain.h
     ${include_path}/TokenChainElement.h
+    ${include_path}/LineEditChainElement.h
 )
 
 set(sources
@@ -66,6 +67,7 @@ set(sources
     ${source_path}/FlexLayout.cpp
     ${source_path}/TokenChain.cpp
     ${source_path}/TokenChainElement.cpp
+    ${source_path}/LineEditChainElement.cpp
 )
 
 # Group source files

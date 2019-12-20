@@ -4,13 +4,13 @@
 
 #include <memory>
 
-class QWidget;
+class QLineEdit;
 
 class TokenChainElement;
 
 class QTADVWIDGETS_API TokenChain {
  public:
-  TokenChain(QWidget* last);
+  TokenChain(QLineEdit* last);
   ~TokenChain();
 
   void add(TokenChainElement* element);
