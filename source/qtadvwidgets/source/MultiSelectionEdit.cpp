@@ -1,6 +1,6 @@
 #include <qtadvwidgets/FlexLayout.h>
 #include <qtadvwidgets/MultiSelectionEdit.h>
-#include <qtadvwidgets/RemovableSelection.h>
+#include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/MultiSelectionLineEdit.h>
 
 #include <QtGlobal>
@@ -26,7 +26,7 @@ MultiSelectionEdit::MultiSelectionEdit(QWidget* parent) : QScrollArea{parent} {
     }
   });
 
-  auto dummyItem = QScopedPointer{new RemovableSelection{"dummy"}};
+  auto dummyItem = QScopedPointer{new Token{"dummy"}};
   _lineEdit->setFixedHeight(dummyItem->sizeHint().height());
 
   _layout->addWidget(_lineEdit);
@@ -58,13 +58,13 @@ void MultiSelectionEdit::setMaxLineCount(int count) {
 
 void MultiSelectionEdit::addItem(QString const& text,
                                  QVariant const& userData) {
-  auto item = new RemovableSelection{text, userData, this};
+  auto item = new Token{text, userData, this};
   auto index = std::max(0, _items.size());
 
   _items.append(item);
   _layout->insertWidget(index, item);
 
-  connect(item, &RemovableSelection::removeClicked, [=]() {
+  connect(item, &Token::removeClicked, [=]() {
     auto index = _items.indexOf(item);
     removeItem(index);
   });

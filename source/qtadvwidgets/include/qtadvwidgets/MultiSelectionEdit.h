@@ -9,7 +9,7 @@
 
 class QLineEdit;
 
-class RemovableSelection;
+class Token;
 class FlexLayout;
 class MultiSelectionLineEdit;
 
@@ -47,7 +47,7 @@ class QTADVWIDGETS_API MultiSelectionEdit : public QScrollArea {
   void updateHeight();
 
  private:
-  QVector<RemovableSelection*> _items;
+  QVector<Token*> _items;
   MultiSelectionLineEdit* _lineEdit;
   FlexLayout* _layout;
   int _maxLineCount;

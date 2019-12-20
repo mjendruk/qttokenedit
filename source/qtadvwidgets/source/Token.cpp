@@ -1,5 +1,5 @@
-#include <qtadvwidgets/RemovableSelection.h>
 #include <qtadvwidgets/RemoveButton.h>
+#include <qtadvwidgets/Token.h>
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -11,34 +11,30 @@
 #include <QToolButton>
 #include <cmath>
 
-RemovableSelection::RemovableSelection(QString const& text, QWidget* parent)
-    : RemovableSelection{text, {}, parent} {}
+Token::Token(QString const& text, QWidget* parent) : Token{text, {}, parent} {}
 
-RemovableSelection::RemovableSelection(QString const& text,
-                                       QVariant const& userData,
-                                       QWidget* parent)
+Token::Token(QString const& text, QVariant const& userData, QWidget* parent)
     : QWidget{parent}, _text{text}, _userData{userData}, _selected{false} {
   setCursor(Qt::ArrowCursor);
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
   _button = new RemoveButton{contentHeight(), this};
 
-  connect(_button, &RemoveButton::clicked, this,
-          &RemovableSelection::removeClicked);
+  connect(_button, &RemoveButton::clicked, this, &Token::removeClicked);
 }
 
-QString const& RemovableSelection::text() const { return _text; }
+QString const& Token::text() const { return _text; }
 
-void RemovableSelection::setText(QString const& text) {
+void Token::setText(QString const& text) {
   _text = text;
   _label->setText(_text);
 }
 
-QVariant const& RemovableSelection::userData() const { return _userData; }
+QVariant const& Token::userData() const { return _userData; }
 
-void RemovableSelection::setUserData(QVariant const& data) { _userData = data; }
+void Token::setUserData(QVariant const& data) { _userData = data; }
 
-QSize RemovableSelection::sizeHint() const {
+QSize Token::sizeHint() const {
   auto const margins =
       QSize{horizontalTextMargin() + margin(), margin() + margin()};
   auto const buttonWidth = _button->sizeHint().width();
@@ -46,7 +42,7 @@ QSize RemovableSelection::sizeHint() const {
   return textSize() + margins + QSize{buttonWidth + spacing(), 0};
 }
 
-QSize RemovableSelection::minimumSizeHint() const {
+QSize Token::minimumSizeHint() const {
   auto const margins =
       QSize{horizontalTextMargin() + margin(), margin() + margin()};
 
@@ -57,29 +53,25 @@ QSize RemovableSelection::minimumSizeHint() const {
   return margins + QSize{minimalTextWidth + buttonWidth + spacing(), 0};
 }
 
-int RemovableSelection::contentHeight() const { return fontMetrics().height(); }
+int Token::contentHeight() const { return fontMetrics().height(); }
 
-int RemovableSelection::horizontalTextMargin() const {
+int Token::horizontalTextMargin() const {
   return std::lround(contentHeight() * 0.5);
 }
 
-int RemovableSelection::margin() const {
-  return std::lround(contentHeight() / 3.0);
-}
+int Token::margin() const { return std::lround(contentHeight() / 3.0); }
 
-int RemovableSelection::spacing() const {
-  return std::lround(contentHeight() / 3.0);
-}
+int Token::spacing() const { return std::lround(contentHeight() / 3.0); }
 
-QSize RemovableSelection::textSize() const {
+QSize Token::textSize() const {
   return fontMetrics().size(Qt::TextSingleLine, _text);
 }
 
-void RemovableSelection::paintEvent(QPaintEvent* event) {
+void Token::paintEvent(QPaintEvent* event) {
   auto const clippingRect = QRectF{event->rect()};
 
-  auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}}.marginsRemoved(QMarginsF{0.5, 0.5, 0.5, 0.5});
-  
+  auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}}.marginsRemoved(
+      QMarginsF{0.5, 0.5, 0.5, 0.5});
 
   auto const rounding = rect.height() / 2.0;
 
@@ -113,14 +105,14 @@ void RemovableSelection::paintEvent(QPaintEvent* event) {
   QWidget::paintEvent(event);
 }
 
-void RemovableSelection::mousePressEvent(QMouseEvent* event) {
+void Token::mousePressEvent(QMouseEvent* event) {
   if (event->buttons() == Qt::LeftButton) {
     _pressed = true;
     update();
   }
 }
 
-void RemovableSelection::mouseReleaseEvent(QMouseEvent* event) {
+void Token::mouseReleaseEvent(QMouseEvent* event) {
   if (_pressed) {
     _selected = !_selected;
     _pressed = false;
@@ -128,32 +120,32 @@ void RemovableSelection::mouseReleaseEvent(QMouseEvent* event) {
   }
 }
 
-void RemovableSelection::leaveEvent(QEvent* event) {
+void Token::leaveEvent(QEvent* event) {
   _pressed = false;
   update();
 }
 
-void RemovableSelection::resizeEvent(QResizeEvent* event) {
+void Token::resizeEvent(QResizeEvent* event) {
   QWidget::resizeEvent(event);
   updateElidedText(event->size());
   updateButtonPosition(event->size());
 }
 
-void RemovableSelection::updateElidedText(QSize size) {
+void Token::updateElidedText(QSize size) {
   auto availableWidth = size.width() - (horizontalTextMargin() + spacing() +
                                         _button->sizeHint().width() + margin());
 
   _elidedText = fontMetrics().elidedText(_text, Qt::ElideRight, availableWidth);
 }
 
-void RemovableSelection::updateButtonPosition(QSize size) {
+void Token::updateButtonPosition(QSize size) {
   auto const x = size.width() - _button->sizeHint().width() - margin();
   auto const y = margin();
   _button->move(x, y);
 }
 
-QSize RemovableSelection::elidedTextSize() const {
+QSize Token::elidedTextSize() const {
   return fontMetrics().size(Qt::TextSingleLine, _elidedText);
 }
 
-QString RemovableSelection::elidedText() const { return _elidedText; }
+QString Token::elidedText() const { return _elidedText; }

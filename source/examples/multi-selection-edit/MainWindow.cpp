@@ -10,7 +10,7 @@
 #include "ui_MainWindow.h"
 
 #include <qtadvwidgets/MultiSelectionEdit.h>
-#include <qtadvwidgets/RemovableSelection.h>
+#include <qtadvwidgets/Token.h>
 
 
 MainWindow::MainWindow()
@@ -39,7 +39,7 @@ MainWindow::MainWindow()
         lineEdit->clear();
     });
 
-    m_ui->formLayout->addRow("RemovableSelection", new RemovableSelection{"S+U Potsdamer Platz"});
+    m_ui->formLayout->addRow("Token", new Token{"S+U Potsdamer Platz"});
 }
 
 MainWindow::~MainWindow()

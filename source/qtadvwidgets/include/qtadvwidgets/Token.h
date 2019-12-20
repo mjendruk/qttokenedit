@@ -11,12 +11,12 @@ class QLabel;
 
 class RemoveButton;
 
-class QTADVWIDGETS_API RemovableSelection : public QWidget {
+class QTADVWIDGETS_API Token : public QWidget {
   Q_OBJECT
 
  public:
-  RemovableSelection(QString const& text, QWidget* parent = nullptr);
-  RemovableSelection(QString const& text, QVariant const& userData, QWidget* parent = nullptr);
+  Token(QString const& text, QWidget* parent = nullptr);
+  Token(QString const& text, QVariant const& userData, QWidget* parent = nullptr);
 
   QString const& text() const;
   void setText(QString const& text);

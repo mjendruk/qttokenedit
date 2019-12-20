@@ -1,5 +1,4 @@
-
-# 
+ #
 # External dependencies
 # 
 
@@ -48,7 +47,7 @@ set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/source")
 set(headers
     ${include_path}/baselib.h
     ${include_path}/DarkStyle.h
-    ${include_path}/RemovableSelection.h
+    ${include_path}/Token.h
     ${include_path}/RemoveButton.h
     ${include_path}/MultiSelectionEdit.h
     ${include_path}/MultiSelectionLineEdit.h
@@ -58,7 +57,7 @@ set(headers
 set(sources
     ${source_path}/baselib.cpp
     ${source_path}/DarkStyle.cpp
-    ${source_path}/RemovableSelection.cpp
+    ${source_path}/Token.cpp
     ${source_path}/RemoveButton.cpp
     ${source_path}/MultiSelectionEdit.cpp
     ${source_path}/MultiSelectionLineEdit.cpp
