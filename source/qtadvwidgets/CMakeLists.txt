@@ -50,8 +50,10 @@ set(headers
     ${include_path}/Token.h
     ${include_path}/RemoveButton.h
     ${include_path}/TokenEdit.h
-    ${include_path}/MultiSelectionLineEdit.h
+    ${include_path}/TokenLineEdit.h
     ${include_path}/FlexLayout.h
+    ${include_path}/TokenChain.h
+    ${include_path}/TokenChainElement.h
 )
 
 set(sources
@@ -60,8 +62,10 @@ set(sources
     ${source_path}/Token.cpp
     ${source_path}/RemoveButton.cpp
     ${source_path}/TokenEdit.cpp
-    ${source_path}/MultiSelectionLineEdit.cpp
+    ${source_path}/TokenLineEdit.cpp
     ${source_path}/FlexLayout.cpp
+    ${source_path}/TokenChain.cpp
+    ${source_path}/TokenChainElement.cpp
 )
 
 # Group source files

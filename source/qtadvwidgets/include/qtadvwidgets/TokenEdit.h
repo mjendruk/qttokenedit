@@ -6,18 +6,21 @@
 #include <QVariant>
 #include <QVector>
 #include <cstdint>
+#include <memory>
 
 class QLineEdit;
 
 class Token;
 class FlexLayout;
-class MultiSelectionLineEdit;
+class TokenLineEdit;
+class TokenChain;
 
 class QTADVWIDGETS_API TokenEdit : public QScrollArea {
   Q_OBJECT
 
  public:
   TokenEdit(QWidget* parent = nullptr);
+  ~TokenEdit();
 
   int maxLineCount() const;
   void setMaxLineCount(int count);
@@ -48,7 +51,8 @@ class QTADVWIDGETS_API TokenEdit : public QScrollArea {
 
  private:
   QVector<Token*> _items;
-  MultiSelectionLineEdit* _lineEdit;
+  TokenLineEdit* _lineEdit;
+  std::unique_ptr<TokenChain> _tokenChain;
   FlexLayout* _layout;
   int _maxLineCount;
 };

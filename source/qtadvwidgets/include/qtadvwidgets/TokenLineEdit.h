@@ -4,7 +4,7 @@
 
 #include <QLineEdit>
 
-class QTADVWIDGETS_API MultiSelectionLineEdit : public QLineEdit {
+class QTADVWIDGETS_API TokenLineEdit : public QLineEdit {
   Q_OBJECT
  public:
   using QLineEdit::QLineEdit;

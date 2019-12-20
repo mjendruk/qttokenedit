@@ -2,21 +2,25 @@
 
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
-#include <QWidget>
 #include <QString>
 #include <QVariant>
+#include <QWidget>
+#include <memory>
 
 class QFontMetrics;
 class QLabel;
 
 class RemoveButton;
+class TokenChainElement;
 
 class QTADVWIDGETS_API Token : public QWidget {
   Q_OBJECT
 
  public:
   Token(QString const& text, QWidget* parent = nullptr);
-  Token(QString const& text, QVariant const& userData, QWidget* parent = nullptr);
+  Token(QString const& text, QVariant const& userData,
+        QWidget* parent = nullptr);
+  ~Token();
 
   QString const& text() const;
   void setText(QString const& text);
@@ -27,23 +31,25 @@ class QTADVWIDGETS_API Token : public QWidget {
   virtual QSize sizeHint() const;
   virtual QSize minimumSizeHint() const;
 
+  TokenChainElement* chainElement() const;
+
  signals:
   void removeClicked();
 
  protected:
   void paintEvent(QPaintEvent* event) override;
-  void mousePressEvent(QMouseEvent *event) override;
-  void mouseReleaseEvent(QMouseEvent *event) override;
-  void leaveEvent(QEvent *event) override;
-  void resizeEvent(QResizeEvent *event) override;
-  void keyPressEvent(QKeyEvent *event) override;
+  void mousePressEvent(QMouseEvent* event) override;
+  void mouseReleaseEvent(QMouseEvent* event) override;
+  void leaveEvent(QEvent* event) override;
+  void resizeEvent(QResizeEvent* event) override;
+  void keyPressEvent(QKeyEvent* event) override;
 
   int contentHeight() const;
   int horizontalTextMargin() const;
   int margin() const;
   int spacing() const;
   QSize textSize() const;
-  
+
   void updateElidedText(QSize size);
   void updateButtonPosition(QSize size);
 
@@ -53,6 +59,8 @@ class QTADVWIDGETS_API Token : public QWidget {
  private:
   QString _text;
   QVariant _userData;
+
+  std::unique_ptr<TokenChainElement> _chainElement;
 
   QLabel* _label;
   RemoveButton* _button;

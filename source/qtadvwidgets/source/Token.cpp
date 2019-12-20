@@ -1,10 +1,11 @@
 #include <qtadvwidgets/RemoveButton.h>
 #include <qtadvwidgets/Token.h>
+#include <qtadvwidgets/TokenChainElement.h>
 
 #include <QBoxLayout>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QMouseEvent>
-#include <QKeyEvent>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPainterPath>
@@ -15,7 +16,11 @@
 Token::Token(QString const& text, QWidget* parent) : Token{text, {}, parent} {}
 
 Token::Token(QString const& text, QVariant const& userData, QWidget* parent)
-    : QWidget{parent}, _text{text}, _userData{userData}, _selected{false} {
+    : QWidget{parent},
+      _text{text},
+      _userData{userData},
+      _chainElement{std::make_unique<TokenChainElement>(this)},
+      _selected{false} {
   setCursor(Qt::ArrowCursor);
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   setFocusPolicy(Qt::ClickFocus);
@@ -24,6 +29,8 @@ Token::Token(QString const& text, QVariant const& userData, QWidget* parent)
 
   connect(_button, &RemoveButton::clicked, this, &Token::removeClicked);
 }
+
+Token::~Token() = default;
 
 QString const& Token::text() const { return _text; }
 
@@ -54,6 +61,8 @@ QSize Token::minimumSizeHint() const {
 
   return margins + QSize{minimalTextWidth + buttonWidth + spacing(), 0};
 }
+
+TokenChainElement* Token::chainElement() const { return _chainElement.get(); }
 
 int Token::contentHeight() const { return fontMetrics().height(); }
 
@@ -138,6 +147,18 @@ void Token::keyPressEvent(QKeyEvent* event) {
     emit removeClicked();
     event->accept();
     return;
+  }
+
+  if (event->key() == Qt::Key_Left) {
+    if (auto prev = chainElement()->previousElement()) {
+      prev->widget()->setFocus();
+    }
+  }
+
+  if (event->key() == Qt::Key_Right) {
+    if (auto next = chainElement()->nextElement()) {
+      next->widget()->setFocus();
+    }
   }
 
   QWidget::keyPressEvent(event);

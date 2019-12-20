@@ -1,26 +1,29 @@
 #include <qtadvwidgets/FlexLayout.h>
-#include <qtadvwidgets/TokenEdit.h>
+#include <qtadvwidgets/TokenLineEdit.h>
 #include <qtadvwidgets/Token.h>
-#include <qtadvwidgets/MultiSelectionLineEdit.h>
+#include <qtadvwidgets/TokenChain.h>
+#include <qtadvwidgets/TokenEdit.h>
 
-#include <QtGlobal>
 #include <QLineEdit>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QStyleOptionFrame>
+#include <QtGlobal>
 
-TokenEdit::TokenEdit(QWidget* parent) : QScrollArea{parent} {
+TokenEdit::TokenEdit(QWidget* parent)
+    : QScrollArea{parent},
+      _lineEdit{new TokenLineEdit{this}},
+      _tokenChain{std::make_unique<TokenChain>(_lineEdit)} {
   auto mainWidget = new QWidget{};
 
   _layout = new FlexLayout{4, 4, 4};
 
-  _lineEdit = new MultiSelectionLineEdit{this};
   _lineEdit->setFrame(false);
   _lineEdit->setMinimumSize(QSize{120, 0});
   _lineEdit->setPlaceholderText("Halt hinzufuegen");
   _lineEdit->setTextMargins(QMargins{});
 
-  connect(_lineEdit, &MultiSelectionLineEdit::backspaceAtBeginning, [=]() {
+  connect(_lineEdit, &TokenLineEdit::backspaceAtBeginning, [=]() {
     if (!_items.empty()) {
       removeItem(_items.size() - 1);
     }
@@ -37,7 +40,7 @@ TokenEdit::TokenEdit(QWidget* parent) : QScrollArea{parent} {
   mainWidget->setObjectName("mainWidget");
 
   setWidget(mainWidget);
-  
+
   setFocusProxy(_lineEdit);
 
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -49,6 +52,8 @@ TokenEdit::TokenEdit(QWidget* parent) : QScrollArea{parent} {
   updateHeight();
 }
 
+TokenEdit::~TokenEdit() = default;
+
 int TokenEdit::maxLineCount() const { return _maxLineCount; }
 
 void TokenEdit::setMaxLineCount(int count) {
@@ -56,12 +61,12 @@ void TokenEdit::setMaxLineCount(int count) {
   updateHeight();
 }
 
-void TokenEdit::addItem(QString const& text,
-                                 QVariant const& userData) {
+void TokenEdit::addItem(QString const& text, QVariant const& userData) {
   auto item = new Token{text, userData, this};
   auto index = std::max(0, _items.size());
 
   _items.append(item);
+  _tokenChain->add(item->chainElement());
   _layout->insertWidget(index, item);
 
   connect(item, &Token::removeClicked, [=]() {
@@ -72,58 +77,47 @@ void TokenEdit::addItem(QString const& text,
   updateHeight();
 }
 
-void TokenEdit::addItems(QStringList const& texts)
-{
+void TokenEdit::addItems(QStringList const& texts) {
   for (auto const& text : texts) {
     addItem(text);
   }
 }
 
-void TokenEdit::setItemData(int index, QVariant const& value)
-{
+void TokenEdit::setItemData(int index, QVariant const& value) {
   auto item = _items.at(index);
   item->setUserData(value);
 }
 
-void TokenEdit::setItemText(int index, QString const& text)
-{
+void TokenEdit::setItemText(int index, QString const& text) {
   auto item = _items.at(index);
   item->setText(text);
   _layout->activate();
   updateHeight();
 }
 
-void TokenEdit::removeItem(int index)
-{
+void TokenEdit::removeItem(int index) {
+  emit itemAboutToBeRemoved(index);
   auto item = _items.takeAt(index);
   auto layoutItem = _layout->takeAt(index);
-  emit itemAboutToBeRemoved(index);
+  _tokenChain->remove(item->chainElement());
   delete layoutItem;
   delete item;
   updateHeight();
 }
 
-QString TokenEdit::itemText(int index) const
-{
+QString TokenEdit::itemText(int index) const {
   auto item = _items.at(index);
   return item->text();
 }
 
-QVariant TokenEdit::itemData(int index) const
-{
+QVariant TokenEdit::itemData(int index) const {
   auto item = _items.at(index);
   return item->userData();
 }
 
-int TokenEdit::count() const
-{
-  return _items.size();
-}
+int TokenEdit::count() const { return _items.size(); }
 
-QLineEdit* TokenEdit::lineEdit() 
-{
-  return _lineEdit;
-}
+QLineEdit* TokenEdit::lineEdit() { return _lineEdit; }
 
 void TokenEdit::resizeEvent(QResizeEvent* event) {
   QScrollArea::resizeEvent(event);
@@ -142,7 +136,7 @@ void TokenEdit::updateHeight() {
     height += _layout->lineHeight(i);
     height += spacing;
   }
-  
+
   height += 2;
 
   setFixedHeight(height);
