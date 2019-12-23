@@ -81,8 +81,7 @@ QSize Token::textSize() const {
 void Token::paintEvent(QPaintEvent* event) {
   auto const clippingRect = QRectF{event->rect()};
 
-  auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}}.marginsRemoved(
-      QMarginsF{0.5, 0.5, 0.5, 0.5});
+  auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}};
 
   auto const rounding = contentHeight() / 8.0;
 
