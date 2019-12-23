@@ -63,7 +63,7 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
                             LayoutItemConstIterator end) const
       -> std::vector<std::size_t>;
 
-  void distributeRemainingWidth(int remainingWidth,
+  void distributeRemainingWidth(int width,
                                 std::vector<std::size_t> const &indices,
                                 std::vector<ItemMetrics> &itemMetrics) const;
 

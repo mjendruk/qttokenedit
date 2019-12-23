@@ -203,22 +203,15 @@ std::vector<std::size_t> FlexLayout::expandingItemIndices(
 }
 
 void FlexLayout::distributeRemainingWidth(
-    int remainingWidth, std::vector<std::size_t> const &indices,
+    int width, std::vector<std::size_t> const &indices,
     std::vector<ItemMetrics> &itemMetrics) const {
-  auto const additionalWidth =
-      static_cast<qreal>(remainingWidth) / indices.size();
+  auto const additionalWidth = width / indices.size();
+  auto remainingWidth = width - (additionalWidth * indices.size());
 
-  auto ceiledAdditionalWidth = static_cast<int>(std::floor(additionalWidth));
-  auto flooredAdditionalWidth = static_cast<int>(std::floor(additionalWidth));
-
-  auto indexIt = indices.cbegin();
-
-  itemMetrics.at(*indexIt).size.rwidth() += ceiledAdditionalWidth;
-
-  ++indexIt;
-
-  for (; indexIt != indices.cend(); ++indexIt) {
-    itemMetrics.at(*indexIt).size.rwidth() += flooredAdditionalWidth;
+  for (auto indexIt = indices.cbegin(); indexIt != indices.cend(); ++indexIt) {
+    auto const additionalPixel = (remainingWidth-- > 0) ? 1 : 0;
+    
+    itemMetrics.at(*indexIt).size.rwidth() += (additionalWidth + additionalPixel);
   }
 }
 
