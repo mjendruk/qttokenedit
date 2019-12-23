@@ -14,8 +14,6 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
 
   void addItem(QLayoutItem *item) override;
 
-  int horizontalSpacing() const;
-  int verticalSpacing() const;
   Qt::Orientations expandingDirections() const override;
   bool hasHeightForWidth() const override;
   int heightForWidth(int) const override;
@@ -25,6 +23,9 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   void setGeometry(const QRect &rect) override;
   QSize sizeHint() const override;
   QLayoutItem *takeAt(int index) override;
+
+  int horizontalSpacing() const;
+  int verticalSpacing() const;
 
   void insertItem(int index, QLayoutItem *item);
   void insertLayout(int index, QLayout *layout);
@@ -36,9 +37,9 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
  private:
   struct ItemMetrics {
     QSize size;
-    int succHorizontalSpacing;
+    int hSpacing;  //!< succeeding horizontal spacing
   };
-  
+
   using LayoutItemConstIterator = QList<QLayoutItem *>::const_iterator;
   using RemainingWidth = int;
 
@@ -46,29 +47,32 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
                                  QLayoutItem *rightItem) const;
 
   int resultingVerticalSpacing(QLayoutItem *item) const;
-  
-  auto findNextLine(LayoutItemConstIterator begin,
-                    LayoutItemConstIterator end, int width) const -> std::pair<LayoutItemConstIterator, RemainingWidth>;
-  
+
+  auto findNextLine(LayoutItemConstIterator begin, LayoutItemConstIterator end,
+                    int width) const
+      -> std::pair<LayoutItemConstIterator, RemainingWidth>;
+
   auto itemMetrics(LayoutItemConstIterator begin,
-                   LayoutItemConstIterator end) const -> std::vector<ItemMetrics>;
+                   LayoutItemConstIterator end) const
+      -> std::vector<ItemMetrics>;
 
   void tryRemoveOverflow(int overflow, QLayoutItem const *item,
                          QSize &size) const;
-  
-  std::vector<std::size_t> expandingItemIndices(LayoutItemConstIterator begin,
-                                                LayoutItemConstIterator end) const;
-  
-  void distributeRemainingWidth(
-      int remainingWidth,
-      std::vector<std::size_t> const& indices,
-      std::vector<ItemMetrics>& itemMetrics) const;
+
+  auto expandingItemIndices(LayoutItemConstIterator begin,
+                            LayoutItemConstIterator end) const
+      -> std::vector<std::size_t>;
+
+  void distributeRemainingWidth(int remainingWidth,
+                                std::vector<std::size_t> const &indices,
+                                std::vector<ItemMetrics> &itemMetrics) const;
 
   auto metricsForLine(LayoutItemConstIterator begin,
                       LayoutItemConstIterator end, int width) const
       -> std::pair<std::vector<ItemMetrics>, LayoutItemConstIterator>;
 
   int doLayout(const QRect &rect, bool testOnly) const;
+
   int smartSpacing(QStyle::PixelMetric pm) const;
 
  private:

@@ -131,8 +131,8 @@ int FlexLayout::resultingVerticalSpacing(QLayoutItem *item) const {
 }
 
 auto FlexLayout::findNextLine(LayoutItemConstIterator begin,
-LayoutItemConstIterator end, int width) const -> std::pair<LayoutItemConstIterator, RemainingWidth>
-{
+                              LayoutItemConstIterator end, int width) const
+    -> std::pair<LayoutItemConstIterator, RemainingWidth> {
   auto remainingWidth = width;
   auto lastHSpacing = 0;
 
@@ -156,15 +156,15 @@ LayoutItemConstIterator end, int width) const -> std::pair<LayoutItemConstIterat
   }
 
   remainingWidth += lastHSpacing;
-  
+
   return std::pair{it, remainingWidth};
 }
 
 auto FlexLayout::itemMetrics(LayoutItemConstIterator begin,
-LayoutItemConstIterator end) const -> std::vector<ItemMetrics>
-{
+                             LayoutItemConstIterator end) const
+    -> std::vector<ItemMetrics> {
   auto result = std::vector<ItemMetrics>{};
-      
+
   for (auto it = begin; it != end; ++it) {
     auto const size = (*it)->sizeHint();
 
@@ -172,10 +172,10 @@ LayoutItemConstIterator end) const -> std::vector<ItemMetrics>
 
     auto hSpacing =
         (nextIt == end) ? 0 : resultingHorizontalSpacing((*it), (*nextIt));
-    
+
     result.push_back({size, hSpacing});
   }
-  
+
   return result;
 }
 
@@ -188,25 +188,23 @@ void FlexLayout::tryRemoveOverflow(int overflow, QLayoutItem const *item,
   }
 }
 
-std::vector<std::size_t> FlexLayout::expandingItemIndices(LayoutItemConstIterator begin,
-LayoutItemConstIterator end) const
-{
+std::vector<std::size_t> FlexLayout::expandingItemIndices(
+    LayoutItemConstIterator begin, LayoutItemConstIterator end) const {
   auto result = std::vector<std::size_t>{};
-  
+
   auto index = std::size_t{0};
   for (auto it = begin; it != end; ++it, ++index) {
     if ((*it)->expandingDirections().testFlag(Qt::Horizontal)) {
       result.push_back(index);
     }
   }
-  
+
   return result;
 }
 
 void FlexLayout::distributeRemainingWidth(
-    int remainingWidth,
-    std::vector<std::size_t> const& indices,
-    std::vector<ItemMetrics>& itemMetrics) const {
+    int remainingWidth, std::vector<std::size_t> const &indices,
+    std::vector<ItemMetrics> &itemMetrics) const {
   auto const additionalWidth =
       static_cast<qreal>(remainingWidth) / indices.size();
 
@@ -215,7 +213,7 @@ void FlexLayout::distributeRemainingWidth(
 
   auto indexIt = indices.cbegin();
 
-  itemMetrics.at(*indexIt).size.rwidth()+= ceiledAdditionalWidth;
+  itemMetrics.at(*indexIt).size.rwidth() += ceiledAdditionalWidth;
 
   ++indexIt;
 
@@ -227,7 +225,6 @@ void FlexLayout::distributeRemainingWidth(
 auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
                                 LayoutItemConstIterator end, int width) const
     -> std::pair<std::vector<ItemMetrics>, LayoutItemConstIterator> {
-      
   auto const [nextLineIt, remainingWidth] = findNextLine(begin, end, width);
   auto itemMetrics = this->itemMetrics(begin, nextLineIt);
 
@@ -237,7 +234,8 @@ auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
     auto const overflow = -remainingWidth;
     tryRemoveOverflow(overflow, *begin, itemMetrics.front().size);
   } else if (remainingWidth > 0) {
-    if (auto indices = expandingItemIndices(begin, nextLineIt); !indices.empty()) {
+    if (auto indices = expandingItemIndices(begin, nextLineIt);
+        !indices.empty()) {
       distributeRemainingWidth(remainingWidth, indices, itemMetrics);
     }
   }
@@ -257,7 +255,7 @@ int FlexLayout::doLayout(QRect const &rect, bool testOnly) const {
   _lineHeights.clear();
 
   auto lastVSpacing = 0;
-  
+
   while (itemIt != itemEnd) {
     auto const [itemMetrics, nextLineItemIt] =
         metricsForLine(itemIt, itemEnd, effectiveRect.width());
@@ -274,7 +272,7 @@ int FlexLayout::doLayout(QRect const &rect, bool testOnly) const {
       if (!testOnly)
         (*itemIt)->setGeometry(QRect{QPoint{x, lineY}, metricIt->size});
 
-      x = x + metricIt->size.width() + metricIt->succHorizontalSpacing;
+      x = x + metricIt->size.width() + metricIt->hSpacing;
 
       lineHeight = qMax(lineHeight, metricIt->size.height());
     }
