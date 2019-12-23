@@ -34,6 +34,7 @@ class QTADVWIDGETS_API Token : public QWidget {
 
  signals:
   void removeClicked();
+  void focused();
 
  protected:
   void paintEvent(QPaintEvent* event) override;
@@ -42,6 +43,7 @@ class QTADVWIDGETS_API Token : public QWidget {
   void leaveEvent(QEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
+  void focusInEvent(QFocusEvent* event) override;
 
   int contentHeight() const;
   int horizontalTextMargin() const;

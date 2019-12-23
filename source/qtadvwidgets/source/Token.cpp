@@ -154,6 +154,12 @@ void Token::keyPressEvent(QKeyEvent* event) {
   QWidget::keyPressEvent(event);
 }
 
+void Token::focusInEvent(QFocusEvent* event)
+{
+  emit focused();
+  QWidget::focusInEvent(event);
+}
+
 void Token::updateElidedText(QSize size) {
   auto availableWidth = size.width() - (horizontalTextMargin() + spacing() +
                                         _button->sizeHint().width() + margin());

@@ -1,12 +1,13 @@
 #include <qtadvwidgets/FlexLayout.h>
-#include <qtadvwidgets/TokenLineEdit.h>
 #include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenChain.h>
 #include <qtadvwidgets/TokenEdit.h>
+#include <qtadvwidgets/TokenLineEdit.h>
 
 #include <QLineEdit>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QScrollBar>
 #include <QStyleOptionFrame>
 #include <QtGlobal>
 
@@ -17,13 +18,13 @@ TokenEdit::TokenEdit(QWidget* parent)
   auto mainWidget = new QWidget{};
 
   _layout = new FlexLayout{4, 4, 4};
-        
-   connect(_layout, &FlexLayout::linesChanged, this, &TokenEdit::updateHeight);
+
+  connect(_layout, &FlexLayout::linesChanged, this, &TokenEdit::updateHeight);
 
   _lineEdit->setFrame(false);
   _lineEdit->setPlaceholderText("Halt hinzufuegen");
   _lineEdit->setTextMargins(QMargins{});
-        
+
   auto dummyItem = QScopedPointer{new Token{"dummy"}};
   _lineEdit->setFixedHeight(dummyItem->sizeHint().height());
 
@@ -33,17 +34,22 @@ TokenEdit::TokenEdit(QWidget* parent)
     }
   });
 
-  
+  connect(_lineEdit, &TokenLineEdit::focused,
+          [=]() { ensureWidgetVisible(_lineEdit); });
 
   _layout->addWidget(_lineEdit);
 
   mainWidget->setLayout(_layout);
 
   auto customPalette = mainWidget->palette();
-  customPalette.setColor(QPalette::Disabled, QPalette::Window, customPalette.color(QPalette::Disabled, QPalette::Base));
-  customPalette.setColor(QPalette::Active, QPalette::Window, customPalette.color(QPalette::Active, QPalette::Base));
-  customPalette.setColor(QPalette::Inactive, QPalette::Window, customPalette.color(QPalette::Inactive, QPalette::Base));
-  customPalette.setColor(QPalette::Normal, QPalette::Window, customPalette.color(QPalette::Normal, QPalette::Base));
+  customPalette.setColor(
+      QPalette::Disabled, QPalette::Window,
+      customPalette.color(QPalette::Disabled, QPalette::Base));
+  customPalette.setColor(QPalette::Active, QPalette::Window,
+                         customPalette.color(QPalette::Active, QPalette::Base));
+  customPalette.setColor(
+      QPalette::Inactive, QPalette::Window,
+      customPalette.color(QPalette::Inactive, QPalette::Base));
   mainWidget->setPalette(customPalette);
 
   setWidget(mainWidget);
@@ -80,6 +86,8 @@ void TokenEdit::addItem(QString const& text, QVariant const& userData) {
     auto index = _items.indexOf(item);
     removeItem(index);
   });
+
+  connect(item, &Token::focused, [=]() { ensureWidgetVisible(item); });
 }
 
 void TokenEdit::addItems(QStringList const& texts) {
@@ -125,7 +133,6 @@ QLineEdit* TokenEdit::lineEdit() { return _lineEdit; }
 
 void TokenEdit::resizeEvent(QResizeEvent* event) {
   QScrollArea::resizeEvent(event);
-  updateHeight();
 }
 
 void TokenEdit::updateHeight() {
@@ -144,4 +151,5 @@ void TokenEdit::updateHeight() {
   height += 2;
 
   setFixedHeight(height);
+  verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 }

@@ -10,3 +10,9 @@ void TokenLineEdit::keyPressEvent(QKeyEvent *event)
 
   QLineEdit::keyPressEvent(event);
 }
+
+void TokenLineEdit::focusInEvent(QFocusEvent* event)
+{
+  emit focused();
+  QLineEdit::focusInEvent(event);
+}

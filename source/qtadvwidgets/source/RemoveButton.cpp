@@ -9,6 +9,7 @@ RemoveButton::RemoveButton(int diameter, QWidget *parent) : QAbstractButton{pare
   setCheckable(false);
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setCursor(Qt::PointingHandCursor);
+  setFocusPolicy(Qt::NoFocus);
   
   initSize();
   initButtonShapePath();
