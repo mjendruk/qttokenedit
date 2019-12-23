@@ -48,9 +48,14 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
 
   void tryRemoveOverflow(int overflow, QLayoutItem const *item,
                          QSize &size) const;
+  
+  std::vector<std::size_t> expandingItemIndices(LayoutItemConstIterator begin,
+                                                LayoutItemConstIterator end) const;
+  
   void distributeRemainingWidth(
       int remainingWidth,
-      std::vector<std::vector<ItemMetrics>::iterator> &expandingItems) const;
+      std::vector<std::size_t> const& indices,
+      std::vector<ItemMetrics>& itemMetrics) const;
 
   auto metricsForLine(LayoutItemConstIterator begin,
                       LayoutItemConstIterator end, int width) const

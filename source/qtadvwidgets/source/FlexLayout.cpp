@@ -139,23 +139,39 @@ void FlexLayout::tryRemoveOverflow(int overflow, QLayoutItem const *item,
   }
 }
 
+std::vector<std::size_t> FlexLayout::expandingItemIndices(LayoutItemConstIterator begin,
+LayoutItemConstIterator end) const
+{
+  auto result = std::vector<std::size_t>{};
+  
+  auto index = std::size_t{0};
+  for (auto it = begin; it != end; ++it, ++index) {
+    if ((*it)->expandingDirections().testFlag(Qt::Horizontal)) {
+      result.push_back(index);
+    }
+  }
+  
+  return result;
+}
+
 void FlexLayout::distributeRemainingWidth(
     int remainingWidth,
-    std::vector<std::vector<ItemMetrics>::iterator> &expandingItems) const {
+    std::vector<std::size_t> const& indices,
+    std::vector<ItemMetrics>& itemMetrics) const {
   auto const additionalWidth =
-      static_cast<qreal>(remainingWidth) / expandingItems.size();
+      static_cast<qreal>(remainingWidth) / indices.size();
 
   auto ceiledAdditionalWidth = static_cast<int>(std::floor(additionalWidth));
   auto flooredAdditionalWidth = static_cast<int>(std::floor(additionalWidth));
 
-  auto expandingItemIt = expandingItems.begin();
+  auto indexIt = indices.cbegin();
 
-  (*expandingItemIt)->size.rwidth() += ceiledAdditionalWidth;
+  itemMetrics.at(*indexIt).size.rwidth()+= ceiledAdditionalWidth;
 
-  ++expandingItemIt;
+  ++indexIt;
 
-  for (; expandingItemIt != expandingItems.end(); ++expandingItemIt) {
-    (*expandingItemIt)->size.rwidth() += flooredAdditionalWidth;
+  for (; indexIt != indices.cend(); ++indexIt) {
+    itemMetrics.at(*indexIt).size.rwidth() += flooredAdditionalWidth;
   }
 }
 
@@ -163,7 +179,8 @@ auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
                                 LayoutItemConstIterator end, int width) const
     -> std::pair<std::vector<ItemMetrics>, LayoutItemConstIterator> {
   auto itemMetrics = std::vector<ItemMetrics>{};
-  auto expandingItems = std::vector<std::vector<ItemMetrics>::iterator>{};
+      
+      
 
   auto remainingWidth = width;
 
@@ -185,10 +202,6 @@ auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
     remainingWidth -= (size.width() + hSpacing);
     itemMetrics.push_back({size, hSpacing});
 
-    if ((*it)->expandingDirections().testFlag(Qt::Horizontal)) {
-      expandingItems.push_back(std::prev(itemMetrics.end()));
-    }
-
     it = nextIt;
     lastHSpacing = hSpacing;
   }
@@ -196,14 +209,18 @@ auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
   remainingWidth += lastHSpacing;
 
   // adjust widths
+      
+   auto const   beginNextLineIt = it;
 
   if (remainingWidth < 0) {
     Q_ASSERT(itemMetrics.size() == 1u);
 
     auto const overflow = -remainingWidth;
     tryRemoveOverflow(overflow, *begin, itemMetrics.front().size);
-  } else if (remainingWidth > 0 && !expandingItems.empty()) {
-    distributeRemainingWidth(remainingWidth, expandingItems);
+  } else if (remainingWidth > 0) {
+    if (auto indices = expandingItemIndices(begin, beginNextLineIt); !indices.empty()) {
+      distributeRemainingWidth(remainingWidth, indices, itemMetrics);
+    }
   }
 
   return std::pair{std::move(itemMetrics), it};
@@ -220,6 +237,8 @@ int FlexLayout::doLayout(QRect const &rect, bool testOnly) const {
   auto lineY = effectiveRect.y();
   _lineHeights.clear();
 
+  auto lastVSpacing = 0;
+  
   while (itemIt != itemEnd) {
     auto const [itemMetrics, nextLineItemIt] =
         metricsForLine(itemIt, itemEnd, effectiveRect.width());
@@ -245,9 +264,10 @@ int FlexLayout::doLayout(QRect const &rect, bool testOnly) const {
     lineY = lineY + lineHeight + vSpacing;
 
     _lineHeights.append(lineHeight);
+    lastVSpacing = vSpacing;
   }
 
-  return lineY - rect.y() + bottom;
+  return lineY - lastVSpacing - rect.y() + bottom;
 }
 
 int FlexLayout::smartSpacing(QStyle::PixelMetric pm) const {
