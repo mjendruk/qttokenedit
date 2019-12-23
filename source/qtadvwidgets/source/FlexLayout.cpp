@@ -64,6 +64,7 @@ int FlexLayout::heightForWidth(int width) const {
 void FlexLayout::setGeometry(const QRect &rect) {
   QLayout::setGeometry(rect);
   doLayout(rect, false);
+  emit linesChanged();
 }
 
 QSize FlexLayout::sizeHint() const { return minimumSize(); }
@@ -210,8 +211,9 @@ void FlexLayout::distributeRemainingWidth(
 
   for (auto indexIt = indices.cbegin(); indexIt != indices.cend(); ++indexIt) {
     auto const additionalPixel = (remainingWidth-- > 0) ? 1 : 0;
-    
-    itemMetrics.at(*indexIt).size.rwidth() += (additionalWidth + additionalPixel);
+
+    itemMetrics.at(*indexIt).size.rwidth() +=
+        (additionalWidth + additionalPixel);
   }
 }
 

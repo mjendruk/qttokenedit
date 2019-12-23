@@ -17,6 +17,8 @@ TokenEdit::TokenEdit(QWidget* parent)
   auto mainWidget = new QWidget{};
 
   _layout = new FlexLayout{4, 4, 4};
+        
+   connect(_layout, &FlexLayout::linesChanged, this, &TokenEdit::updateHeight);
 
   _lineEdit->setFrame(false);
   _lineEdit->setPlaceholderText("Halt hinzufuegen");
@@ -78,8 +80,6 @@ void TokenEdit::addItem(QString const& text, QVariant const& userData) {
     auto index = _items.indexOf(item);
     removeItem(index);
   });
-
-  updateHeight();
 }
 
 void TokenEdit::addItems(QStringList const& texts) {
@@ -107,7 +107,6 @@ void TokenEdit::removeItem(int index) {
   _tokenChain->remove(item->chainElement());
   delete layoutItem;
   delete item;
-  updateHeight();
 }
 
 QString TokenEdit::itemText(int index) const {

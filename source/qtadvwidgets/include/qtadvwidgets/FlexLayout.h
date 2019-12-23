@@ -6,6 +6,7 @@
 #include <QStyle>
 
 class QTADVWIDGETS_API FlexLayout : public QLayout {
+  Q_OBJECT
  public:
   explicit FlexLayout(QWidget *parent);
   explicit FlexLayout(int margin = -1, int hSpacing = -1, int vSpacing = -1,
@@ -33,6 +34,9 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
 
   int lineCount() const;
   int lineHeight(int index) const;
+
+ signals:
+  void linesChanged() const;
 
  private:
   struct ItemMetrics {
