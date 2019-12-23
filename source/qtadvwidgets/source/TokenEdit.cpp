@@ -19,9 +19,11 @@ TokenEdit::TokenEdit(QWidget* parent)
   _layout = new FlexLayout{4, 4, 4};
 
   _lineEdit->setFrame(false);
-  _lineEdit->setMinimumSize(QSize{120, 0});
   _lineEdit->setPlaceholderText("Halt hinzufuegen");
   _lineEdit->setTextMargins(QMargins{});
+        
+  auto dummyItem = QScopedPointer{new Token{"dummy"}};
+  _lineEdit->setFixedHeight(dummyItem->sizeHint().height());
 
   connect(_lineEdit, &TokenLineEdit::backspaceAtBeginning, [=]() {
     if (!_items.empty()) {
@@ -29,8 +31,7 @@ TokenEdit::TokenEdit(QWidget* parent)
     }
   });
 
-  auto dummyItem = QScopedPointer{new Token{"dummy"}};
-  _lineEdit->setFixedHeight(dummyItem->sizeHint().height());
+  
 
   _layout->addWidget(_lineEdit);
 

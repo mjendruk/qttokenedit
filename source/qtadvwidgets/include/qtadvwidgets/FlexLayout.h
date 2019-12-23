@@ -13,7 +13,7 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   ~FlexLayout();
 
   void addItem(QLayoutItem *item) override;
-  
+
   int horizontalSpacing() const;
   int verticalSpacing() const;
   Qt::Orientations expandingDirections() const override;
@@ -25,7 +25,7 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   void setGeometry(const QRect &rect) override;
   QSize sizeHint() const override;
   QLayoutItem *takeAt(int index) override;
-  
+
   void insertItem(int index, QLayoutItem *item);
   void insertLayout(int index, QLayout *layout);
   void insertWidget(int index, QWidget *widget);
@@ -34,9 +34,26 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   int lineHeight(int index) const;
 
  private:
+  struct ItemMetrics {
+    QSize size;
+    int succHorizontalSpacing;
+  };
+
+  using LayoutItemConstIterator = QList<QLayoutItem *>::const_iterator;
+
+  int resultingHorizontalSpacing(QLayoutItem *leftItem,
+                                 QLayoutItem *rightItem) const;
+
+  int resultingVerticalSpacing(QLayoutItem *item) const;
+
+  auto metricsForLine(LayoutItemConstIterator begin,
+                      LayoutItemConstIterator end, int width) const
+      -> std::pair<std::vector<ItemMetrics>, LayoutItemConstIterator>;
+
   int doLayout(const QRect &rect, bool testOnly) const;
   int smartSpacing(QStyle::PixelMetric pm) const;
 
+ private:
   QList<QLayoutItem *> _itemList;
   int _hSpacing;
   int _vSpacing;

@@ -1,13 +1,15 @@
 #include <qtadvwidgets/FlexLayout.h>
 
+#include <cmath>
+
+#include <QLayoutItem>
 #include <QWidget>
 #include <QWidgetItem>
-#include <QLayoutItem>
 
 FlexLayout::FlexLayout(QWidget *parent) : FlexLayout{-1, -1, -1, parent} {}
 
 FlexLayout::FlexLayout(int margin, int hSpacing, int vSpacing, QWidget *parent)
-: QLayout{parent}, _hSpacing{hSpacing}, _vSpacing{vSpacing} {
+    : QLayout{parent}, _hSpacing{hSpacing}, _vSpacing{vSpacing} {
   setContentsMargins(margin, margin, margin, margin);
 }
 
@@ -16,9 +18,7 @@ FlexLayout::~FlexLayout() {
   while ((item = takeAt(0))) delete item;
 }
 
-void FlexLayout::addItem(QLayoutItem *item) { 
-  insertItem(-1, item);
-}
+void FlexLayout::addItem(QLayoutItem *item) { insertItem(-1, item); }
 
 int FlexLayout::horizontalSpacing() const {
   if (_hSpacing >= 0) {
@@ -43,7 +43,7 @@ QLayoutItem *FlexLayout::itemAt(int index) const {
 }
 
 QLayoutItem *FlexLayout::takeAt(int index) {
-  if (index >= 0 && index < _itemList.size()) { 
+  if (index >= 0 && index < _itemList.size()) {
     auto item = _itemList.takeAt(index);
     invalidate();
     return item;
@@ -62,16 +62,12 @@ int FlexLayout::heightForWidth(int width) const {
   return height;
 }
 
-void FlexLayout::setGeometry(const QRect &rect)
-{
-    QLayout::setGeometry(rect);
-    doLayout(rect, false);
+void FlexLayout::setGeometry(const QRect &rect) {
+  QLayout::setGeometry(rect);
+  doLayout(rect, false);
 }
 
-QSize FlexLayout::sizeHint() const
-{
-    return minimumSize();
-}
+QSize FlexLayout::sizeHint() const { return minimumSize(); }
 
 QSize FlexLayout::minimumSize() const {
   QSize size;
@@ -84,64 +80,165 @@ QSize FlexLayout::minimumSize() const {
   return size;
 }
 
-void FlexLayout::insertItem(int index, QLayoutItem *item)
-{
+void FlexLayout::insertItem(int index, QLayoutItem *item) {
   _itemList.insert(index, item);
   invalidate();
 }
 
-void FlexLayout::insertLayout(int index, QLayout *layout)
-{
+void FlexLayout::insertLayout(int index, QLayout *layout) {
   insertItem(index, layout);
 }
 
-void FlexLayout::insertWidget(int index, QWidget *widget)
-{
+void FlexLayout::insertWidget(int index, QWidget *widget) {
   Q_ASSERT(widget);
-  
+
   addChildWidget(widget);
   insertItem(index, new QWidgetItem{widget});
 }
 
-int FlexLayout::doLayout(const QRect &rect, bool testOnly) const {
+int FlexLayout::resultingHorizontalSpacing(QLayoutItem *leftItem,
+                                           QLayoutItem *rightItem) const {
+  auto leftWidget = leftItem->widget();
+  auto rightWidget = rightItem->widget();
+
+  Q_ASSERT(leftWidget);
+  Q_ASSERT(rightWidget);
+
+  auto hSpacing = horizontalSpacing();
+
+  if (hSpacing == -1) {
+    hSpacing = leftWidget->style()->layoutSpacing(
+        leftWidget->sizePolicy().controlType(),
+        rightWidget->sizePolicy().controlType(), Qt::Horizontal);
+  }
+
+  return hSpacing;
+}
+
+int FlexLayout::resultingVerticalSpacing(QLayoutItem *item) const
+{
+  auto widget = item->widget();
+
+  Q_ASSERT(widget);
+
+  auto vSpacing = verticalSpacing();
+
+  if (vSpacing == -1) {
+    vSpacing = widget->style()->layoutSpacing(
+        widget->sizePolicy().controlType(),
+        widget->sizePolicy().controlType(), Qt::Vertical);
+  }
+
+  return vSpacing;
+}
+
+auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
+                                LayoutItemConstIterator end, int width) const
+    -> std::pair<std::vector<ItemMetrics>, LayoutItemConstIterator> {
+  auto itemMetrics = std::vector<ItemMetrics>{};
+  auto expandingItems = std::vector<std::vector<ItemMetrics>::iterator>{};
+
+  auto remainingWidth = width;
+
+  auto lastHSpacing = 0;
+      
+  auto it = begin;
+  while (it != end) {
+    auto const size = (*it)->sizeHint();
+
+    auto nextIt = std::next(it);
+
+    auto hSpacing =
+        (nextIt == end) ? 0 : resultingHorizontalSpacing((*it), (*nextIt));
+
+    if (remainingWidth < size.width() && it != begin) {
+      break;
+    }
+
+    remainingWidth -= (size.width() + hSpacing);
+    itemMetrics.push_back({size, hSpacing});
+
+    if ((*it)->expandingDirections().testFlag(Qt::Horizontal)) {
+      expandingItems.push_back(std::prev(itemMetrics.end()));
+    }
+
+    it = nextIt;
+    lastHSpacing = hSpacing;
+  }
+      
+  remainingWidth += lastHSpacing;
+
+  // adjust widths
+
+  if (remainingWidth < 0) {
+    Q_ASSERT(itemMetrics.size() == 1u);
+
+    auto &item = *begin;
+    auto &itemMetric = itemMetrics.front();
+
+    auto const adjustedWidth = itemMetric.size.width() + remainingWidth;
+
+    if (adjustedWidth >= item->minimumSize().width()) {
+      itemMetric.size.setWidth(adjustedWidth);
+    }
+  } else if (remainingWidth > 0 && !expandingItems.empty()) {
+    auto const additionalWidth =
+        static_cast<qreal>(remainingWidth) / expandingItems.size();
+
+    auto ceiledAdditionalWidth = static_cast<int>(std::floor(additionalWidth));
+    auto flooredAdditionalWidth = static_cast<int>(std::floor(additionalWidth));
+
+    auto expandingItemIt = expandingItems.begin();
+
+    (*expandingItemIt)->size.rwidth() += ceiledAdditionalWidth;
+
+    for (; std::next(expandingItemIt) != expandingItems.end(); ++expandingItemIt) {
+      (*expandingItemIt)->size.rwidth() += flooredAdditionalWidth;
+    }
+  }
+
+  return std::pair{std::move(itemMetrics), it};
+}
+
+int FlexLayout::doLayout(QRect const &rect, bool testOnly) const {
   int left, top, right, bottom;
   getContentsMargins(&left, &top, &right, &bottom);
   QRect effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
-  int x = effectiveRect.x();
-  int y = effectiveRect.y();
-  
-  int lineHeight = 0;
-  _lineHeights.clear();
 
-  for (QLayoutItem *item : qAsConst(_itemList)) {
-    const QWidget *wid = item->widget();
-    int spaceX = horizontalSpacing();
-    if (spaceX == -1)
-      spaceX = wid->style()->layoutSpacing(
-          QSizePolicy::PushButton, QSizePolicy::PushButton, Qt::Horizontal);
-    int spaceY = verticalSpacing();
-    if (spaceY == -1)
-      spaceY = wid->style()->layoutSpacing(
-          QSizePolicy::PushButton, QSizePolicy::PushButton, Qt::Vertical);
+  auto itemIt = _itemList.cbegin();
+  auto const itemEnd = _itemList.cend();
 
-    int nextX = x + item->sizeHint().width() + spaceX;
-    if (nextX - spaceX > effectiveRect.right() && lineHeight > 0) {
-      x = effectiveRect.x();
-      y = y + lineHeight + spaceY;
-      nextX = x + item->sizeHint().width() + spaceX;
-      _lineHeights.append(lineHeight);
-      lineHeight = 0;
+  auto lineY = effectiveRect.y();
+   _lineHeights.clear();
+
+  while (itemIt != itemEnd) {
+    auto const [itemMetrics, nextLineItemIt] = metricsForLine(itemIt, itemEnd, effectiveRect.width());
+
+    auto x = effectiveRect.x();
+    auto lineHeight = 0;
+
+    auto const vSpacing = resultingVerticalSpacing(*itemIt);
+
+    for (auto metricIt = itemMetrics.cbegin(); itemIt < nextLineItemIt;
+         ++itemIt, ++metricIt) {
+      Q_ASSERT(metricIt != itemMetrics.cend());
+
+      if (!testOnly)
+        (*itemIt)->setGeometry(QRect{QPoint{x, lineY}, metricIt->size});
+
+      x = x + metricIt->size.width() + metricIt->succHorizontalSpacing;
+
+      lineHeight = qMax(lineHeight,
+                           metricIt->size.height());
     }
 
-    if (!testOnly) item->setGeometry(QRect(QPoint(x, y), item->sizeHint()));
+    itemIt = nextLineItemIt;
+    lineY = lineY + lineHeight + vSpacing;
 
-    x = nextX;
-    lineHeight = qMax(lineHeight, item->sizeHint().height());
+    _lineHeights.append(lineHeight);
   }
-  
-  _lineHeights.append(lineHeight);
-  
-  return y + lineHeight - rect.y() + bottom;
+
+  return lineY - rect.y() + bottom;
 }
 
 int FlexLayout::smartSpacing(QStyle::PixelMetric pm) const {
@@ -156,12 +253,6 @@ int FlexLayout::smartSpacing(QStyle::PixelMetric pm) const {
   }
 }
 
-int FlexLayout::lineCount() const
-{
-  return _lineHeights.size();
-}
+int FlexLayout::lineCount() const { return _lineHeights.size(); }
 
-int FlexLayout::lineHeight(int index) const
-{
-  return _lineHeights.at(index);
-}
+int FlexLayout::lineHeight(int index) const { return _lineHeights.at(index); }
