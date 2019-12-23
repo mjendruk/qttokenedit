@@ -38,13 +38,20 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
     QSize size;
     int succHorizontalSpacing;
   };
-
+  
   using LayoutItemConstIterator = QList<QLayoutItem *>::const_iterator;
+  using RemainingWidth = int;
 
   int resultingHorizontalSpacing(QLayoutItem *leftItem,
                                  QLayoutItem *rightItem) const;
 
   int resultingVerticalSpacing(QLayoutItem *item) const;
+  
+  auto findNextLine(LayoutItemConstIterator begin,
+                    LayoutItemConstIterator end, int width) const -> std::pair<LayoutItemConstIterator, RemainingWidth>;
+  
+  auto itemMetrics(LayoutItemConstIterator begin,
+                   LayoutItemConstIterator end) const -> std::vector<ItemMetrics>;
 
   void tryRemoveOverflow(int overflow, QLayoutItem const *item,
                          QSize &size) const;

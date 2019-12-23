@@ -130,6 +130,55 @@ int FlexLayout::resultingVerticalSpacing(QLayoutItem *item) const {
   return vSpacing;
 }
 
+auto FlexLayout::findNextLine(LayoutItemConstIterator begin,
+LayoutItemConstIterator end, int width) const -> std::pair<LayoutItemConstIterator, RemainingWidth>
+{
+  auto remainingWidth = width;
+  auto lastHSpacing = 0;
+
+  auto it = begin;
+  while (it != end) {
+    auto const size = (*it)->sizeHint();
+
+    auto nextIt = std::next(it);
+
+    auto const hSpacing =
+        (nextIt == end) ? 0 : resultingHorizontalSpacing((*it), (*nextIt));
+
+    if (remainingWidth < size.width() && it != begin) {
+      break;
+    }
+
+    remainingWidth -= (size.width() + hSpacing);
+
+    it = nextIt;
+    lastHSpacing = hSpacing;
+  }
+
+  remainingWidth += lastHSpacing;
+  
+  return std::pair{it, remainingWidth};
+}
+
+auto FlexLayout::itemMetrics(LayoutItemConstIterator begin,
+LayoutItemConstIterator end) const -> std::vector<ItemMetrics>
+{
+  auto result = std::vector<ItemMetrics>{};
+      
+  for (auto it = begin; it != end; ++it) {
+    auto const size = (*it)->sizeHint();
+
+    auto nextIt = std::next(it);
+
+    auto hSpacing =
+        (nextIt == end) ? 0 : resultingHorizontalSpacing((*it), (*nextIt));
+    
+    result.push_back({size, hSpacing});
+  }
+  
+  return result;
+}
+
 void FlexLayout::tryRemoveOverflow(int overflow, QLayoutItem const *item,
                                    QSize &size) const {
   auto const adjustedWidth = size.width() - overflow;
@@ -178,39 +227,9 @@ void FlexLayout::distributeRemainingWidth(
 auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
                                 LayoutItemConstIterator end, int width) const
     -> std::pair<std::vector<ItemMetrics>, LayoutItemConstIterator> {
-  auto itemMetrics = std::vector<ItemMetrics>{};
       
-      
-
-  auto remainingWidth = width;
-
-  auto lastHSpacing = 0;
-
-  auto it = begin;
-  while (it != end) {
-    auto const size = (*it)->sizeHint();
-
-    auto nextIt = std::next(it);
-
-    auto hSpacing =
-        (nextIt == end) ? 0 : resultingHorizontalSpacing((*it), (*nextIt));
-
-    if (remainingWidth < size.width() && it != begin) {
-      break;
-    }
-
-    remainingWidth -= (size.width() + hSpacing);
-    itemMetrics.push_back({size, hSpacing});
-
-    it = nextIt;
-    lastHSpacing = hSpacing;
-  }
-
-  remainingWidth += lastHSpacing;
-
-  // adjust widths
-      
-   auto const   beginNextLineIt = it;
+  auto const [nextLineIt, remainingWidth] = findNextLine(begin, end, width);
+  auto itemMetrics = this->itemMetrics(begin, nextLineIt);
 
   if (remainingWidth < 0) {
     Q_ASSERT(itemMetrics.size() == 1u);
@@ -218,12 +237,12 @@ auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
     auto const overflow = -remainingWidth;
     tryRemoveOverflow(overflow, *begin, itemMetrics.front().size);
   } else if (remainingWidth > 0) {
-    if (auto indices = expandingItemIndices(begin, beginNextLineIt); !indices.empty()) {
+    if (auto indices = expandingItemIndices(begin, nextLineIt); !indices.empty()) {
       distributeRemainingWidth(remainingWidth, indices, itemMetrics);
     }
   }
 
-  return std::pair{std::move(itemMetrics), it};
+  return std::pair{std::move(itemMetrics), nextLineIt};
 }
 
 int FlexLayout::doLayout(QRect const &rect, bool testOnly) const {
