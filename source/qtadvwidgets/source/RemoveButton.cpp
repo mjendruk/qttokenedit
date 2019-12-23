@@ -5,7 +5,8 @@
 #include <QPainterPath>
 #include <cmath>
 
-RemoveButton::RemoveButton(int diameter, QWidget *parent) : QWidget{parent}, _diameter{diameter}, _pressed{false}, _hovered{false} {
+RemoveButton::RemoveButton(int diameter, QWidget *parent) : QAbstractButton{parent}, _diameter{diameter} {
+  setCheckable(false);
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setCursor(Qt::PointingHandCursor);
   
@@ -18,13 +19,10 @@ QSize RemoveButton::sizeHint() const { return _size; }
 void RemoveButton::paintEvent(QPaintEvent *event) {
   auto const clippingRect = QRectF{event->rect()};
   auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF{_size}};
-  auto const palette = this->palette();
-  
-  auto fillRole = _hovered ? QPalette::QPalette::WindowText : QPalette::WindowText;
   
   auto painter = QPainter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
-  painter.setBrush(palette.brush(fillRole));
+  painter.setBrush(this->palette().brush(QPalette::WindowText));
   painter.setPen(Qt::NoPen);
   painter.setClipRect(clippingRect);
   
@@ -33,32 +31,6 @@ void RemoveButton::paintEvent(QPaintEvent *event) {
   painter.translate(-rect.center());
   
   painter.drawPath(_path);
-}
-
-void RemoveButton::enterEvent(QEvent *event) {
-  _hovered = true;
-  update();
-}
-
-void RemoveButton::leaveEvent(QEvent *event) {
-  _hovered = false;
-  _pressed = false;
-  update();
-}
-
-void RemoveButton::mousePressEvent(QMouseEvent *event) {
-  if (event->button() == Qt::LeftButton) {
-    _pressed = true;
-    update();
-  }
-}
-
-void RemoveButton::mouseReleaseEvent(QMouseEvent *event) {
-  if (event->button() == Qt::LeftButton && _pressed) {
-    _pressed = false;
-    update();
-    emit clicked();
-  }
 }
 
 void RemoveButton::initSize()
