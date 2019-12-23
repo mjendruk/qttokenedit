@@ -1,11 +1,11 @@
-#include <qtadvwidgets/RemoveButton.h>
+#include <qtadvwidgets/RoundRemoveButton.h>
 
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPainterPath>
 #include <cmath>
 
-RemoveButton::RemoveButton(int diameter, QWidget *parent) : QWidget{parent}, _diameter{diameter}, _pressed{false}, _hovered{false} {
+RoundRemoveButton::RoundRemoveButton(int diameter, QWidget *parent) : QWidget{parent}, _diameter{diameter}, _pressed{false}, _hovered{false} {
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setCursor(Qt::PointingHandCursor);
   
@@ -13,14 +13,14 @@ RemoveButton::RemoveButton(int diameter, QWidget *parent) : QWidget{parent}, _di
   initButtonShapePath();
 }
 
-QSize RemoveButton::sizeHint() const { return _size; }
+QSize RoundRemoveButton::sizeHint() const { return _size; }
 
-void RemoveButton::paintEvent(QPaintEvent *event) {
+void RoundRemoveButton::paintEvent(QPaintEvent *event) {
   auto const clippingRect = QRectF{event->rect()};
   auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF{_size}};
   auto const palette = this->palette();
   
-  auto fillRole = _hovered ? QPalette::QPalette::WindowText : QPalette::WindowText;
+  auto fillRole = _hovered ? QPalette::Shadow : QPalette::Dark;
   
   auto painter = QPainter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
@@ -35,25 +35,25 @@ void RemoveButton::paintEvent(QPaintEvent *event) {
   painter.drawPath(_path);
 }
 
-void RemoveButton::enterEvent(QEvent *event) {
+void RoundRemoveButton::enterEvent(QEvent *event) {
   _hovered = true;
   update();
 }
 
-void RemoveButton::leaveEvent(QEvent *event) {
+void RoundRemoveButton::leaveEvent(QEvent *event) {
   _hovered = false;
   _pressed = false;
   update();
 }
 
-void RemoveButton::mousePressEvent(QMouseEvent *event) {
+void RoundRemoveButton::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
     _pressed = true;
     update();
   }
 }
 
-void RemoveButton::mouseReleaseEvent(QMouseEvent *event) {
+void RoundRemoveButton::mouseReleaseEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton && _pressed) {
     _pressed = false;
     update();
@@ -61,14 +61,22 @@ void RemoveButton::mouseReleaseEvent(QMouseEvent *event) {
   }
 }
 
-void RemoveButton::initSize()
+void RoundRemoveButton::initSize()
 {
   _size = QSize{_diameter, _diameter};
 }
 
-void RemoveButton::initButtonShapePath()
+void RoundRemoveButton::initButtonShapePath()
 {
   auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF{_size}};
+  
+  auto circlePath = QPainterPath{};
+  
+  auto circleRect = rect;
+  auto const circleSize = rect.size() * 0.95;
+  circleRect.setSize(circleSize);
+  circleRect.moveCenter(rect.center());
+  circlePath.addEllipse(circleRect);
 
   auto crossPath = QPainterPath{};
   crossPath.setFillRule(Qt::WindingFill);
@@ -81,5 +89,5 @@ void RemoveButton::initButtonShapePath()
   crossPath.addRect(crossMargin, rect.center().y() - (crossLineWidth * 0.5),
                     crossLength, crossLineWidth);
 
-  _path = crossPath;
+  _path = circlePath - crossPath;
 }

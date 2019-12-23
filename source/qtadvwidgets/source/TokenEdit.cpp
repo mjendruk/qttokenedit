@@ -36,8 +36,12 @@ TokenEdit::TokenEdit(QWidget* parent)
 
   mainWidget->setLayout(_layout);
 
-  mainWidget->setStyleSheet("#mainWidget { background-color: white; }");
-  mainWidget->setObjectName("mainWidget");
+  auto customPalette = mainWidget->palette();
+  customPalette.setColor(QPalette::Disabled, QPalette::Window, customPalette.color(QPalette::Disabled, QPalette::Base));
+  customPalette.setColor(QPalette::Active, QPalette::Window, customPalette.color(QPalette::Active, QPalette::Base));
+  customPalette.setColor(QPalette::Inactive, QPalette::Window, customPalette.color(QPalette::Inactive, QPalette::Base));
+  customPalette.setColor(QPalette::Normal, QPalette::Window, customPalette.color(QPalette::Normal, QPalette::Base));
+  mainWidget->setPalette(customPalette);
 
   setWidget(mainWidget);
 
@@ -47,7 +51,7 @@ TokenEdit::TokenEdit(QWidget* parent)
   setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   setWidgetResizable(true);
 
-  setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   updateHeight();
 }

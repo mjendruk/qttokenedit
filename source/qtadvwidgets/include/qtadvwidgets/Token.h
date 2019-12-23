@@ -8,7 +8,6 @@
 #include <memory>
 
 class QFontMetrics;
-class QLabel;
 
 class RemoveButton;
 class TokenChainElement;
@@ -28,8 +27,8 @@ class QTADVWIDGETS_API Token : public QWidget {
   QVariant const& userData() const;
   void setUserData(QVariant const& data);
 
-  virtual QSize sizeHint() const;
-  virtual QSize minimumSizeHint() const;
+  QSize sizeHint() const override;
+  QSize minimumSizeHint() const override;
 
   TokenChainElement* chainElement() const;
 
@@ -62,7 +61,6 @@ class QTADVWIDGETS_API Token : public QWidget {
 
   std::unique_ptr<TokenChainElement> _chainElement;
 
-  QLabel* _label;
   RemoveButton* _button;
 
   int _elidedTextWidth;

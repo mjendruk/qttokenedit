@@ -48,7 +48,7 @@ set(headers
     ${include_path}/baselib.h
     ${include_path}/DarkStyle.h
     ${include_path}/Token.h
-    ${include_path}/RemoveButton.h
+    ${include_path}/RoundRemoveButton.h
     ${include_path}/TokenEdit.h
     ${include_path}/TokenLineEdit.h
     ${include_path}/FlexLayout.h
@@ -61,7 +61,7 @@ set(sources
     ${source_path}/baselib.cpp
     ${source_path}/DarkStyle.cpp
     ${source_path}/Token.cpp
-    ${source_path}/RemoveButton.cpp
+    ${source_path}/RoundRemoveButton.cpp
     ${source_path}/TokenEdit.cpp
     ${source_path}/TokenLineEdit.cpp
     ${source_path}/FlexLayout.cpp

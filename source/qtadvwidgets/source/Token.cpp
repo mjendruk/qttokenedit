@@ -36,7 +36,7 @@ QString const& Token::text() const { return _text; }
 
 void Token::setText(QString const& text) {
   _text = text;
-  _label->setText(_text);
+  update();
 }
 
 QVariant const& Token::userData() const { return _userData; }
@@ -57,7 +57,7 @@ QSize Token::minimumSizeHint() const {
 
   auto const buttonWidth = _button->sizeHint().width();
 
-  auto const minimalTextWidth = fontMetrics().averageCharWidth() * 5;
+  auto const minimalTextWidth = fontMetrics().averageCharWidth() * std::min(5, _text.size());
 
   return margins + QSize{minimalTextWidth + buttonWidth + spacing(), 0};
 }
@@ -67,12 +67,12 @@ TokenChainElement* Token::chainElement() const { return _chainElement.get(); }
 int Token::contentHeight() const { return fontMetrics().height(); }
 
 int Token::horizontalTextMargin() const {
-  return std::lround(contentHeight() * 0.5);
+  return margin() * 2;
 }
 
-int Token::margin() const { return std::lround(contentHeight() / 3.0); }
+int Token::margin() const { return std::lround(contentHeight() / 6.0); }
 
-int Token::spacing() const { return std::lround(contentHeight() / 3.0); }
+int Token::spacing() const { return std::lround(contentHeight() * 0.25); }
 
 QSize Token::textSize() const {
   return fontMetrics().size(Qt::TextSingleLine, _text);
@@ -84,7 +84,7 @@ void Token::paintEvent(QPaintEvent* event) {
   auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}}.marginsRemoved(
       QMarginsF{0.5, 0.5, 0.5, 0.5});
 
-  auto const rounding = rect.height() / 2.0;
+  auto const rounding = contentHeight() / 8.0;
 
   auto path = QPainterPath{};
   path.addRoundedRect(rect, rounding, rounding);
@@ -95,16 +95,18 @@ void Token::paintEvent(QPaintEvent* event) {
 
   painter.save();
 
-  auto const penRole = hasFocus() ? QPalette::Highlight : QPalette::Shadow;
-  painter.setBrush(palette.brush(QPalette::Base));
-  painter.setPen(QPen{palette.color(penRole)});
-  //  painter.setPen(Qt::NoPen);
+  auto const brushRole = hasFocus() ? QPalette::Highlight : QPalette::Button;
+  painter.setBrush(palette.brush(brushRole));
+  painter.setPen(Qt::NoPen);
 
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(clippingRect);
   painter.drawPath(path);
 
   painter.restore();
+
+  auto const penRole = hasFocus() ? QPalette::HighlightedText : QPalette::ButtonText;
+  painter.setPen(palette.color(penRole));
 
   auto const textPosition = QPointF(horizontalTextMargin(), margin());
   auto const textSize =
