@@ -2,11 +2,12 @@
 
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+#include <qtadvwidgets/TokenEditViewport.h>
+
 #include <QScrollArea>
 #include <QVariant>
 #include <QVector>
 #include <cstdint>
-#include <memory>
 
 class QLineEdit;
 
@@ -15,7 +16,7 @@ class FlexLayout;
 class TokenLineEdit;
 class TokenChain;
 
-class QTADVWIDGETS_API TokenEdit : public QScrollArea {
+class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   Q_OBJECT
 
  public:
@@ -43,16 +44,16 @@ class QTADVWIDGETS_API TokenEdit : public QScrollArea {
  signals:
   void itemAboutToBeRemoved(int index);
 
- protected:
-  void resizeEvent(QResizeEvent* event) override;
-
  private:
   void updateHeight();
 
  private:
   QVector<Token*> _items;
   TokenLineEdit* _lineEdit;
-  std::unique_ptr<TokenChain> _tokenChain;
+  TokenChain* _tokenChain;
   FlexLayout* _layout;
   int _maxLineCount;
+  int _spacing;
+  
+  QScrollArea* _scrollArea;
 };

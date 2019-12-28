@@ -51,6 +51,7 @@ set(headers
     ${include_path}/RoundRemoveButton.h
     ${include_path}/RemoveButton.h
     ${include_path}/TokenEdit.h
+    ${include_path}/TokenEditViewport.h
     ${include_path}/TokenLineEdit.h
     ${include_path}/FlexLayout.h
     ${include_path}/TokenChain.h
@@ -65,6 +66,7 @@ set(sources
     ${source_path}/RoundRemoveButton.cpp
     ${source_path}/RemoveButton.cpp
     ${source_path}/TokenEdit.cpp
+    ${source_path}/TokenEditViewport.cpp
     ${source_path}/TokenLineEdit.cpp
     ${source_path}/FlexLayout.cpp
     ${source_path}/TokenChain.cpp

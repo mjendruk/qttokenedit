@@ -1,12 +1,17 @@
+#include <qtadvwidgets/LineEditChainElement.h>
 #include <qtadvwidgets/TokenChain.h>
 #include <qtadvwidgets/TokenChainElement.h>
-#include <qtadvwidgets/LineEditChainElement.h>
 
 #include <QWidget>
 #include <QtGlobal>
 
-TokenChain::TokenChain(QLineEdit* last)
-    : _last{std::make_unique<LineEditChainElement>(last)} {}
+TokenChain::TokenChain(QLineEdit* last, QObject* parent)
+    : QObject{parent}, _last{std::make_unique<LineEditChainElement>(last)} {
+  connect(_last.get(), &TokenChainElement::gotFocus, this,
+          &TokenChain::gotFocus);
+  connect(_last.get(), &TokenChainElement::lostFocus, this,
+          &TokenChain::lostFocus);
+}
 
 TokenChain::~TokenChain() = default;
 
@@ -22,6 +27,9 @@ void TokenChain::add(TokenChainElement* element) {
 
   _last->setPreviousElement(element);
   element->setNextElement(_last.get());
+
+  connect(element, &TokenChainElement::gotFocus, this, &TokenChain::gotFocus);
+  connect(element, &TokenChainElement::lostFocus, this, &TokenChain::lostFocus);
 }
 
 void TokenChain::remove(TokenChainElement* element) {
@@ -44,4 +52,6 @@ void TokenChain::remove(TokenChainElement* element) {
   } else if (next) {
     next->widget()->setFocus();
   }
+
+  element->disconnect(this);
 }

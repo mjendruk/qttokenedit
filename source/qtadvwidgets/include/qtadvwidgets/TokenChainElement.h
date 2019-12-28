@@ -18,6 +18,10 @@ class QTADVWIDGETS_API TokenChainElement : public QObject {
 
   QWidget* widget() const;
 
+ signals:
+  void gotFocus(TokenChainElement* element);
+  void lostFocus(TokenChainElement* element);
+
  protected:
   bool eventFilter(QObject* watched, QEvent* event) override;
 

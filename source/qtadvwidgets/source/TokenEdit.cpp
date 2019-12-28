@@ -2,6 +2,7 @@
 #include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenChain.h>
 #include <qtadvwidgets/TokenEdit.h>
+#include <qtadvwidgets/TokenEditViewport.h>
 #include <qtadvwidgets/TokenLineEdit.h>
 
 #include <QLineEdit>
@@ -12,12 +13,23 @@
 #include <QtGlobal>
 
 TokenEdit::TokenEdit(QWidget* parent)
-    : QScrollArea{parent},
+    : TokenEditViewport{parent},
       _lineEdit{new TokenLineEdit{this}},
-      _tokenChain{std::make_unique<TokenChain>(_lineEdit)} {
+      _tokenChain{new TokenChain{_lineEdit, this}},
+      _maxLineCount{-1},
+      _spacing{4},
+      _scrollArea(new QScrollArea{this}) {
+  connect(_tokenChain, &TokenChain::gotFocus,
+          [=](auto element) { setShownAsFocused(true); });
+
+  connect(_tokenChain, &TokenChain::lostFocus,
+          [=](auto element) { setShownAsFocused(false); });
+
+  setWidget(_scrollArea);
+
   auto mainWidget = new QWidget{};
 
-  _layout = new FlexLayout{4, 4, 4};
+  _layout = new FlexLayout{4, _spacing, _spacing};
 
   connect(_layout, &FlexLayout::linesChanged, this, &TokenEdit::updateHeight);
 
@@ -34,8 +46,9 @@ TokenEdit::TokenEdit(QWidget* parent)
     }
   });
 
-  connect(_lineEdit, &TokenLineEdit::focused,
-          [=]() { ensureWidgetVisible(_lineEdit); });
+  connect(_lineEdit, &TokenLineEdit::focused, [=]() {
+    _scrollArea->ensureWidgetVisible(_lineEdit);
+  });
 
   _layout->addWidget(_lineEdit);
 
@@ -52,15 +65,16 @@ TokenEdit::TokenEdit(QWidget* parent)
       customPalette.color(QPalette::Inactive, QPalette::Base));
   mainWidget->setPalette(customPalette);
 
-  setWidget(mainWidget);
+  _scrollArea->setWidget(mainWidget);
 
   setFocusProxy(_lineEdit);
 
-  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  setWidgetResizable(true);
+  _scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  _scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  _scrollArea->setWidgetResizable(true);
+  _scrollArea->setFrameShape(QFrame::NoFrame);
 
-  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  _scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   updateHeight();
 }
@@ -87,7 +101,8 @@ void TokenEdit::addItem(QString const& text, QVariant const& userData) {
     removeItem(index);
   });
 
-  connect(item, &Token::focused, [=]() { ensureWidgetVisible(item); });
+  connect(item, &Token::focused,
+          [=]() { _scrollArea->ensureWidgetVisible(item); });
 }
 
 void TokenEdit::addItems(QStringList const& texts) {
@@ -131,25 +146,20 @@ int TokenEdit::count() const { return _items.size(); }
 
 QLineEdit* TokenEdit::lineEdit() { return _lineEdit; }
 
-void TokenEdit::resizeEvent(QResizeEvent* event) {
-  QScrollArea::resizeEvent(event);
-}
-
 void TokenEdit::updateHeight() {
   auto const actualMaxRows = _maxLineCount <= 0 ? 3 : _maxLineCount;
   auto const actualRows = std::min(actualMaxRows, _layout->lineCount());
 
-  auto const spacing = 4;
-
-  auto height = spacing;
+  auto height = _spacing;
 
   for (auto i = 0; i < actualRows; ++i) {
     height += _layout->lineHeight(i);
-    height += spacing;
+    height += _spacing;
   }
 
   height += 2;
 
   setFixedHeight(height);
-  verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+  _scrollArea->verticalScrollBar()->triggerAction(
+      QAbstractSlider::SliderToMaximum);
 }
