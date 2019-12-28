@@ -59,13 +59,14 @@ void TokenEditViewport::setWidget(QWidget* widget) {
   _widget = widget;
   _layout->addWidget(_widget);
   _frame->raise();
+  _frame->update();
 }
 
 bool TokenEditViewport::shownAsFocused() const { return _shownAsFocused; }
 
 void TokenEditViewport::setShownAsFocused(bool value) {
   _shownAsFocused = value;
-  update();
+  _frame->update();
 }
 
 void TokenEditViewport::paintEvent(QPaintEvent* event) {
