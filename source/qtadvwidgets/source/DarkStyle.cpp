@@ -34,7 +34,7 @@ void DarkStyle::polish(QPalette& palette) {
   palette.setColor(QPalette::Link, QColor(42, 130, 218));
   palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
   palette.setColor(QPalette::Disabled, QPalette::Highlight, QColor(80, 80, 80));
-  palette.setColor(QPalette::HighlightedText, Qt::white);
+  palette.setColor(QPalette::HighlightedText, QColor{183, 219, 255});
   palette.setColor(QPalette::Disabled, QPalette::HighlightedText,
                    QColor(127, 127, 127));
 }

@@ -25,7 +25,8 @@ Token::Token(QString const& text, QVariant const& userData, QWidget* parent)
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   setFocusPolicy(Qt::ClickFocus);
 
-  _button = new RemoveButton{contentHeight(), this};
+  _button = new RemoveButton{palette().color(QPalette::ButtonText),
+                             contentHeight(), this};
 
   connect(_button, &RemoveButton::clicked, this, &Token::removeClicked);
 }
@@ -57,7 +58,8 @@ QSize Token::minimumSizeHint() const {
 
   auto const buttonWidth = _button->sizeHint().width();
 
-  auto const minimalTextWidth = fontMetrics().averageCharWidth() * std::min(5, _text.size());
+  auto const minimalTextWidth =
+      fontMetrics().averageCharWidth() * std::min(5, _text.size());
 
   return margins + QSize{minimalTextWidth + buttonWidth + spacing(), 0};
 }
@@ -66,9 +68,7 @@ TokenChainElement* Token::chainElement() const { return _chainElement.get(); }
 
 int Token::contentHeight() const { return fontMetrics().height(); }
 
-int Token::horizontalTextMargin() const {
-  return margin() * 2;
-}
+int Token::horizontalTextMargin() const { return margin() * 2; }
 
 int Token::margin() const { return std::lround(contentHeight() / 6.0); }
 
@@ -104,7 +104,8 @@ void Token::paintEvent(QPaintEvent* event) {
 
   painter.restore();
 
-  auto const penRole = hasFocus() ? QPalette::HighlightedText : QPalette::ButtonText;
+  auto const penRole =
+      hasFocus() ? QPalette::HighlightedText : QPalette::ButtonText;
   painter.setPen(palette.color(penRole));
 
   auto const textPosition = QPointF(horizontalTextMargin(), margin());
@@ -153,10 +154,17 @@ void Token::keyPressEvent(QKeyEvent* event) {
   QWidget::keyPressEvent(event);
 }
 
-void Token::focusInEvent(QFocusEvent* event)
-{
+void Token::focusInEvent(QFocusEvent* event) {
   emit focused();
+
+  _button->setColor(palette().color(QPalette::HighlightedText));
   QWidget::focusInEvent(event);
+}
+
+void Token::focusOutEvent(QFocusEvent* event) {
+  _button->setColor(palette().color(QPalette::ButtonText));
+
+  QWidget::focusOutEvent(event);
 }
 
 void Token::updateElidedText(QSize size) {

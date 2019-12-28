@@ -44,6 +44,7 @@ class QTADVWIDGETS_API Token : public QWidget {
   void resizeEvent(QResizeEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
   void focusInEvent(QFocusEvent* event) override;
+  void focusOutEvent(QFocusEvent* event) override;
 
   int contentHeight() const;
   int horizontalTextMargin() const;

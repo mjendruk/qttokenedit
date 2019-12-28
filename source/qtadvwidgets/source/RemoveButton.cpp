@@ -5,42 +5,46 @@
 #include <QPainterPath>
 #include <cmath>
 
-RemoveButton::RemoveButton(int diameter, QWidget *parent) : QAbstractButton{parent}, _diameter{diameter} {
+RemoveButton::RemoveButton(QColor const& color, int diameter, QWidget* parent)
+    : QAbstractButton{parent}, _diameter{diameter}, _color{color} {
   setCheckable(false);
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setCursor(Qt::PointingHandCursor);
   setFocusPolicy(Qt::NoFocus);
-  
+
   initSize();
   initButtonShapePath();
 }
 
 QSize RemoveButton::sizeHint() const { return _size; }
 
-void RemoveButton::paintEvent(QPaintEvent *event) {
+QColor RemoveButton::color() const { return _color; }
+
+void RemoveButton::setColor(QColor const& color) {
+  _color = color;
+  update();
+}
+
+void RemoveButton::paintEvent(QPaintEvent* event) {
   auto const clippingRect = QRectF{event->rect()};
   auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF{_size}};
-  
+
   auto painter = QPainter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
-  painter.setBrush(this->palette().brush(QPalette::WindowText));
+  painter.setBrush(QBrush{_color});
   painter.setPen(Qt::NoPen);
   painter.setClipRect(clippingRect);
-  
+
   painter.translate(+rect.center());
   painter.rotate(45.0);
   painter.translate(-rect.center());
-  
+
   painter.drawPath(_path);
 }
 
-void RemoveButton::initSize()
-{
-  _size = QSize{_diameter, _diameter};
-}
+void RemoveButton::initSize() { _size = QSize{_diameter, _diameter}; }
 
-void RemoveButton::initButtonShapePath()
-{
+void RemoveButton::initButtonShapePath() {
   auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF{_size}};
 
   auto crossPath = QPainterPath{};
