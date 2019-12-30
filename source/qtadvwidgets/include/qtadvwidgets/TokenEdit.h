@@ -1,8 +1,8 @@
 #pragma once
 
-#include <qtadvwidgets/qtadvwidgets_api.h>
-
+#include <qtadvwidgets/TokenEditMode.h>
 #include <qtadvwidgets/TokenEditViewport.h>
+#include <qtadvwidgets/qtadvwidgets_api.h>
 
 #include <QScrollArea>
 #include <QVariant>
@@ -20,7 +20,10 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   Q_OBJECT
 
  public:
-  TokenEdit(QWidget* parent = nullptr);
+  using Mode = TokenEditMode;
+
+  TokenEdit(TokenEditMode mode = TokenEditMode::Multiple,
+            QWidget* parent = nullptr);
   ~TokenEdit();
 
   int maxLineCount() const;
@@ -54,6 +57,6 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   FlexLayout* _layout;
   int _maxLineCount;
   int _spacing;
-  
+  TokenEditMode _mode;
   QScrollArea* _scrollArea;
 };

@@ -11,7 +11,7 @@ class QTADVWIDGETS_API RoundRemoveButton : public QWidget {
   RoundRemoveButton(int diameter, QWidget *parent = nullptr);
 
   QSize sizeHint() const override;
-  
+
  signals:
   void clicked();
 
@@ -21,12 +21,12 @@ class QTADVWIDGETS_API RoundRemoveButton : public QWidget {
   void leaveEvent(QEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
-  
-private:
+
+ private:
   void initSize();
   void initButtonShapePath();
 
-private:
+ private:
   bool _pressed;
   bool _hovered;
   int _diameter;

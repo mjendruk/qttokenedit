@@ -141,6 +141,11 @@ auto FlexLayout::findNextLine(LayoutItemConstIterator begin,
   while (it != end) {
     auto const size = (*it)->sizeHint();
 
+    if (size.isEmpty()) {
+      ++it;
+      continue;
+    }
+
     auto nextIt = std::next(it);
 
     auto const hSpacing =
@@ -169,12 +174,16 @@ auto FlexLayout::itemMetrics(LayoutItemConstIterator begin,
   for (auto it = begin; it != end; ++it) {
     auto const size = (*it)->sizeHint();
 
+    if (size.isEmpty()) {
+      continue;
+    }
+
     auto nextIt = std::next(it);
 
     auto hSpacing =
         (nextIt == end) ? 0 : resultingHorizontalSpacing((*it), (*nextIt));
 
-    result.push_back({size, hSpacing});
+    result.push_back({size, hSpacing, *it});
   }
 
   return result;
@@ -186,6 +195,10 @@ void FlexLayout::tryRemoveOverflow(int overflow, QLayoutItem const *item,
 
   if (adjustedWidth >= item->minimumSize().width()) {
     size.setWidth(adjustedWidth);
+
+    if (item->hasHeightForWidth()) {
+      size.setHeight(item->heightForWidth(adjustedWidth));
+    }
   }
 }
 
@@ -212,8 +225,14 @@ void FlexLayout::distributeRemainingWidth(
   for (auto indexIt = indices.cbegin(); indexIt != indices.cend(); ++indexIt) {
     auto const additionalPixel = (remainingWidth-- > 0) ? 1 : 0;
 
-    itemMetrics.at(*indexIt).size.rwidth() +=
-        (additionalWidth + additionalPixel);
+    auto &itemMetric = itemMetrics.at(*indexIt);
+
+    itemMetric.size.rwidth() += (additionalWidth + additionalPixel);
+
+    if (itemMetric.item->hasHeightForWidth()) {
+      itemMetric.size.setHeight(
+          itemMetric.item->heightForWidth(itemMetric.size.height()));
+    }
   }
 }
 
@@ -260,16 +279,13 @@ int FlexLayout::doLayout(QRect const &rect, bool testOnly) const {
 
     auto const vSpacing = resultingVerticalSpacing(*itemIt);
 
-    for (auto metricIt = itemMetrics.cbegin(); itemIt < nextLineItemIt;
-         ++itemIt, ++metricIt) {
-      Q_ASSERT(metricIt != itemMetrics.cend());
-
+    for (auto metric : itemMetrics) {
       if (!testOnly)
-        (*itemIt)->setGeometry(QRect{QPoint{x, lineY}, metricIt->size});
+        metric.item->setGeometry(QRect{QPoint{x, lineY}, metric.size});
 
-      x = x + metricIt->size.width() + metricIt->hSpacing;
+      x = x + metric.size.width() + metric.hSpacing;
 
-      lineHeight = qMax(lineHeight, metricIt->size.height());
+      lineHeight = qMax(lineHeight, metric.size.height());
     }
 
     itemIt = nextLineItemIt;

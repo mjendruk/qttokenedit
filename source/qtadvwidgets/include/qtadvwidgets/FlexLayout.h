@@ -42,6 +42,7 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   struct ItemMetrics {
     QSize size;
     int hSpacing;  //!< succeeding horizontal spacing
+    QLayoutItem *item;
   };
 
   using LayoutItemConstIterator = QList<QLayoutItem *>::const_iterator;

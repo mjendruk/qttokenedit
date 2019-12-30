@@ -12,12 +12,13 @@
 #include <QStyleOptionFrame>
 #include <QtGlobal>
 
-TokenEdit::TokenEdit(QWidget* parent)
+TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
     : TokenEditViewport{parent},
       _lineEdit{new TokenLineEdit{this}},
-      _tokenChain{new TokenChain{_lineEdit, this}},
+      _tokenChain{new TokenChain{mode, _lineEdit, this}},
       _maxLineCount{-1},
-      _spacing{4},
+      _spacing{3},
+      _mode{mode},
       _scrollArea(new QScrollArea{this}) {
   connect(_tokenChain, &TokenChain::gotFocus,
           [=](auto element) { setShownAsFocused(true); });
@@ -29,12 +30,11 @@ TokenEdit::TokenEdit(QWidget* parent)
 
   auto mainWidget = new QWidget{};
 
-  _layout = new FlexLayout{4, _spacing, _spacing};
+  _layout = new FlexLayout{3, _spacing, _spacing};
 
   connect(_layout, &FlexLayout::linesChanged, this, &TokenEdit::updateHeight);
 
   _lineEdit->setFrame(false);
-  _lineEdit->setPlaceholderText("Halt hinzufuegen");
   _lineEdit->setTextMargins(QMargins{});
 
   auto dummyItem = QScopedPointer{new Token{"dummy"}};
@@ -46,9 +46,8 @@ TokenEdit::TokenEdit(QWidget* parent)
     }
   });
 
-  connect(_lineEdit, &TokenLineEdit::focused, [=]() {
-    _scrollArea->ensureWidgetVisible(_lineEdit);
-  });
+  connect(_lineEdit, &TokenLineEdit::focused,
+          [=]() { _scrollArea->ensureWidgetVisible(_lineEdit); });
 
   _layout->addWidget(_lineEdit);
 
@@ -67,7 +66,7 @@ TokenEdit::TokenEdit(QWidget* parent)
 
   _scrollArea->setWidget(mainWidget);
 
-  setFocusProxy(_lineEdit);
+  _scrollArea->setFocusProxy(_lineEdit);
 
   _scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   _scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -89,12 +88,20 @@ void TokenEdit::setMaxLineCount(int count) {
 }
 
 void TokenEdit::addItem(QString const& text, QVariant const& userData) {
+  Q_ASSERT(_mode == Mode::Multiple ||
+           (_mode == Mode::Single && _items.empty()));
+
   auto item = new Token{text, userData, this};
   auto index = std::max(0, _items.size());
 
+  if (_mode == Mode::Single) {
+    _lineEdit->hide();
+    _scrollArea->setFocusProxy(item);
+  }
+
   _items.append(item);
-  _tokenChain->add(item->chainElement());
   _layout->insertWidget(index, item);
+  _tokenChain->add(item->chainElement());
 
   connect(item, &Token::removeClicked, [=]() {
     auto index = _items.indexOf(item);
@@ -127,6 +134,12 @@ void TokenEdit::removeItem(int index) {
   emit itemAboutToBeRemoved(index);
   auto item = _items.takeAt(index);
   auto layoutItem = _layout->takeAt(index);
+
+  if (_mode == Mode::Single) {
+    _lineEdit->show();
+    _scrollArea->setFocusProxy(item);
+  }
+
   _tokenChain->remove(item->chainElement());
   delete layoutItem;
   delete item;

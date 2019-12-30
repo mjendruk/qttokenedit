@@ -50,6 +50,33 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="comboBoxLabel">
+        <property name="text">
+         <string>ComboBox</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="comboBox">
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+        <property name="currentText">
+         <string>S+U Potsdamer Platz</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="doubleSpinBoxLabel">
+        <property name="text">
+         <string>DoubleSpinBox</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBoxDoubleSpinBox"/>
+      </item>
      </layout>
     </item>
    </layout>

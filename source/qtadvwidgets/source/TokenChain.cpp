@@ -5,8 +5,10 @@
 #include <QWidget>
 #include <QtGlobal>
 
-TokenChain::TokenChain(QLineEdit* last, QObject* parent)
-    : QObject{parent}, _last{std::make_unique<LineEditChainElement>(last)} {
+TokenChain::TokenChain(TokenEditMode mode, QLineEdit* last, QObject* parent)
+    : QObject{parent},
+      _last{std::make_unique<LineEditChainElement>(last)},
+      _mode{mode} {
   connect(_last.get(), &TokenChainElement::gotFocus, this,
           &TokenChain::gotFocus);
   connect(_last.get(), &TokenChainElement::lostFocus, this,
@@ -30,6 +32,10 @@ void TokenChain::add(TokenChainElement* element) {
 
   connect(element, &TokenChainElement::gotFocus, this, &TokenChain::gotFocus);
   connect(element, &TokenChainElement::lostFocus, this, &TokenChain::lostFocus);
+
+  if (_mode == TokenEditMode::Single) {
+    element->widget()->setFocus();
+  }
 }
 
 void TokenChain::remove(TokenChainElement* element) {
@@ -55,3 +61,5 @@ void TokenChain::remove(TokenChainElement* element) {
 
   element->disconnect(this);
 }
+
+void TokenChain::setMode(TokenEditMode mode) { _mode = mode; }

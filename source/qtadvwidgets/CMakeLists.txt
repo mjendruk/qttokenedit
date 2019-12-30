@@ -47,31 +47,32 @@ set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/source")
 set(headers
     ${include_path}/baselib.h
     ${include_path}/DarkStyle.h
-    ${include_path}/Token.h
-    ${include_path}/RoundRemoveButton.h
-    ${include_path}/RemoveButton.h
-    ${include_path}/TokenEdit.h
-    ${include_path}/TokenEditViewport.h
-    ${include_path}/TokenLineEdit.h
     ${include_path}/FlexLayout.h
+    ${include_path}/LineEditChainElement.h
+    ${include_path}/RemoveButton.h
+    ${include_path}/RoundRemoveButton.h
+    ${include_path}/Token.h
     ${include_path}/TokenChain.h
     ${include_path}/TokenChainElement.h
-    ${include_path}/LineEditChainElement.h
+    ${include_path}/TokenEdit.h
+    ${include_path}/TokenEditMode.h
+    ${include_path}/TokenEditViewport.h
+    ${include_path}/TokenLineEdit.h
 )
 
 set(sources
     ${source_path}/baselib.cpp
     ${source_path}/DarkStyle.cpp
-    ${source_path}/Token.cpp
-    ${source_path}/RoundRemoveButton.cpp
+    ${source_path}/FlexLayout.cpp
+    ${source_path}/LineEditChainElement.cpp
     ${source_path}/RemoveButton.cpp
+    ${source_path}/RoundRemoveButton.cpp
+    ${source_path}/Token.cpp
+    ${source_path}/TokenChain.cpp
+    ${source_path}/TokenChainElement.cpp
     ${source_path}/TokenEdit.cpp
     ${source_path}/TokenEditViewport.cpp
     ${source_path}/TokenLineEdit.cpp
-    ${source_path}/FlexLayout.cpp
-    ${source_path}/TokenChain.cpp
-    ${source_path}/TokenChainElement.cpp
-    ${source_path}/LineEditChainElement.cpp
 )
 
 # Group source files

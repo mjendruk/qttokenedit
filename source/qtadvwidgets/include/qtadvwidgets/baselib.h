@@ -1,21 +1,16 @@
 
 #pragma once
 
+#include <qtadvwidgets/qtadvwidgets_api.h>
 
 #include <string>
 
-#include <qtadvwidgets/qtadvwidgets_api.h>
-
-
-namespace baselib
-{
-
+namespace baselib {
 
 /**
-*  @brief
-*    Print information about the library to the console
-*/
+ *  @brief
+ *    Print information about the library to the console
+ */
 QTADVWIDGETS_API void printInfo();
 
-
-} // namespace baselib
+}  // namespace baselib
