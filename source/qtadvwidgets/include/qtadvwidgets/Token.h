@@ -38,9 +38,8 @@ class QTADVWIDGETS_API Token : public QWidget {
 
  protected:
   void paintEvent(QPaintEvent* event) override;
-  void mousePressEvent(QMouseEvent* event) override;
-  void mouseReleaseEvent(QMouseEvent* event) override;
   void leaveEvent(QEvent* event) override;
+  void enterEvent(QEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
   void focusInEvent(QFocusEvent* event) override;
@@ -69,6 +68,5 @@ class QTADVWIDGETS_API Token : public QWidget {
   int _elidedTextWidth;
   QString _elidedText;
 
-  bool _selected;
-  bool _pressed;
+  bool _hovered;
 };

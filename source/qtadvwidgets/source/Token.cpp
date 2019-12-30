@@ -20,7 +20,7 @@ Token::Token(QString const& text, QVariant const& userData, QWidget* parent)
       _text{text},
       _userData{userData},
       _chainElement{std::make_unique<TokenChainElement>(this)},
-      _selected{false} {
+      _hovered{false} {
   setCursor(Qt::ArrowCursor);
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   setFocusPolicy(Qt::ClickFocus);
@@ -95,7 +95,15 @@ void Token::paintEvent(QPaintEvent* event) {
   painter.save();
 
   auto const brushRole = hasFocus() ? QPalette::Highlight : QPalette::Button;
-  painter.setBrush(palette.brush(brushRole));
+  
+  auto brush = palette.brush(brushRole);
+  
+  if (_hovered) {
+    auto color = brush.color();
+    brush.setColor(color.lighter(102));
+  }
+  
+  painter.setBrush(brush);
   painter.setPen(Qt::NoPen);
 
   painter.setRenderHint(QPainter::Antialiasing, true);
@@ -118,23 +126,13 @@ void Token::paintEvent(QPaintEvent* event) {
   QWidget::paintEvent(event);
 }
 
-void Token::mousePressEvent(QMouseEvent* event) {
-  if (event->buttons() == Qt::LeftButton) {
-    _pressed = true;
-    update();
-  }
-}
-
-void Token::mouseReleaseEvent(QMouseEvent* event) {
-  if (_pressed) {
-    _selected = !_selected;
-    _pressed = false;
-    update();
-  }
-}
-
 void Token::leaveEvent(QEvent* event) {
-  _pressed = false;
+  _hovered = false;
+  update();
+}
+
+void Token::enterEvent(QEvent* event) {
+  _hovered = true;
   update();
 }
 
