@@ -20,6 +20,8 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
       _spacing{3},
       _mode{mode},
       _scrollArea(new QScrollArea{this}) {
+  _scrollArea->setFocusPolicy(Qt::ClickFocus);
+
   connect(_tokenChain, &TokenChain::gotFocus,
           [=](auto element) { setShownAsFocused(true); });
 
@@ -29,6 +31,7 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
   setWidget(_scrollArea);
 
   auto mainWidget = new QWidget{};
+  mainWidget->setFocusPolicy(Qt::NoFocus);
 
   _layout = new FlexLayout{3, _spacing, _spacing};
 

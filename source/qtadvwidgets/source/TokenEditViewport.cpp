@@ -43,7 +43,7 @@ TokenEditViewport::TokenEditViewport(QWidget* parent)
       _widget{nullptr},
       _layout{new QBoxLayout{QBoxLayout::TopToBottom}},
       _frame{new TokenEditViewportFrame{this}} {
-  setFocusPolicy(Qt::StrongFocus);
+  setFocusPolicy(Qt::NoFocus);
   _layout->setContentsMargins(contentMargins());
   setLayout(_layout);
 }
