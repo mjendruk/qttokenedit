@@ -93,15 +93,18 @@ void Token::paintEvent(QPaintEvent* event) {
   auto palette = this->palette();
 
   painter.save();
-
-  auto const brushRole = hasFocus() ? QPalette::Highlight : QPalette::Button;
   
-  auto brush = palette.brush(brushRole);
+  auto brushRole = QPalette::Button;
   
   if (_hovered) {
-    auto color = brush.color();
-    brush.setColor(color.lighter(102));
+    brushRole = QPalette::Midlight;
   }
+  
+  if (hasFocus()) {
+    brushRole = QPalette::Highlight;
+  }
+  
+  auto brush = palette.brush(brushRole);
   
   painter.setBrush(brush);
   painter.setPen(Qt::NoPen);
