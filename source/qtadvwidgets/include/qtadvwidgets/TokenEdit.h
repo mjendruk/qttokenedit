@@ -8,8 +8,10 @@
 #include <QVariant>
 #include <QVector>
 #include <cstdint>
+#include <QModelIndex>
 
 class QLineEdit;
+class QAbstractItemModel;
 
 class Token;
 class FlexLayout;
@@ -29,26 +31,41 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   int maxLineCount() const;
   void setMaxLineCount(int count);
 
-  void addItem(QString const& text, QVariant const& userData = QVariant{});
-  void addItems(QStringList const& texts);
-
-  void setItemData(int index, QVariant const& value);
-  void setItemText(int index, QString const& text);
-
-  void removeItem(int index);
-
-  QString itemText(int index) const;
-  QVariant itemData(int index) const;
-
   int count() const;
+  int isEmpty() const;
 
   QLineEdit* lineEdit();
+
+  QAbstractItemModel* model() const;
+  void setModel(QAbstractItemModel* model);
+  
+  int modelColumn() const;
+  void setModelColumn(int column);
 
  signals:
   void itemAboutToBeRemoved(int index);
 
  private:
+  void addItem(QString const& text);
+  void addItems(QStringList const& texts);
+
+  void insertItem(int index, QString const& text);
+
+  void setItemText(int index, QString const& text);
+
+  void removeItem(int index);
+  
   void updateHeight();
+  void init();
+  void clear();
+
+  void onRowsInserted(QModelIndex const& parent, int first, int last);
+  void onRowsRemoved(QModelIndex const& parent, int first, int last);
+  void onRowsMoved(QModelIndex const& parent, int first, int last,
+                   QModelIndex const& destination, int row);
+  void onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight,
+                     const QVector<int>& roles);
+  void onModelReset();
 
  private:
   QVector<Token*> _items;
@@ -59,4 +76,7 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   int _spacing;
   TokenEditMode _mode;
   QScrollArea* _scrollArea;
+  QAbstractItemModel* _model;
+  QModelIndex _rootModelIndex;
+  int _modelColumn;
 };

@@ -6,10 +6,8 @@
 #include <qtadvwidgets/TokenLineEdit.h>
 
 #include <QLineEdit>
-#include <QPaintEvent>
 #include <QPainter>
 #include <QScrollBar>
-#include <QStyleOptionFrame>
 #include <QtGlobal>
 
 TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
@@ -19,7 +17,10 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
       _maxLineCount{-1},
       _spacing{3},
       _mode{mode},
-      _scrollArea(new QScrollArea{this}) {
+      _scrollArea(new QScrollArea{this}),
+      _model{nullptr},
+      _rootModelIndex{QModelIndex{}},
+      _modelColumn{0} {
   _scrollArea->setFocusPolicy(Qt::ClickFocus);
 
   connect(_tokenChain, &TokenChain::gotFocus,
@@ -44,8 +45,8 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
   _lineEdit->setFixedHeight(dummyItem->sizeHint().height());
 
   connect(_lineEdit, &TokenLineEdit::backspaceAtBeginning, [=]() {
-    if (!_items.empty()) {
-      removeItem(_items.size() - 1);
+    if (_model && !isEmpty()) {
+      _model->removeRow(count() - 1);
     }
   });
 
@@ -90,25 +91,29 @@ void TokenEdit::setMaxLineCount(int count) {
   updateHeight();
 }
 
-void TokenEdit::addItem(QString const& text, QVariant const& userData) {
-  Q_ASSERT(_mode == Mode::Multiple ||
-           (_mode == Mode::Single && _items.empty()));
+void TokenEdit::addItem(QString const& text) {
+  auto const index = _items.size();
+  insertItem(index, text);
+}
 
-  auto item = new Token{text, userData, this};
-  auto index = std::max(0, _items.size());
+void TokenEdit::insertItem(int index, QString const& text) {
+  Q_ASSERT(_mode == Mode::Multiple ||
+           (_mode == Mode::Single && _items.empty() && index == 0));
+
+  auto item = new Token{text, this};
 
   if (_mode == Mode::Single) {
     _lineEdit->hide();
     _scrollArea->setFocusProxy(item);
   }
 
-  _items.append(item);
+  _items.insert(index, item);
   _layout->insertWidget(index, item);
-  _tokenChain->add(item->chainElement());
+  _tokenChain->insert(index, item->chainElement());
 
   connect(item, &Token::removeClicked, [=]() {
     auto index = _items.indexOf(item);
-    removeItem(index);
+    _model->removeRow(index);
   });
 
   connect(item, &Token::focused,
@@ -121,15 +126,10 @@ void TokenEdit::addItems(QStringList const& texts) {
   }
 }
 
-void TokenEdit::setItemData(int index, QVariant const& value) {
-  auto item = _items.at(index);
-  item->setUserData(value);
-}
-
 void TokenEdit::setItemText(int index, QString const& text) {
   auto item = _items.at(index);
   item->setText(text);
-  _layout->activate();
+  _layout->invalidate();
   updateHeight();
 }
 
@@ -148,19 +148,61 @@ void TokenEdit::removeItem(int index) {
   delete item;
 }
 
-QString TokenEdit::itemText(int index) const {
-  auto item = _items.at(index);
-  return item->text();
-}
-
-QVariant TokenEdit::itemData(int index) const {
-  auto item = _items.at(index);
-  return item->userData();
-}
-
 int TokenEdit::count() const { return _items.size(); }
 
+int TokenEdit::isEmpty() const { return _items.isEmpty(); }
+
 QLineEdit* TokenEdit::lineEdit() { return _lineEdit; }
+
+QAbstractItemModel* TokenEdit::model() const
+{
+  return _model;
+}
+
+void TokenEdit::setModel(QAbstractItemModel* model)
+{
+  if (_model == model) {
+    return;
+  }
+  
+  clear();
+  
+  if (_model) {
+    _model->disconnect(this);
+    
+    if (_model->parent() == this) {
+      delete _model;
+    }
+  }
+  
+  _model = model;
+  
+  connect(_model, &QAbstractItemModel::rowsInserted, this,
+          &TokenEdit::onRowsInserted);
+
+  connect(_model, &QAbstractItemModel::rowsRemoved, this,
+          &TokenEdit::onRowsRemoved);
+
+  connect(_model, &QAbstractItemModel::rowsMoved, this, &TokenEdit::onRowsMoved);
+  connect(_model, &QAbstractItemModel::dataChanged, this, &TokenEdit::onDataChanged);
+  connect(_model, &QAbstractItemModel::modelReset, this, &TokenEdit::onModelReset);
+  
+  init();
+}
+
+int TokenEdit::modelColumn() const
+{
+  return _modelColumn;
+}
+
+void TokenEdit::setModelColumn(int column)
+{
+  if (_modelColumn == column) {
+    return;
+  }
+  
+  _modelColumn = column;
+}
 
 void TokenEdit::updateHeight() {
   auto const actualMaxRows = _maxLineCount <= 0 ? 3 : _maxLineCount;
@@ -178,4 +220,85 @@ void TokenEdit::updateHeight() {
   setFixedHeight(height);
   _scrollArea->verticalScrollBar()->triggerAction(
       QAbstractSlider::SliderToMaximum);
+}
+
+void TokenEdit::init() {
+  if (auto rows = _model->rowCount(_rootModelIndex); rows > 0) {
+    onRowsInserted(_rootModelIndex, 0, (rows - 1));
+  }
+}
+
+void TokenEdit::clear() {
+  if (!isEmpty()) {
+    onRowsRemoved(_rootModelIndex, 0, count() - 1);
+  }
+}
+
+void TokenEdit::onRowsInserted(QModelIndex const& parent, int first, int last) {
+  if (parent != _rootModelIndex) {
+    return;
+  }
+
+  for (auto row = first; row <= last; ++row) {
+    auto const index = _model->index(row, _modelColumn, parent);
+    auto const text = index.data(Qt::DisplayRole).toString();
+    insertItem(row, text);
+  }
+}
+
+void TokenEdit::onRowsRemoved(QModelIndex const& parent, int first, int last) {
+  if (parent != _rootModelIndex) {
+    return;
+  }
+
+  auto index = first;
+  for (auto i = first; i <= last; ++i) {
+    removeItem(index);
+  }
+}
+
+void TokenEdit::onRowsMoved(QModelIndex const& parent, int first, int last,
+                   QModelIndex const& destination, int row)
+{
+  if (parent != _rootModelIndex) {
+    return;
+  }
+
+  onRowsRemoved(parent, first, last);
+
+  if (parent == destination) {
+    onRowsInserted(parent, row, row + (last - first));
+  }
+}
+
+void TokenEdit::onDataChanged(const QModelIndex& topLeft,
+                              const QModelIndex& bottomRight,
+                              const QVector<int>& roles) {
+  if (topLeft.parent() != _rootModelIndex) {
+    return;
+  }
+
+  if (topLeft.column() > _modelColumn || bottomRight.column() < _modelColumn) {
+    return;
+  }
+
+  if (!roles.contains(Qt::DisplayRole) && !roles.contains(Qt::UserRole)) {
+    return;
+  }
+
+  auto const parent = topLeft.parent();
+
+  if (roles.contains(Qt::DisplayRole)) {
+    for (auto row = topLeft.row(); row <= bottomRight.row(); ++row) {
+      auto const index = _model->index(row, _modelColumn, parent);
+
+      setItemText(row, _model->data(index, Qt::DisplayRole).toString());
+    }
+  }
+}
+
+void TokenEdit::onModelReset()
+{
+  clear();
+  init();
 }
