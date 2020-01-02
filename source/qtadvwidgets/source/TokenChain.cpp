@@ -8,6 +8,7 @@
 TokenChain::TokenChain(TokenEditMode mode, QLineEdit* last, QObject* parent)
     : QObject{parent},
       _last{std::make_unique<LineEditChainElement>(last)},
+      _size{1},
       _mode{mode} {
   connect(_last.get(), &TokenChainElement::gotFocus, this,
           &TokenChain::gotFocus);
@@ -18,17 +19,26 @@ TokenChain::TokenChain(TokenEditMode mode, QLineEdit* last, QObject* parent)
 TokenChain::~TokenChain() = default;
 
 void TokenChain::add(TokenChainElement* element) {
+  insert(indexLast(), element);
+}
+
+void TokenChain::insert(int index, TokenChainElement* element)
+{
+  Q_ASSERT(0 <= index && index < _size);  // last element is always the line edit
   Q_ASSERT(element);
 
-  auto prev = _last->previousElement();
+  auto next = at(index);
+  auto prev = next->previousElement();
 
   if (prev) {
     prev->setNextElement(element);
     element->setPreviousElement(prev);
   }
 
-  _last->setPreviousElement(element);
-  element->setNextElement(_last.get());
+  next->setPreviousElement(element);
+  element->setNextElement(next);
+
+  ++_size;
 
   connect(element, &TokenChainElement::gotFocus, this, &TokenChain::gotFocus);
   connect(element, &TokenChainElement::lostFocus, this, &TokenChain::lostFocus);
@@ -58,8 +68,22 @@ void TokenChain::remove(TokenChainElement* element) {
   } else if (next) {
     next->widget()->setFocus();
   }
+  
+   --_size;
 
   element->disconnect(this);
 }
 
 void TokenChain::setMode(TokenEditMode mode) { _mode = mode; }
+
+int TokenChain::indexLast() const { return _size - 1; }
+
+TokenChainElement* TokenChain::at(int index) const {
+  auto element = _last.get();
+
+  for (auto currentIndex = indexLast(); currentIndex > index; --currentIndex) {
+    element = element->previousElement();
+  }
+
+  return element;
+}
