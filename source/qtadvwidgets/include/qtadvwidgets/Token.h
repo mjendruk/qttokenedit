@@ -17,15 +17,10 @@ class QTADVWIDGETS_API Token : public QWidget {
 
  public:
   Token(QString const& text, QWidget* parent = nullptr);
-  Token(QString const& text, QVariant const& userData,
-        QWidget* parent = nullptr);
   ~Token();
 
   QString const& text() const;
   void setText(QString const& text);
-
-  QVariant const& userData() const;
-  void setUserData(QVariant const& data);
 
   QSize sizeHint() const override;
   QSize minimumSizeHint() const override;
@@ -59,7 +54,6 @@ class QTADVWIDGETS_API Token : public QWidget {
 
  private:
   QString _text;
-  QVariant _userData;
 
   std::unique_ptr<TokenChainElement> _chainElement;
 

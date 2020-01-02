@@ -13,12 +13,9 @@
 #include <QToolButton>
 #include <cmath>
 
-Token::Token(QString const& text, QWidget* parent) : Token{text, {}, parent} {}
-
-Token::Token(QString const& text, QVariant const& userData, QWidget* parent)
+Token::Token(QString const& text, QWidget* parent)
     : QWidget{parent},
       _text{text},
-      _userData{userData},
       _chainElement{std::make_unique<TokenChainElement>(this)},
       _hovered{false} {
   setCursor(Qt::ArrowCursor);
@@ -39,10 +36,6 @@ void Token::setText(QString const& text) {
   _text = text;
   update();
 }
-
-QVariant const& Token::userData() const { return _userData; }
-
-void Token::setUserData(QVariant const& data) { _userData = data; }
 
 QSize Token::sizeHint() const {
   auto const margins =
