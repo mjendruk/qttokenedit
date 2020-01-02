@@ -24,7 +24,9 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
   _scrollArea->setFocusPolicy(Qt::ClickFocus);
 
   connect(_tokenChain, &TokenChain::gotFocus,
-          [=](auto element) { setShownAsFocused(true); });
+          [=](auto element) { setShownAsFocused(true);
+          _scrollArea->ensureWidgetVisible(element->widget());
+          });
 
   connect(_tokenChain, &TokenChain::lostFocus,
           [=](auto element) { setShownAsFocused(false); });
@@ -49,10 +51,7 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
       _model->removeRow(count() - 1);
     }
   });
-
-  connect(_lineEdit, &TokenLineEdit::focused,
-          [=]() { _scrollArea->ensureWidgetVisible(_lineEdit); });
-
+        
   _layout->addWidget(_lineEdit);
 
   mainWidget->setLayout(_layout);
@@ -89,63 +88,6 @@ int TokenEdit::maxLineCount() const { return _maxLineCount; }
 void TokenEdit::setMaxLineCount(int count) {
   _maxLineCount = count;
   updateHeight();
-}
-
-void TokenEdit::addItem(QString const& text) {
-  auto const index = _items.size();
-  insertItem(index, text);
-}
-
-void TokenEdit::insertItem(int index, QString const& text) {
-  Q_ASSERT(_mode == Mode::Multiple ||
-           (_mode == Mode::Single && _items.empty() && index == 0));
-
-  auto item = new Token{text, this};
-
-  if (_mode == Mode::Single) {
-    _lineEdit->hide();
-    _scrollArea->setFocusProxy(item);
-  }
-
-  _items.insert(index, item);
-  _layout->insertWidget(index, item);
-  _tokenChain->insert(index, item->chainElement());
-
-  connect(item, &Token::removeClicked, [=]() {
-    auto index = _items.indexOf(item);
-    _model->removeRow(index);
-  });
-
-  connect(item, &Token::focused,
-          [=]() { _scrollArea->ensureWidgetVisible(item); });
-}
-
-void TokenEdit::addItems(QStringList const& texts) {
-  for (auto const& text : texts) {
-    addItem(text);
-  }
-}
-
-void TokenEdit::setItemText(int index, QString const& text) {
-  auto item = _items.at(index);
-  item->setText(text);
-  _layout->invalidate();
-  updateHeight();
-}
-
-void TokenEdit::removeItem(int index) {
-  emit itemAboutToBeRemoved(index);
-  auto item = _items.takeAt(index);
-  auto layoutItem = _layout->takeAt(index);
-
-  if (_mode == Mode::Single) {
-    _lineEdit->show();
-    _scrollArea->setFocusProxy(item);
-  }
-
-  _tokenChain->remove(item->chainElement());
-  delete layoutItem;
-  delete item;
 }
 
 int TokenEdit::count() const { return _items.size(); }
@@ -202,6 +144,55 @@ void TokenEdit::setModelColumn(int column)
   }
   
   _modelColumn = column;
+  
+  onModelReset();
+}
+
+void TokenEdit::addItem(QString const& text) {
+  auto const index = _items.size();
+  insertItem(index, text);
+}
+
+void TokenEdit::insertItem(int index, QString const& text) {
+  Q_ASSERT(_mode == Mode::Multiple ||
+           (_mode == Mode::Single && _items.empty() && index == 0));
+
+  auto item = new Token{text, this};
+
+  if (_mode == Mode::Single) {
+    _lineEdit->hide();
+    _scrollArea->setFocusProxy(item);
+  }
+
+  _items.insert(index, item);
+  _layout->insertWidget(index, item);
+  _tokenChain->insert(index, item->chainElement());
+
+  connect(item, &Token::removeClicked, [=]() {
+    auto index = _items.indexOf(item);
+    _model->removeRow(index);
+  });
+}
+
+void TokenEdit::setItemText(int index, QString const& text) {
+  auto item = _items.at(index);
+  item->setText(text);
+  _layout->invalidate();
+  updateHeight();
+}
+
+void TokenEdit::removeItem(int index) {
+  auto item = _items.takeAt(index);
+  auto layoutItem = _layout->takeAt(index);
+
+  if (_mode == Mode::Single) {
+    _lineEdit->show();
+    _scrollArea->setFocusProxy(item);
+  }
+
+  _tokenChain->remove(item->chainElement());
+  delete layoutItem;
+  delete item;
 }
 
 void TokenEdit::updateHeight() {

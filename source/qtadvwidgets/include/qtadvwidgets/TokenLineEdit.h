@@ -11,9 +11,7 @@ class QTADVWIDGETS_API TokenLineEdit : public QLineEdit {
 
  signals:
   void backspaceAtBeginning();
-  void focused();
 
  protected:
   void keyPressEvent(QKeyEvent* event) override;
-  void focusInEvent(QFocusEvent* event) override;
 };

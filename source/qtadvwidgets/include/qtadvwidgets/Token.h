@@ -29,7 +29,6 @@ class QTADVWIDGETS_API Token : public QWidget {
 
  signals:
   void removeClicked();
-  void focused();
 
  protected:
   void paintEvent(QPaintEvent* event) override;

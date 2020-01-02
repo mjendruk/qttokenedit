@@ -42,17 +42,10 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   int modelColumn() const;
   void setModelColumn(int column);
 
- signals:
-  void itemAboutToBeRemoved(int index);
-
  private:
   void addItem(QString const& text);
-  void addItems(QStringList const& texts);
-
   void insertItem(int index, QString const& text);
-
   void setItemText(int index, QString const& text);
-
   void removeItem(int index);
   
   void updateHeight();

@@ -149,8 +149,6 @@ void Token::keyPressEvent(QKeyEvent* event) {
 }
 
 void Token::focusInEvent(QFocusEvent* event) {
-  emit focused();
-
   _button->setColor(palette().color(QPalette::HighlightedText));
   QWidget::focusInEvent(event);
 }
