@@ -203,12 +203,12 @@ void FlexLayout::tryRemoveOverflow(int overflow, QLayoutItem const *item,
 }
 
 std::vector<std::size_t> FlexLayout::expandingItemIndices(
-    LayoutItemConstIterator begin, LayoutItemConstIterator end) const {
+    std::vector<ItemMetrics> const& itemMetrics) const {
   auto result = std::vector<std::size_t>{};
 
   auto index = std::size_t{0};
-  for (auto it = begin; it != end; ++it, ++index) {
-    if ((*it)->expandingDirections().testFlag(Qt::Horizontal)) {
+  for (auto index = std::size_t{0}; index < itemMetrics.size(); ++index) {
+    if (itemMetrics.at(index).item->expandingDirections().testFlag(Qt::Horizontal)) {
       result.push_back(index);
     }
   }
@@ -248,7 +248,7 @@ auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
     auto const overflow = -remainingWidth;
     tryRemoveOverflow(overflow, *begin, itemMetrics.front().size);
   } else if (remainingWidth > 0) {
-    if (auto indices = expandingItemIndices(begin, nextLineIt);
+    if (auto indices = expandingItemIndices(itemMetrics);
         !indices.empty()) {
       distributeRemainingWidth(remainingWidth, indices, itemMetrics);
     }
