@@ -40,8 +40,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
     auto tokenEdit = new TokenEdit{TokenEditMode::Multiple, this};
     tokenEdit->setModelColumn(0);
     
-    auto listView = new QListView{this};
-    listView->setMovement(QListView::Snap);
+    auto listView = new QTableView{this};
     
     auto const longNames = QStringList{
       "S+U Potsdamer Platz",
@@ -62,6 +61,14 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
     
     m_ui->formLayout->addRow("MultipleTokenEdit", tokenEdit);
     m_ui->formLayout->addRow("ListView", listView);
+    
+    auto resetButton = new QPushButton{"Reset Model"};
+    m_ui->formLayout->addRow("Reset", resetButton);
+    
+    connect(resetButton, &QPushButton::clicked, [=]() {
+      tokenEdit->setModel(nullptr);
+      tokenEdit->setModel(model);
+    });
 
     auto lineEdit = tokenEdit->lineEdit();
 

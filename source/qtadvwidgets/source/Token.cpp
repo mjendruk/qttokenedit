@@ -59,6 +59,60 @@ QSize Token::minimumSizeHint() const {
 
 TokenChainElement* Token::chainElement() const { return _chainElement.get(); }
 
+QPixmap Token::toPixmap() const
+{
+  auto pixmap = QPixmap(size() * devicePixelRatio());
+  pixmap.setDevicePixelRatio(devicePixelRatio());
+  pixmap.fill(QColor{0, 0, 0, 0});
+  
+  auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}};
+
+  auto const rounding = contentHeight() / 8.0;
+
+  auto path = QPainterPath{};
+  path.addRoundedRect(rect, rounding, rounding);
+  
+  auto painter = QPainter{&pixmap};
+  
+  auto palette = this->palette();
+
+  painter.save();
+  
+  auto brushRole = QPalette::Button;
+  
+  if (_hovered) {
+    brushRole = QPalette::Midlight;
+  }
+  
+  if (hasFocus()) {
+    brushRole = QPalette::Highlight;
+  }
+  
+  auto brush = palette.brush(brushRole);
+  
+  painter.setBrush(brush);
+  painter.setPen(Qt::NoPen);
+
+  painter.setRenderHint(QPainter::Antialiasing, true);
+//  painter.setClipRect(clippingRect);
+  painter.drawPath(path);
+
+  painter.restore();
+  
+  auto const penRole =
+      hasFocus() ? QPalette::HighlightedText : QPalette::ButtonText;
+  painter.setPen(palette.color(penRole));
+
+  auto const textPosition = QPointF(horizontalTextMargin(), margin());
+  auto const textSize =
+      QSizeF{QSize{elidedTextSize().width(), contentHeight()}};
+
+  painter.drawText(QRectF{textPosition, textSize},
+                   Qt::TextSingleLine | Qt::AlignLeft, _elidedText);
+  
+  return pixmap;
+}
+
 int Token::contentHeight() const { return fontMetrics().height(); }
 
 int Token::horizontalTextMargin() const { return margin() * 2; }

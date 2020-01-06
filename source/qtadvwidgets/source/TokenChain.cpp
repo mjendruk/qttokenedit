@@ -1,6 +1,7 @@
 #include <qtadvwidgets/LineEditChainElement.h>
 #include <qtadvwidgets/TokenChain.h>
 #include <qtadvwidgets/TokenChainElement.h>
+#include <qtadvwidgets/Token.h>
 
 #include <QWidget>
 #include <QtGlobal>
@@ -22,33 +23,62 @@ void TokenChain::add(TokenChainElement* element) {
   insert(indexLast(), element);
 }
 
-void TokenChain::insert(int index, TokenChainElement* element)
-{
-  Q_ASSERT(0 <= index && index < _size);  // last element is always the line edit
+void TokenChain::insert(int index, TokenChainElement* element) {
+  insert(index, element, true);
+}
+
+std::string toStdString(TokenChainElement* element) {
+  if (auto token = dynamic_cast<Token*>(element->widget())) {
+    return token->text().toStdString();
+  } else {
+    return "";
+  }
+}
+
+void TokenChain::move(int from, int to) {
+  if (from == to) {
+    return;
+  }
+  
+  insert(to, takeAt(from, false), false);
+}
+
+void TokenChain::remove(TokenChainElement* element) {
+  remove(element, true);
+}
+
+void TokenChain::setMode(TokenEditMode mode) { _mode = mode; }
+
+void TokenChain::insert(int index, TokenChainElement* element, bool _connect) {
+  Q_ASSERT(0 <= index && index <= indexLast());  // last element is always the line edit
   Q_ASSERT(element);
 
   auto next = at(index);
   auto prev = next->previousElement();
-
+  
   if (prev) {
     prev->setNextElement(element);
-    element->setPreviousElement(prev);
   }
-
+  
   next->setPreviousElement(element);
+  
+  element->setPreviousElement(prev);
   element->setNextElement(next);
-
+  
   ++_size;
 
-  connect(element, &TokenChainElement::gotFocus, this, &TokenChain::gotFocus);
-  connect(element, &TokenChainElement::lostFocus, this, &TokenChain::lostFocus);
-
+  if (_connect) {
+    connect(element, &TokenChainElement::gotFocus, this, &TokenChain::gotFocus);
+    connect(element, &TokenChainElement::lostFocus, this, &TokenChain::lostFocus);
+  }
+  
   if (_mode == TokenEditMode::Single) {
     element->widget()->setFocus();
   }
 }
 
-void TokenChain::remove(TokenChainElement* element) {
+void TokenChain::remove(TokenChainElement* element, bool disconnect)
+{
   Q_ASSERT(element);
   Q_ASSERT(element != _last.get());
 
@@ -71,17 +101,27 @@ void TokenChain::remove(TokenChainElement* element) {
   
    --_size;
 
-  element->disconnect(this);
+  if (disconnect) {
+    element->disconnect(this);
+  }
 }
 
-void TokenChain::setMode(TokenEditMode mode) { _mode = mode; }
+TokenChainElement* TokenChain::takeAt(int index, bool disconnect) {
+  auto element = at(index);
+  remove(element, disconnect);
+  return element;
+}
 
 int TokenChain::indexLast() const { return _size - 1; }
 
 TokenChainElement* TokenChain::at(int index) const {
+  Q_ASSERT(0 <= index && index <= indexLast());
+  
   auto element = _last.get();
+  
+  auto reverseIndex = indexLast() - index;
 
-  for (auto currentIndex = indexLast(); currentIndex > index; --currentIndex) {
+  while (reverseIndex--) {
     element = element->previousElement();
   }
 

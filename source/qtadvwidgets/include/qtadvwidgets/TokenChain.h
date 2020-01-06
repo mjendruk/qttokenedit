@@ -17,6 +17,7 @@ class QTADVWIDGETS_API TokenChain : public QObject {
 
   void add(TokenChainElement* element);
   void insert(int index, TokenChainElement* element);
+  void move(int from, int to);
   void remove(TokenChainElement* element);
 
   void setMode(TokenEditMode mode);
@@ -26,6 +27,10 @@ class QTADVWIDGETS_API TokenChain : public QObject {
   void lostFocus(TokenChainElement* element);
 
  private:
+  void insert(int index, TokenChainElement* element, bool connect);
+  void remove(TokenChainElement* element, bool disconnect);
+  TokenChainElement* takeAt(int index, bool disconnect);
+  
   int indexLast() const;
   TokenChainElement* at(int index) const;
 

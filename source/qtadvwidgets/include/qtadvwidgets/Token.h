@@ -26,6 +26,8 @@ class QTADVWIDGETS_API Token : public QWidget {
   QSize minimumSizeHint() const override;
 
   TokenChainElement* chainElement() const;
+  
+  QPixmap toPixmap() const;
 
  signals:
   void removeClicked();
