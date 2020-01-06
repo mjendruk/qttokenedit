@@ -22,6 +22,8 @@ class QTADVWIDGETS_API TokenEditViewport : public QWidget {
  protected:
   void paintEvent(QPaintEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
+  void leaveEvent(QEvent* event) override;
+  void enterEvent(QEvent* event) override;
 
  private:
   QRect contentRect() const;

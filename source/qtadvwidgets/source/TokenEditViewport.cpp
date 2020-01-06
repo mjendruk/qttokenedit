@@ -11,6 +11,7 @@ class TokenEditViewportFrame : public QWidget {
  public:
   TokenEditViewportFrame(TokenEditViewport* parent = nullptr)
       : QWidget{parent}, _parent{parent} {
+    setFocusPolicy(Qt::NoFocus);
     setAttribute(Qt::WA_TransparentForMouseEvents);
   }
 
@@ -20,16 +21,10 @@ class TokenEditViewportFrame : public QWidget {
     painter.setClipRect(event->rect());
 
     auto option = QStyleOptionFrame{};
-    option.initFrom(this);
+    option.initFrom(_parent);
     option.frameShape = QFrame::StyledPanel;
-
-    if (_parent->underMouse()) {
-      option.state |= QStyle::State_MouseOver;
-    }
-
-    if (_parent->shownAsFocused()) {
-      option.state |= QStyle::State_HasFocus;
-    }
+    option.state.setFlag(QStyle::State_MouseOver, _parent->underMouse());
+    option.state.setFlag(QStyle::State_HasFocus, _parent->shownAsFocused());
 
     style()->drawPrimitive(QStyle::PE_FrameLineEdit, &option, &painter);
   }
@@ -42,7 +37,8 @@ TokenEditViewport::TokenEditViewport(QWidget* parent)
     : QWidget{parent},
       _widget{nullptr},
       _layout{new QBoxLayout{QBoxLayout::TopToBottom}},
-      _frame{new TokenEditViewportFrame{this}} {
+      _frame{new TokenEditViewportFrame{this}},
+      _shownAsFocused{false} {
   setFocusPolicy(Qt::NoFocus);
   _layout->setContentsMargins(contentMargins());
   setLayout(_layout);
@@ -88,6 +84,16 @@ void TokenEditViewport::resizeEvent(QResizeEvent* event) {
   _frame->resize(size());
 
   QWidget::resizeEvent(event);
+}
+
+void TokenEditViewport::leaveEvent(QEvent* event) {
+  update();
+  QWidget::leaveEvent(event);
+}
+
+void TokenEditViewport::enterEvent(QEvent* event) {
+  update();
+  QWidget::enterEvent(event);
 }
 
 QRect TokenEditViewport::contentRect() const {
