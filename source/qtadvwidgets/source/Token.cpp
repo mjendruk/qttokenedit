@@ -16,8 +16,7 @@
 Token::Token(QString const& text, QWidget* parent)
     : QWidget{parent},
       _text{text},
-      _chainElement{std::make_unique<TokenChainElement>(this)},
-      _hovered{false} {
+      _chainElement{std::make_unique<TokenChainElement>(this)} {
   setCursor(Qt::ArrowCursor);
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   setFocusPolicy(Qt::ClickFocus);
@@ -89,7 +88,7 @@ void Token::paintEvent(QPaintEvent* event) {
   
   auto brushRole = QPalette::Button;
   
-  if (_hovered) {
+  if (underMouse()) {
     brushRole = QPalette::Midlight;
   }
   
@@ -123,12 +122,12 @@ void Token::paintEvent(QPaintEvent* event) {
 }
 
 void Token::leaveEvent(QEvent* event) {
-  _hovered = false;
+  QWidget::leaveEvent(event);
   update();
 }
 
 void Token::enterEvent(QEvent* event) {
-  _hovered = true;
+  QWidget::enterEvent(event);
   update();
 }
 
