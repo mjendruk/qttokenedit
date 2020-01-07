@@ -1,7 +1,7 @@
 #include <qtadvwidgets/LineEditChainElement.h>
+#include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenChain.h>
 #include <qtadvwidgets/TokenChainElement.h>
-#include <qtadvwidgets/Token.h>
 
 #include <QWidget>
 #include <QtGlobal>
@@ -39,49 +39,48 @@ void TokenChain::move(int from, int to) {
   if (from == to) {
     return;
   }
-  
+
   auto element = takeAt(from, false);
   insert(to, element, false);
-  
+
   element->widget()->setFocus();
 }
 
-void TokenChain::remove(TokenChainElement* element) {
-  remove(element, true);
-}
+void TokenChain::remove(TokenChainElement* element) { remove(element, true); }
 
 void TokenChain::setMode(TokenEditMode mode) { _mode = mode; }
 
 void TokenChain::insert(int index, TokenChainElement* element, bool _connect) {
-  Q_ASSERT(0 <= index && index <= indexLast());  // last element is always the line edit
+  Q_ASSERT(0 <= index &&
+           index <= indexLast());  // last element is always the line edit
   Q_ASSERT(element);
 
   auto next = at(index);
   auto prev = next->previousElement();
-  
+
   if (prev) {
     prev->setNextElement(element);
   }
-  
+
   next->setPreviousElement(element);
-  
+
   element->setPreviousElement(prev);
   element->setNextElement(next);
-  
+
   ++_size;
 
   if (_connect) {
     connect(element, &TokenChainElement::gotFocus, this, &TokenChain::gotFocus);
-    connect(element, &TokenChainElement::lostFocus, this, &TokenChain::lostFocus);
+    connect(element, &TokenChainElement::lostFocus, this,
+            &TokenChain::lostFocus);
   }
-  
+
   if (_mode == TokenEditMode::Single) {
     element->widget()->setFocus();
   }
 }
 
-void TokenChain::remove(TokenChainElement* element, bool disconnect)
-{
+void TokenChain::remove(TokenChainElement* element, bool disconnect) {
   Q_ASSERT(element);
   Q_ASSERT(element != _last.get());
 
@@ -101,8 +100,8 @@ void TokenChain::remove(TokenChainElement* element, bool disconnect)
   } else if (next) {
     next->widget()->setFocus();
   }
-  
-   --_size;
+
+  --_size;
 
   if (disconnect) {
     element->disconnect(this);
@@ -119,9 +118,9 @@ int TokenChain::indexLast() const { return _size - 1; }
 
 TokenChainElement* TokenChain::at(int index) const {
   Q_ASSERT(0 <= index && index <= indexLast());
-  
+
   auto element = _last.get();
-  
+
   auto reverseIndex = indexLast() - index;
 
   while (reverseIndex--) {

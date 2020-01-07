@@ -2,7 +2,7 @@
 
 #include <QKeyEvent>
 
-TokenLineEdit::TokenLineEdit(QWidget* parent) {
+TokenLineEdit::TokenLineEdit(QWidget* parent) : QLineEdit{parent} {
   setAttribute(Qt::WA_MacShowFocusRect, 0);
 }
 

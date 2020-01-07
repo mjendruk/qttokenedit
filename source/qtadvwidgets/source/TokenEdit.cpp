@@ -5,11 +5,10 @@
 #include <qtadvwidgets/TokenEditViewport.h>
 #include <qtadvwidgets/TokenLineEdit.h>
 
-#include <algorithm>
-
 #include <QLineEdit>
 #include <QScrollBar>
 #include <QtGlobal>
+#include <algorithm>
 
 TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
     : TokenEditViewport{parent},
@@ -38,7 +37,7 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
   auto mainWidget = new QWidget{};
   mainWidget->setFocusPolicy(Qt::NoFocus);
 
-  _layout = new FlexLayout{3, _spacing, _spacing};
+  _layout = new FlexLayout{_spacing, _spacing, _spacing};
 
   connect(_layout, &FlexLayout::linesChanged, this, &TokenEdit::updateHeight);
 
@@ -116,7 +115,7 @@ void TokenEdit::setModel(QAbstractItemModel* model) {
   }
 
   _model = model;
-  
+
   if (_model != nullptr) {
     connect(_model, &QAbstractItemModel::rowsInserted, this,
             &TokenEdit::onRowsInserted);
@@ -131,7 +130,6 @@ void TokenEdit::setModel(QAbstractItemModel* model) {
 
     init();
   } else {
-    
   }
 }
 
@@ -172,9 +170,8 @@ void TokenEdit::insertItem(int index, QString const& text) {
     _model->removeRow(index);
   });
 
-  connect(item, &Token::dragged, [=](auto target, auto hint) {
-    onItemDragged(item, target, hint);
-  });
+  connect(item, &Token::dragged,
+          [=](auto target, auto hint) { onItemDragged(item, target, hint); });
 }
 
 void TokenEdit::setItemText(int index, QString const& text) {
@@ -184,25 +181,24 @@ void TokenEdit::setItemText(int index, QString const& text) {
   updateHeight();
 }
 
-void TokenEdit::moveItem(int from, int to)
-{
+void TokenEdit::moveItem(int from, int to) {
   Q_ASSERT(_mode == Mode::Multiple || (_mode == Mode::Single && from == to));
-  
+
   if (from == to) {
     return;
   }
-  
+
   auto insertAt = to - 1;
-  
+
   if (to < _items.size()) {
     _items.move(from, insertAt);
   } else {
     _items.append(_items.takeAt(from));
   }
-  
+
   auto layoutItem = _layout->takeAt(from);
   _layout->insertItem(insertAt, layoutItem);
-  
+
   _tokenChain->move(from, insertAt);
 }
 
@@ -240,7 +236,7 @@ void TokenEdit::updateHeight() {
 
 void TokenEdit::init() {
   _lineEdit->show();
-  
+
   if (auto rows = _model->rowCount(_rootModelIndex); rows > 0) {
     onRowsInserted(_rootModelIndex, 0, (rows - 1));
   }
@@ -250,7 +246,7 @@ void TokenEdit::clear() {
   if (!isEmpty()) {
     onRowsRemoved(_rootModelIndex, 0, count() - 1);
   }
-  
+
   _lineEdit->hide();
 }
 
@@ -283,7 +279,7 @@ void TokenEdit::onRowsMoved(QModelIndex const& parent, int first, int last,
   if (parent != _rootModelIndex) {
     return;
   }
-  
+
   if (parent == destination) {
     for (int from = last; from >= last; --from) {
       moveItem(from, to);
@@ -329,9 +325,9 @@ void TokenEdit::onItemDragged(Token* source, Token* target,
   auto const from = _items.indexOf(source);
 
   auto to = _items.indexOf(target);
-  
+
   Q_ASSERT(to >= 0);
-  
+
   if (hint == Token::DropHint::After) ++to;
 
   to = from > to ? to + 1 : to;  // wrong implementation of QStringListModel

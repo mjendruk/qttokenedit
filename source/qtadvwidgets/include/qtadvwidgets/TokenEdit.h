@@ -4,11 +4,11 @@
 #include <qtadvwidgets/TokenEditViewport.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+#include <QModelIndex>
 #include <QScrollArea>
 #include <QVariant>
 #include <QVector>
 #include <cstdint>
-#include <QModelIndex>
 
 class QLineEdit;
 class QAbstractItemModel;
@@ -38,17 +38,17 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
 
   QAbstractItemModel* model() const;
   void setModel(QAbstractItemModel* model);
-  
+
   int modelColumn() const;
   void setModelColumn(int column);
-  
+
  private:
   void addItem(QString const& text);
   void insertItem(int index, QString const& text);
   void setItemText(int index, QString const& text);
   void moveItem(int from, int to);
   void removeItem(int index);
-  
+
   void updateHeight();
   void init();
   void clear();
@@ -72,7 +72,7 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   int _spacing;
   TokenEditMode _mode;
   QScrollArea* _scrollArea;
-  
+
   // model members
   QAbstractItemModel* _model;
   QModelIndex _rootModelIndex;

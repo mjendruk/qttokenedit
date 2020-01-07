@@ -69,7 +69,7 @@ QPixmap Token::toPixmap() const {
   pixmap.fill(QColor{0, 0, 0, 0});
 
   auto painter = QPainter{&pixmap};
-  
+
   drawBackground(&painter, palette().brush(QPalette::Highlight));
   drawText(&painter, palette().color(QPalette::HighlightedText));
 
@@ -104,12 +104,12 @@ void Token::paintEvent(QPaintEvent* event) {
   }
 
   drawBackground(&painter, palette().brush(brushRole));
-  
+
   drawDropIndicator(&painter);
-  
+
   auto const penRole =
       hasFocus() ? QPalette::HighlightedText : QPalette::ButtonText;
-  
+
   drawText(&painter, palette().color(penRole));
 
   QWidget::paintEvent(event);
@@ -194,15 +194,15 @@ void Token::dropEvent(QDropEvent* event) {
 
 void Token::drawBackground(QPainter* painter, QBrush brush) const {
   painter->save();
-  
+
   auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}};
 
   auto const rounding = contentHeight() / 8.0;
-  
+
   painter->setBrush(brush);
   painter->setPen(Qt::NoPen);
   painter->drawRoundedRect(rect, rounding, rounding);
-  
+
   painter->restore();
 }
 
@@ -215,7 +215,7 @@ void Token::drawText(QPainter* painter, QPen pen) const {
       QSizeF{QSize{elidedTextSize().width(), contentHeight()}};
 
   painter->drawText(QRectF{textPosition, textSize},
-                   Qt::TextSingleLine | Qt::AlignLeft, _elidedText);
+                    Qt::TextSingleLine | Qt::AlignLeft, _elidedText);
   painter->restore();
 }
 
@@ -262,7 +262,7 @@ bool Token::acceptsDrag(QDropEvent* event) const {
   if (!token) {
     return false;
   }
-  
+
   if (token == this) {
     return false;
   }
@@ -286,7 +286,7 @@ void Token::finishDrag(QDropEvent* event) {
       qobject_cast<TokenMimeData const*>(event->mimeData())->token();
 
   emit token->dragged(this, dropHint(event->pos()));
-  
+
   resetDropIndicator();
 }
 
@@ -294,39 +294,42 @@ void Token::showDropIndicator(QPoint const& mousePos) {
   _dropIndicator = dropHint(mousePos) == DropHint::Before
                        ? DropIndicator::Before
                        : DropIndicator::After;
-  
+
   update();
 }
 
-void Token::resetDropIndicator() { _dropIndicator = DropIndicator::None; update(); }
+void Token::resetDropIndicator() {
+  _dropIndicator = DropIndicator::None;
+  update();
+}
 
 void Token::drawDropIndicator(QPainter* painter) {
   if (_dropIndicator == DropIndicator::None) {
     return;
   }
-  
+
   painter->save();
-  
+
   auto const rect = QRectF{this->rect()};
 
   auto scaling = logicalDpiX() / 72.0;
-  
+
   auto const width = scaling * 1.0;
   auto const height = rect.height();
   auto const size = QSizeF{width, height};
-  
+
   auto pos = QPointF{0.0, 0.0};
   if (_dropIndicator == DropIndicator::Before) {
     pos.setX(0.0);
   } else {
     pos.setX(rect.width() - size.width());
   }
-  
+
   painter->setBrush(palette().brush(QPalette::ButtonText));
   painter->setPen(Qt::NoPen);
-  
+
   painter->drawRect(QRectF{pos, size});
-  
+
   painter->restore();
 }
 

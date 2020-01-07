@@ -30,7 +30,7 @@ class QTADVWIDGETS_API TokenChain : public QObject {
   void insert(int index, TokenChainElement* element, bool connect);
   void remove(TokenChainElement* element, bool disconnect);
   TokenChainElement* takeAt(int index, bool disconnect);
-  
+
   int indexLast() const;
   TokenChainElement* at(int index) const;
 
