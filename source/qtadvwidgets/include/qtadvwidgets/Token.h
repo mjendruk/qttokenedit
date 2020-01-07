@@ -54,6 +54,9 @@ class QTADVWIDGETS_API Token : public QWidget {
   void dropEvent(QDropEvent* event) override;
 
  private:
+  void drawBackground(QPainter* painter, QBrush brush) const;
+  void drawText(QPainter* painter, QPen pen) const;
+  
   int contentHeight() const;
   int horizontalTextMargin() const;
   int margin() const;
@@ -77,7 +80,7 @@ class QTADVWIDGETS_API Token : public QWidget {
   void showDropIndicator(QPoint const& mousePos);
   void resetDropIndicator();
   
-  void paintDropIndicator(QPainter* painter);
+  void drawDropIndicator(QPainter* painter);
   
   int dragStartDistance() const;
   DropHint dropHint(QPoint const& mousePos) const;

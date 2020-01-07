@@ -68,39 +68,10 @@ QPixmap Token::toPixmap() const {
   pixmap.setDevicePixelRatio(devicePixelRatio());
   pixmap.fill(QColor{0, 0, 0, 0});
 
-  auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}};
-
-  auto const rounding = contentHeight() / 8.0;
-
-  auto path = QPainterPath{};
-  path.addRoundedRect(rect, rounding, rounding);
-
   auto painter = QPainter{&pixmap};
-
-  auto palette = this->palette();
-
-  painter.save();
-
-  auto brushRole = QPalette::Highlight;
-  auto brush = palette.brush(brushRole);
-
-  painter.setBrush(brush);
-  painter.setPen(Qt::NoPen);
-
-  painter.setRenderHint(QPainter::Antialiasing, true);
-  painter.drawPath(path);
-
-  painter.restore();
-
-  auto const penRole = QPalette::HighlightedText;
-  painter.setPen(palette.color(penRole));
-
-  auto const textPosition = QPointF(horizontalTextMargin(), margin());
-  auto const textSize =
-      QSizeF{QSize{elidedTextSize().width(), contentHeight()}};
-
-  painter.drawText(QRectF{textPosition, textSize},
-                   Qt::TextSingleLine | Qt::AlignLeft, _elidedText);
+  
+  drawBackground(&painter, palette().brush(QPalette::Highlight));
+  drawText(&painter, palette().color(QPalette::HighlightedText));
 
   return pixmap;
 }
@@ -118,20 +89,9 @@ QSize Token::textSize() const {
 }
 
 void Token::paintEvent(QPaintEvent* event) {
-  auto const clippingRect = QRectF{event->rect()};
-
-  auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}};
-
-  auto const rounding = contentHeight() / 8.0;
-
-  auto path = QPainterPath{};
-  path.addRoundedRect(rect, rounding, rounding);
-
   auto painter = QPainter{this};
-
-  auto palette = this->palette();
-
-  painter.save();
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  painter.setClipRect(QRectF{event->rect()});
 
   auto brushRole = QPalette::Button;
 
@@ -143,33 +103,14 @@ void Token::paintEvent(QPaintEvent* event) {
     brushRole = QPalette::Highlight;
   }
 
-  auto brush = palette.brush(brushRole);
-
-  painter.setBrush(brush);
-  painter.setPen(Qt::NoPen);
-
-  painter.setRenderHint(QPainter::Antialiasing, true);
-  painter.setClipRect(clippingRect);
-  painter.drawPath(path);
-
-  painter.restore();
+  drawBackground(&painter, palette().brush(brushRole));
   
-  paintDropIndicator(&painter);
+  drawDropIndicator(&painter);
   
-  painter.save();
-
   auto const penRole =
       hasFocus() ? QPalette::HighlightedText : QPalette::ButtonText;
-  painter.setPen(palette.color(penRole));
-
-  auto const textPosition = QPointF(horizontalTextMargin(), margin());
-  auto const textSize =
-      QSizeF{QSize{elidedTextSize().width(), contentHeight()}};
-
-  painter.drawText(QRectF{textPosition, textSize},
-                   Qt::TextSingleLine | Qt::AlignLeft, _elidedText);
   
-  painter.restore();
+  drawText(&painter, palette().color(penRole));
 
   QWidget::paintEvent(event);
 }
@@ -249,6 +190,33 @@ void Token::dropEvent(QDropEvent* event) {
   if (acceptsDrag(event)) {
     finishDrag(event);
   }
+}
+
+void Token::drawBackground(QPainter* painter, QBrush brush) const {
+  painter->save();
+  
+  auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}};
+
+  auto const rounding = contentHeight() / 8.0;
+  
+  painter->setBrush(brush);
+  painter->setPen(Qt::NoPen);
+  painter->drawRoundedRect(rect, rounding, rounding);
+  
+  painter->restore();
+}
+
+void Token::drawText(QPainter* painter, QPen pen) const {
+  painter->save();
+  painter->setPen(pen);
+
+  auto const textPosition = QPointF(horizontalTextMargin(), margin());
+  auto const textSize =
+      QSizeF{QSize{elidedTextSize().width(), contentHeight()}};
+
+  painter->drawText(QRectF{textPosition, textSize},
+                   Qt::TextSingleLine | Qt::AlignLeft, _elidedText);
+  painter->restore();
 }
 
 void Token::updateElidedText(QSize size) {
@@ -332,31 +300,32 @@ void Token::showDropIndicator(QPoint const& mousePos) {
 
 void Token::resetDropIndicator() { _dropIndicator = DropIndicator::None; update(); }
 
-void Token::paintDropIndicator(QPainter* painter) {
+void Token::drawDropIndicator(QPainter* painter) {
   if (_dropIndicator == DropIndicator::None) {
     return;
   }
   
   painter->save();
   
-  auto rect = QRectF{this->rect()};
+  auto const rect = QRectF{this->rect()};
+
+  auto scaling = logicalDpiX() / 72.0;
   
-  auto path = QPainterPath{};
+  auto const width = scaling * 1.0;
+  auto const height = rect.height();
+  auto const size = QSizeF{width, height};
   
-  auto const rounding = contentHeight() / 8.0;
-  
-  auto const size = QSizeF{std::max(std::round(rect.height() * 0.06), 1.0), rect.height()};
-  
+  auto pos = QPointF{0.0, 0.0};
   if (_dropIndicator == DropIndicator::Before) {
-    path.addRoundedRect(QRectF{rect.topLeft(), size}, rounding, rounding);
+    pos.setX(0.0);
   } else {
-    path.addRoundedRect(QRectF{QPointF{rect.right() - size.width(), rect.top()}, size}, rounding, rounding);
+    pos.setX(rect.width() - size.width());
   }
   
   painter->setBrush(palette().brush(QPalette::ButtonText));
   painter->setPen(Qt::NoPen);
   
-  painter->drawPath(path);
+  painter->drawRect(QRectF{pos, size});
   
   painter->restore();
 }
