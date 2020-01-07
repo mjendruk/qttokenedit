@@ -41,15 +41,6 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   
   int modelColumn() const;
   void setModelColumn(int column);
-
-protected:
-  void mousePressEvent(QMouseEvent* event) override;
-  void mouseMoveEvent(QMouseEvent* event) override;
-  void mouseReleaseEvent(QMouseEvent* event) override;
-  void leaveEvent(QEvent *event) override;
-  void dragEnterEvent(QDragEnterEvent *event) override;
-  void dragMoveEvent(QDragMoveEvent *event) override;
-  void dropEvent(QDropEvent* event) override;
   
  private:
   void addItem(QString const& text);
@@ -70,6 +61,8 @@ protected:
                      const QVector<int>& roles);
   void onModelReset();
 
+  void onItemDragged(Token* source, Token* target, Token::DropHint hint);
+
  private:
   QVector<Token*> _items;
   TokenLineEdit* _lineEdit;
@@ -84,9 +77,4 @@ protected:
   QAbstractItemModel* _model;
   QModelIndex _rootModelIndex;
   int _modelColumn;
-  
-  // drag members
-  QPoint _mousePressedPosition;
-  int _draggedTokenIndex;
-  QString const _tokenDragMimeType;
 };

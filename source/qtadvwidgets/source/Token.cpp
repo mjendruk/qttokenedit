@@ -1,10 +1,13 @@
 #include <qtadvwidgets/RemoveButton.h>
 #include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenChainElement.h>
+#include <qtadvwidgets/TokenMimeData.h>
 
 #include <QBoxLayout>
+#include <QDrag>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QMimeData>
 #include <QMouseEvent>
 #include <QPaintEvent>
 #include <QPainter>
@@ -16,7 +19,9 @@
 Token::Token(QString const& text, QWidget* parent)
     : QWidget{parent},
       _text{text},
-      _chainElement{std::make_unique<TokenChainElement>(this)} {
+      _chainElement{std::make_unique<TokenChainElement>(this)},
+      _dropIndicator{DropIndicator::None} {
+  setAcceptDrops(true);
   setCursor(Qt::ArrowCursor);
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   setFocusPolicy(Qt::ClickFocus);
@@ -58,48 +63,36 @@ QSize Token::minimumSizeHint() const {
 
 TokenChainElement* Token::chainElement() const { return _chainElement.get(); }
 
-QPixmap Token::toPixmap() const
-{
+QPixmap Token::toPixmap() const {
   auto pixmap = QPixmap(size() * devicePixelRatio());
   pixmap.setDevicePixelRatio(devicePixelRatio());
   pixmap.fill(QColor{0, 0, 0, 0});
-  
+
   auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}};
 
   auto const rounding = contentHeight() / 8.0;
 
   auto path = QPainterPath{};
   path.addRoundedRect(rect, rounding, rounding);
-  
+
   auto painter = QPainter{&pixmap};
-  
+
   auto palette = this->palette();
 
   painter.save();
-  
-  auto brushRole = QPalette::Button;
-  
-  if (_hovered) {
-    brushRole = QPalette::Midlight;
-  }
-  
-  if (hasFocus()) {
-    brushRole = QPalette::Highlight;
-  }
-  
+
+  auto brushRole = QPalette::Highlight;
   auto brush = palette.brush(brushRole);
-  
+
   painter.setBrush(brush);
   painter.setPen(Qt::NoPen);
 
   painter.setRenderHint(QPainter::Antialiasing, true);
-//  painter.setClipRect(clippingRect);
   painter.drawPath(path);
 
   painter.restore();
-  
-  auto const penRole =
-      hasFocus() ? QPalette::HighlightedText : QPalette::ButtonText;
+
+  auto const penRole = QPalette::HighlightedText;
   painter.setPen(palette.color(penRole));
 
   auto const textPosition = QPointF(horizontalTextMargin(), margin());
@@ -108,7 +101,7 @@ QPixmap Token::toPixmap() const
 
   painter.drawText(QRectF{textPosition, textSize},
                    Qt::TextSingleLine | Qt::AlignLeft, _elidedText);
-  
+
   return pixmap;
 }
 
@@ -139,19 +132,19 @@ void Token::paintEvent(QPaintEvent* event) {
   auto palette = this->palette();
 
   painter.save();
-  
+
   auto brushRole = QPalette::Button;
-  
-  if (underMouse()) {
+
+  if (underMouse() && _dropIndicator == DropIndicator::None) {
     brushRole = QPalette::Midlight;
   }
-  
+
   if (hasFocus()) {
     brushRole = QPalette::Highlight;
   }
-  
+
   auto brush = palette.brush(brushRole);
-  
+
   painter.setBrush(brush);
   painter.setPen(Qt::NoPen);
 
@@ -160,6 +153,10 @@ void Token::paintEvent(QPaintEvent* event) {
   painter.drawPath(path);
 
   painter.restore();
+  
+  paintDropIndicator(&painter);
+  
+  painter.save();
 
   auto const penRole =
       hasFocus() ? QPalette::HighlightedText : QPalette::ButtonText;
@@ -171,18 +168,10 @@ void Token::paintEvent(QPaintEvent* event) {
 
   painter.drawText(QRectF{textPosition, textSize},
                    Qt::TextSingleLine | Qt::AlignLeft, _elidedText);
+  
+  painter.restore();
 
   QWidget::paintEvent(event);
-}
-
-void Token::leaveEvent(QEvent* event) {
-  QWidget::leaveEvent(event);
-  update();
-}
-
-void Token::enterEvent(QEvent* event) {
-  QWidget::enterEvent(event);
-  update();
 }
 
 void Token::resizeEvent(QResizeEvent* event) {
@@ -212,6 +201,56 @@ void Token::focusOutEvent(QFocusEvent* event) {
   QWidget::focusOutEvent(event);
 }
 
+void Token::leaveEvent(QEvent* event) {
+  QWidget::leaveEvent(event);
+  update();
+}
+
+void Token::enterEvent(QEvent* event) {
+  QWidget::enterEvent(event);
+  update();
+}
+
+void Token::mousePressEvent(QMouseEvent* event) {
+  QWidget::mousePressEvent(event);
+
+  if (event->buttons().testFlag(Qt::LeftButton)) {
+    _mousePressedAt = event->pos();
+  }
+}
+
+void Token::mouseMoveEvent(QMouseEvent* event) {
+  QWidget::mouseMoveEvent(event);
+
+  if (shouldStartDrag(event->pos())) {
+    startDrag(event->pos());
+  }
+}
+
+void Token::dragEnterEvent(QDragEnterEvent* event) {
+  if (acceptsDrag(event)) {
+    acceptDrag(event);
+  } else {
+    event->ignore();
+  }
+}
+
+void Token::dragLeaveEvent(QDragLeaveEvent* event) { resetDropIndicator(); }
+
+void Token::dragMoveEvent(QDragMoveEvent* event) {
+  if (acceptsDrag(event)) {
+    acceptDrag(event);
+  } else {
+    event->ignore();
+  }
+}
+
+void Token::dropEvent(QDropEvent* event) {
+  if (acceptsDrag(event)) {
+    finishDrag(event);
+  }
+}
+
 void Token::updateElidedText(QSize size) {
   auto availableWidth = size.width() - (horizontalTextMargin() + spacing() +
                                         _button->sizeHint().width() + margin());
@@ -230,3 +269,102 @@ QSize Token::elidedTextSize() const {
 }
 
 QString Token::elidedText() const { return _elidedText; }
+
+bool Token::shouldStartDrag(QPoint const& mousePos) const {
+  auto const mouseMovement = mousePos - _mousePressedAt;
+  return mouseMovement.manhattanLength() >= dragStartDistance();
+}
+
+void Token::startDrag(QPoint const& mousePos) {
+  auto mimeData = new TokenMimeData{this};
+
+  auto drag = new QDrag{this};
+  drag->setHotSpot(mousePos);
+  drag->setPixmap(toPixmap());
+  drag->setMimeData(mimeData);
+
+  drag->exec(Qt::MoveAction);
+
+  _mousePressedAt = QPoint{};
+}
+
+bool Token::acceptsDrag(QDropEvent* event) const {
+  auto const token = qobject_cast<Token*>(event->source());
+
+  if (!token) {
+    return false;
+  }
+  
+  if (token == this) {
+    return false;
+  }
+
+  if (token->parentWidget() != this->parentWidget()) {
+    return false;
+  }
+
+  return true;
+}
+
+void Token::acceptDrag(QDragMoveEvent* event) {
+  event->acceptProposedAction();
+  showDropIndicator(event->pos());
+}
+
+void Token::finishDrag(QDropEvent* event) {
+  event->acceptProposedAction();
+
+  auto const token =
+      qobject_cast<TokenMimeData const*>(event->mimeData())->token();
+
+  emit token->dragged(this, dropHint(event->pos()));
+  
+  resetDropIndicator();
+}
+
+void Token::showDropIndicator(QPoint const& mousePos) {
+  _dropIndicator = dropHint(mousePos) == DropHint::Before
+                       ? DropIndicator::Before
+                       : DropIndicator::After;
+  
+  update();
+}
+
+void Token::resetDropIndicator() { _dropIndicator = DropIndicator::None; update(); }
+
+void Token::paintDropIndicator(QPainter* painter) {
+  if (_dropIndicator == DropIndicator::None) {
+    return;
+  }
+  
+  painter->save();
+  
+  auto rect = QRectF{this->rect()};
+  
+  auto path = QPainterPath{};
+  
+  auto const rounding = contentHeight() / 8.0;
+  
+  auto const size = QSizeF{std::max(std::round(rect.height() * 0.06), 1.0), rect.height()};
+  
+  if (_dropIndicator == DropIndicator::Before) {
+    path.addRoundedRect(QRectF{rect.topLeft(), size}, rounding, rounding);
+  } else {
+    path.addRoundedRect(QRectF{QPointF{rect.right() - size.width(), rect.top()}, size}, rounding, rounding);
+  }
+  
+  painter->setBrush(palette().brush(QPalette::ButtonText));
+  painter->setPen(Qt::NoPen);
+  
+  painter->drawPath(path);
+  
+  painter->restore();
+}
+
+int Token::dragStartDistance() const {
+  return fontMetrics().averageCharWidth();
+}
+
+auto Token::dropHint(QPoint const& mousePos) const -> DropHint {
+  return mousePos.x() < width() / 2.0 ? DropHint::Before : DropHint::After;
+}

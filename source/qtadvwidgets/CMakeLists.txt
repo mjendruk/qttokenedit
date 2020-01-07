@@ -58,6 +58,7 @@ set(headers
     ${include_path}/TokenEditMode.h
     ${include_path}/TokenEditViewport.h
     ${include_path}/TokenLineEdit.h
+    ${include_path}/TokenMimeData.h
 )
 
 set(sources
@@ -73,6 +74,7 @@ set(sources
     ${source_path}/TokenEdit.cpp
     ${source_path}/TokenEditViewport.cpp
     ${source_path}/TokenLineEdit.cpp
+    ${source_path}/TokenMimeData.cpp
 )
 
 # Group source files

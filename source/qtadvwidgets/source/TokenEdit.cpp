@@ -7,11 +7,7 @@
 
 #include <algorithm>
 
-#include <QDrag>
 #include <QLineEdit>
-#include <QMimeData>
-#include <QMouseEvent>
-#include <QPainter>
 #include <QScrollBar>
 #include <QtGlobal>
 
@@ -22,13 +18,10 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
       _maxLineCount{-1},
       _spacing{3},
       _mode{mode},
-      _scrollArea(new QScrollArea{this}),
+      _scrollArea{new QScrollArea{this}},
       _model{nullptr},
       _rootModelIndex{QModelIndex{}},
-      _modelColumn{0},
-      _mousePressedPosition{},
-      _draggedTokenIndex{-1},
-      _tokenDragMimeType{"application/x-tokenedit-token"} {
+      _modelColumn{0} {
   setAcceptDrops(true);
   _scrollArea->setFocusPolicy(Qt::ClickFocus);
 
@@ -154,137 +147,6 @@ void TokenEdit::setModelColumn(int column) {
   onModelReset();
 }
 
-void TokenEdit::mousePressEvent(QMouseEvent* event) {
-  TokenEditViewport::mousePressEvent(event);
-  
-  if (!(event->buttons() & Qt::LeftButton)) {
-    return;
-  }
-
-  auto tokenIt = std::find_if(_items.cbegin(), _items.cend(), [=](Token* item) {
-    auto pos = item->mapTo(this, QPoint{0, 0});
-    auto rect = QRect(pos, item->size());
-    
-    return rect.contains(event->pos());
-  });
-  
-  if (tokenIt != _items.cend()) {
-    _mousePressedPosition = event->pos();
-    _draggedTokenIndex = _items.indexOf(*tokenIt);
-  }
-}
-
-void TokenEdit::mouseMoveEvent(QMouseEvent* event) {
-  TokenEditViewport::mouseMoveEvent(event);
-  
-  if (_mousePressedPosition.isNull()) {
-    return;
-  }
-
-  auto const distance = event->pos() - _mousePressedPosition;
-
-  if (distance.manhattanLength() < 10) {
-    return;
-  }
-
-  Q_ASSERT(_draggedTokenIndex >= 0);
-
-  auto token = _items.at(_draggedTokenIndex);
-
-  auto hotSpot = event->pos() - token->pos();
-
-  Q_ASSERT(_draggedTokenIndex >= 0);
-
-  auto mimeData = new QMimeData{};
-  mimeData->setData(_tokenDragMimeType, QByteArray::number(_draggedTokenIndex));
-
-  auto drag = new QDrag{this};
-  drag->setMimeData(mimeData);
-  drag->setHotSpot(hotSpot);
-  drag->setPixmap(token->toPixmap());
-
-  if (auto dragAction = drag->exec(Qt::MoveAction);
-      dragAction == Qt::MoveAction) {
-    _mousePressedPosition = QPoint{};
-  }
-}
-
-void TokenEdit::mouseReleaseEvent(QMouseEvent* event) {
-  _mousePressedPosition = QPoint{};
-}
-
-void TokenEdit::leaveEvent(QEvent* event) { _mousePressedPosition = QPoint{}; }
-
-void TokenEdit::dragEnterEvent(QDragEnterEvent* event) {
-  if (event->mimeData()->hasFormat(_tokenDragMimeType) &&
-      event->source() == this) {
-    event->setDropAction(Qt::MoveAction);
-    event->accept();
-  } else {
-    event->ignore();
-  }
-}
-
-void TokenEdit::dragMoveEvent(QDragMoveEvent* event) {
-  if (event->mimeData()->hasFormat(_tokenDragMimeType) &&
-      event->source() == this) {    
-    event->setDropAction(Qt::MoveAction);
-    event->accept();
-  } else {
-    event->ignore();
-  }
-}
-
-void TokenEdit::dropEvent(QDropEvent* event) {
-  if (event->mimeData()->hasFormat(_tokenDragMimeType) &&
-      event->source() == this) {
-    auto const index = event->mimeData()->data(_tokenDragMimeType).toInt();
-    
-    auto tokenIt = std::find_if(_items.cbegin(), _items.cend(), [=](Token* item) {
-      auto pos = item->mapTo(this, QPoint{0, 0});
-      auto rect = QRect(pos, item->size());
-      
-      rect += QMargins{_spacing, _spacing, _spacing, _spacing};
-      
-      return rect.contains(event->pos());
-    });
-    
-    if (tokenIt != _items.cend()) {
-      
-      auto droppedOverToken = *tokenIt;
-      
-      if (droppedOverToken) {
-        auto const droppedOverIndex = _items.indexOf(droppedOverToken);
-        
-        auto const globalPos = mapToGlobal(event->pos());
-        auto const pos = droppedOverToken->mapFromGlobal(globalPos);
-        
-        
-        auto const from = index;
-        
-        auto to = droppedOverIndex;
-        
-        if (pos.x() > droppedOverToken->width() / 2.0) {
-          to += 1;
-        }
-        
-        to = from > to ? to + 1 : to;  // wrong implementation of QStringListModel
-        // https://code.woboq.org/qt5/qtbase/src/corelib/itemmodels/qstringlistmodel.cpp.html#34fromRow
-        
-        auto success = _model->moveRow(_rootModelIndex, from, _rootModelIndex, to);
-        
-        if (success) {
-          event->setDropAction(Qt::MoveAction);
-          event->accept();
-          return;
-        }
-      }
-    }
-  }
-          
-  event->ignore();
-}
-
 void TokenEdit::addItem(QString const& text) {
   auto const index = _items.size();
   insertItem(index, text);
@@ -308,6 +170,10 @@ void TokenEdit::insertItem(int index, QString const& text) {
   connect(item, &Token::removeClicked, [=]() {
     auto index = _items.indexOf(item);
     _model->removeRow(index);
+  });
+
+  connect(item, &Token::dragged, [=](auto target, auto hint) {
+    onItemDragged(item, target, hint);
   });
 }
 
@@ -456,4 +322,20 @@ void TokenEdit::onDataChanged(const QModelIndex& topLeft,
 void TokenEdit::onModelReset() {
   clear();
   init();
+}
+
+void TokenEdit::onItemDragged(Token* source, Token* target,
+                              Token::DropHint hint) {
+  auto const from = _items.indexOf(source);
+
+  auto to = _items.indexOf(target);
+  
+  Q_ASSERT(to >= 0);
+  
+  if (hint == Token::DropHint::After) ++to;
+
+  to = from > to ? to + 1 : to;  // wrong implementation of QStringListModel
+  // https://code.woboq.org/qt5/qtbase/src/corelib/itemmodels/qstringlistmodel.cpp.html#34fromRow
+
+  _model->moveRow(_rootModelIndex, from, _rootModelIndex, to);
 }
