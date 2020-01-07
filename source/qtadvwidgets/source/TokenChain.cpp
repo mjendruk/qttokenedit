@@ -40,7 +40,10 @@ void TokenChain::move(int from, int to) {
     return;
   }
   
-  insert(to, takeAt(from, false), false);
+  auto element = takeAt(from, false);
+  insert(to, element, false);
+  
+  element->widget()->setFocus();
 }
 
 void TokenChain::remove(TokenChainElement* element) {
