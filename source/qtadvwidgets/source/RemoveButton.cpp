@@ -11,7 +11,6 @@ RemoveButton::RemoveButton(QColor const& color, int diameter, QWidget* parent)
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setCursor(Qt::PointingHandCursor);
   setFocusPolicy(Qt::NoFocus);
-
   initSize();
   initButtonShapePath();
 }
@@ -25,21 +24,28 @@ void RemoveButton::setColor(QColor const& color) {
   update();
 }
 
+void RemoveButton::draw(QPainter* painter) const
+{
+  painter->setBrush(QBrush{_color});
+  painter->setPen(Qt::NoPen);
+
+  auto const rect = QRectF{this->rect()};
+
+  painter->translate(+rect.center());
+  painter->rotate(45.0);
+  painter->translate(-rect.center());
+
+  painter->drawPath(_path);
+}
+
 void RemoveButton::paintEvent(QPaintEvent* event) {
   auto const clippingRect = QRectF{event->rect()};
-  auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF{_size}};
 
   auto painter = QPainter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
-  painter.setBrush(QBrush{_color});
-  painter.setPen(Qt::NoPen);
   painter.setClipRect(clippingRect);
 
-  painter.translate(+rect.center());
-  painter.rotate(45.0);
-  painter.translate(-rect.center());
-
-  painter.drawPath(_path);
+  draw(&painter);
 }
 
 void RemoveButton::initSize() { _size = QSize{_diameter, _diameter}; }
@@ -50,8 +56,8 @@ void RemoveButton::initButtonShapePath() {
   auto crossPath = QPainterPath{};
   crossPath.setFillRule(Qt::WindingFill);
 
-  auto const crossMargin = rect.height() * 0.2;
-  auto const crossLength = rect.height() * 0.6;
+  auto const crossMargin = std::round(rect.height() * 0.2);
+  auto const crossLength = rect.height() - (2.0 * crossMargin);
   auto const crossLineWidth = rect.height() * 0.1;
   crossPath.addRect(rect.center().x() - (crossLineWidth * 0.5), crossMargin,
                     crossLineWidth, crossLength);

@@ -15,6 +15,8 @@ class QTADVWIDGETS_API RemoveButton : public QAbstractButton {
   QColor color() const;
   void setColor(QColor const& color);
 
+  void draw(QPainter* painter) const;
+
  protected:
   void paintEvent(QPaintEvent* event) override;
 

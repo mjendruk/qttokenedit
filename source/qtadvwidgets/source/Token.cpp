@@ -69,9 +69,15 @@ QPixmap Token::toPixmap() const {
   pixmap.fill(QColor{0, 0, 0, 0});
 
   auto painter = QPainter{&pixmap};
+  painter.setRenderHint(QPainter::Antialiasing, true);
 
   drawBackground(&painter, palette().brush(QPalette::Highlight));
   drawText(&painter, palette().color(QPalette::HighlightedText));
+
+  painter.save();
+  painter.translate(_button->pos());
+  _button->draw(&painter);
+  painter.restore();
 
   return pixmap;
 }
@@ -312,7 +318,11 @@ void Token::drawDropIndicator(QPainter* painter) {
 
   auto const rect = QRectF{this->rect()};
 
-  auto scaling = logicalDpiX() / 72.0;
+#ifdef Q_OS_MACOS
+  auto scaling = 1.0;
+#else
+  auto scaling = std::round(logicalDpiX() / 96.0);
+#endif
 
   auto const width = scaling * 1.0;
   auto const height = rect.height();
