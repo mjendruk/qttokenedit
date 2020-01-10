@@ -5,6 +5,7 @@
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
 #include <QObject>
+#include <cstdint>
 #include <memory>
 
 class QLineEdit;
@@ -27,9 +28,17 @@ class QTADVWIDGETS_API TokenChain : public QObject {
   void lostFocus(TokenChainElement* element);
 
  private:
-  void insert(int index, TokenChainElement* element, bool connect);
-  void remove(TokenChainElement* element, bool disconnect);
-  TokenChainElement* takeAt(int index, bool disconnect);
+  enum class UpdateSignalConnection : std::int8_t { Yes, No };
+  enum class UpdateFocus : std::int8_t { Yes, No };
+
+  void insert(int index, TokenChainElement* element,
+              UpdateSignalConnection updateConnection, UpdateFocus updateFocus);
+  
+  void remove(TokenChainElement* element,
+              UpdateSignalConnection updateConnection, UpdateFocus updateFocus);
+
+  TokenChainElement* takeAt(int index, UpdateSignalConnection updateConnection,
+                            UpdateFocus updateFocus);
 
   int indexLast() const;
   TokenChainElement* at(int index) const;

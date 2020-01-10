@@ -24,7 +24,7 @@ void TokenChain::add(TokenChainElement* element) {
 }
 
 void TokenChain::insert(int index, TokenChainElement* element) {
-  insert(index, element, true);
+  insert(index, element, UpdateSignalConnection::Yes, UpdateFocus::Yes);
 }
 
 std::string toStdString(TokenChainElement* element) {
@@ -40,17 +40,19 @@ void TokenChain::move(int from, int to) {
     return;
   }
 
-  auto element = takeAt(from, false);
-  insert(to, element, false);
-
-  element->widget()->setFocus();
+  auto element = takeAt(from, UpdateSignalConnection::No, UpdateFocus::No);
+  insert(to, element, UpdateSignalConnection::No, UpdateFocus::No);
 }
 
-void TokenChain::remove(TokenChainElement* element) { remove(element, true); }
+void TokenChain::remove(TokenChainElement* element) {
+  remove(element, UpdateSignalConnection::Yes, UpdateFocus::Yes);
+}
 
 void TokenChain::setMode(TokenEditMode mode) { _mode = mode; }
 
-void TokenChain::insert(int index, TokenChainElement* element, bool _connect) {
+void TokenChain::insert(int index, TokenChainElement* element,
+                        UpdateSignalConnection updateConnection,
+                        UpdateFocus updateFocus) {
   Q_ASSERT(0 <= index &&
            index <= indexLast());  // last element is always the line edit
   Q_ASSERT(element);
@@ -69,19 +71,22 @@ void TokenChain::insert(int index, TokenChainElement* element, bool _connect) {
 
   ++_size;
 
-  if (_connect) {
+  if (updateConnection == UpdateSignalConnection::Yes) {
     connect(element, &TokenChainElement::gotFocus, this, &TokenChain::gotFocus);
     connect(element, &TokenChainElement::lostFocus, this,
             &TokenChain::lostFocus);
   }
 
-  if (_mode == TokenEditMode::ShowLineEditIfEmpty &&
+  if (updateFocus == UpdateFocus::Yes &&
+      _mode == TokenEditMode::ShowLineEditIfEmpty &&
       _last->widget()->hasFocus()) {
     element->widget()->setFocus();
   }
 }
 
-void TokenChain::remove(TokenChainElement* element, bool disconnect) {
+void TokenChain::remove(TokenChainElement* element,
+                        UpdateSignalConnection updateConnection,
+                        UpdateFocus updateFocus) {
   Q_ASSERT(element);
   Q_ASSERT(element != _last.get());
 
@@ -96,7 +101,7 @@ void TokenChain::remove(TokenChainElement* element, bool disconnect) {
     next->setPreviousElement(prev);
   }
 
-  if (element->widget()->hasFocus()) {
+  if (updateFocus == UpdateFocus::Yes && element->widget()->hasFocus()) {
     if (prev) {
       prev->widget()->setFocus();
     } else if (next) {
@@ -106,14 +111,16 @@ void TokenChain::remove(TokenChainElement* element, bool disconnect) {
 
   --_size;
 
-  if (disconnect) {
+  if (updateConnection == UpdateSignalConnection::Yes) {
     element->disconnect(this);
   }
 }
 
-TokenChainElement* TokenChain::takeAt(int index, bool disconnect) {
+TokenChainElement* TokenChain::takeAt(int index,
+                                      UpdateSignalConnection updateConnection,
+                                      UpdateFocus updateFocus) {
   auto element = at(index);
-  remove(element, disconnect);
+  remove(element, updateConnection, updateFocus);
   return element;
 }
 

@@ -10,7 +10,7 @@ RemoveButton::RemoveButton(QPalette::ColorRole colorRole, int diameter, QWidget*
   setCheckable(false);
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setCursor(Qt::PointingHandCursor);
-  setFocusPolicy(Qt::NoFocus);
+  setFocusPolicy(Qt::ClickFocus);
   initSize();
   initButtonShapePath();
 }
