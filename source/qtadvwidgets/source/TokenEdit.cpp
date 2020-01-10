@@ -6,9 +6,29 @@
 #include <qtadvwidgets/TokenLineEdit.h>
 
 #include <QLineEdit>
+#include <QPainter>
 #include <QScrollBar>
 #include <QtGlobal>
+#include <QPaintEvent>
 #include <algorithm>
+
+class TokenEditBackground : public QWidget
+{
+public:
+  using QWidget::QWidget;
+
+protected:
+  void paintEvent(QPaintEvent* event)
+  {
+    auto painter = QPainter{this};
+    painter.setClipRect(event->rect());
+
+    auto brush = palette().brush(QPalette::Base);
+    painter.setBrush(brush);
+    painter.setPen(Qt::NoPen);
+    painter.drawRect(rect());
+  }
+};
 
 TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
     : TokenEditViewport{parent},
@@ -34,7 +54,7 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
 
   setWidget(_scrollArea);
 
-  auto mainWidget = new QWidget{};
+  auto mainWidget = new TokenEditBackground{};
   mainWidget->setFocusPolicy(Qt::NoFocus);
 
   _layout = new FlexLayout{_spacing, _spacing, _spacing};
@@ -56,17 +76,6 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
   _layout->addWidget(_lineEdit);
 
   mainWidget->setLayout(_layout);
-
-  auto customPalette = mainWidget->palette();
-  customPalette.setColor(
-      QPalette::Disabled, QPalette::Window,
-      customPalette.color(QPalette::Disabled, QPalette::Base));
-  customPalette.setColor(QPalette::Active, QPalette::Window,
-                         customPalette.color(QPalette::Active, QPalette::Base));
-  customPalette.setColor(
-      QPalette::Inactive, QPalette::Window,
-      customPalette.color(QPalette::Inactive, QPalette::Base));
-  mainWidget->setPalette(customPalette);
 
   _scrollArea->setWidget(mainWidget);
 

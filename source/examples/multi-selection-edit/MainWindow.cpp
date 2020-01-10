@@ -38,6 +38,11 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
 
   {
     auto tokenEdit = new TokenEdit{TokenEditMode::Multiple, this};
+
+    auto palette = tokenEdit->palette();
+    palette.setColor(QPalette::Highlight, QColor(3, 158, 230));
+    tokenEdit->setPalette(palette);
+
     tokenEdit->setModelColumn(0);
     
     auto listView = new QTableView{this};
