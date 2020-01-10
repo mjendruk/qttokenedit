@@ -6,20 +6,18 @@
 #include <qtadvwidgets/TokenLineEdit.h>
 
 #include <QLineEdit>
+#include <QPaintEvent>
 #include <QPainter>
 #include <QScrollBar>
 #include <QtGlobal>
-#include <QPaintEvent>
 #include <algorithm>
 
-class TokenEditBackground : public QWidget
-{
-public:
+class TokenEditBackground : public QWidget {
+ public:
   using QWidget::QWidget;
 
-protected:
-  void paintEvent(QPaintEvent* event)
-  {
+ protected:
+  void paintEvent(QPaintEvent* event) {
     auto painter = QPainter{this};
     painter.setClipRect(event->rect());
 
