@@ -45,7 +45,7 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
 
   connect(_tokenChain, &TokenChain::gotFocus, [=](auto element) {
     setShownAsFocused(true);
-    _scrollArea->ensureWidgetVisible(element->widget());
+    _scrollArea->ensureWidgetVisible(element->widget(), 0, _spacing);
   });
 
   connect(_tokenChain, &TokenChain::lostFocus,
@@ -84,6 +84,10 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
   _scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   _scrollArea->setWidgetResizable(true);
   _scrollArea->setFrameShape(QFrame::NoFrame);
+
+  auto singleStep = dummyItem->sizeHint().height() + _spacing;
+  _scrollArea->verticalScrollBar()->setSingleStep(singleStep);
+  _scrollArea->verticalScrollBar()->setPageStep(singleStep * 3 - _spacing);
 
   _scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
