@@ -40,6 +40,8 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
       _model{nullptr},
       _rootModelIndex{QModelIndex{}},
       _modelColumn{0} {
+  _lineEdit->hide();
+
   setAcceptDrops(true);
   _scrollArea->setFocusPolicy(Qt::ClickFocus);
 
@@ -160,6 +162,7 @@ void TokenEdit::setModel(QAbstractItemModel* model) {
 
     init();
   } else {
+    _lineEdit->hide();
   }
 }
 
@@ -193,13 +196,10 @@ void TokenEdit::addItem(QString const& text) {
 }
 
 void TokenEdit::insertItem(int index, QString const& text) {
-  Q_ASSERT(_mode == Mode::Multiple ||
-           (_mode == Mode::Single && _items.empty() && index == 0));
-
   auto item = new Token{text, this};
   item->setDragEnabled(dragEnabled());
 
-  if (_mode == Mode::Single) {
+  if (_mode == Mode::ShowLineEditIfEmpty) {
     _lineEdit->hide();
     _scrollArea->setFocusProxy(item);
   }
@@ -225,8 +225,6 @@ void TokenEdit::setItemText(int index, QString const& text) {
 }
 
 void TokenEdit::moveItem(int from, int to) {
-  Q_ASSERT(_mode == Mode::Multiple || (_mode == Mode::Single && from == to));
-
   if (from == to) {
     return;
   }
@@ -249,7 +247,7 @@ void TokenEdit::removeItem(int index) {
   auto item = _items.takeAt(index);
   auto layoutItem = _layout->takeAt(index);
 
-  if (_mode == Mode::Single) {
+  if (_mode == Mode::ShowLineEditIfEmpty && _items.empty()) {
     _lineEdit->show();
     _scrollArea->setFocusProxy(item);
   }
@@ -278,10 +276,14 @@ void TokenEdit::updateHeight() {
 }
 
 void TokenEdit::init() {
-  _lineEdit->show();
+  _lineEdit->setVisible(_mode == Mode::AlwaysShowLineEdit);
 
   if (auto rows = _model->rowCount(_rootModelIndex); rows > 0) {
     onRowsInserted(_rootModelIndex, 0, (rows - 1));
+  }
+
+  if (_mode == Mode::ShowLineEditIfEmpty && _items.empty()) {
+    _lineEdit->show();
   }
 }
 

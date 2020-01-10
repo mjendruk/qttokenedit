@@ -36,7 +36,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
   m_ui->setupUi(this);
 
   {
-    auto tokenEdit = new TokenEdit{TokenEditMode::Multiple, this};
+    auto tokenEdit = new TokenEdit{TokenEditMode::AlwaysShowLineEdit, this};
 
     auto palette = tokenEdit->palette();
     palette.setColor(QPalette::Highlight, QColor(3, 158, 230));
@@ -91,9 +91,15 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
       model->setData(model->index(row), text);
       lineEdit->clear();
     });
+    
+    auto neverShowLineEditTokenEdit = new TokenEdit{TokenEditMode::NeverShowLineEdit, this};
+
+    neverShowLineEditTokenEdit->setModel(model);
+
+    m_ui->formLayout->addWidget(neverShowLineEditTokenEdit);
   }
   {
-    auto tokenEdit = new TokenEdit{TokenEditMode::Single, this};
+    auto tokenEdit = new TokenEdit{TokenEditMode::ShowLineEditIfEmpty, this};
 
     auto model = new QStringListModel{this};
 

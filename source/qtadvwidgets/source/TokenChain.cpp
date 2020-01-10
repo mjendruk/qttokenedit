@@ -75,7 +75,8 @@ void TokenChain::insert(int index, TokenChainElement* element, bool _connect) {
             &TokenChain::lostFocus);
   }
 
-  if (_mode == TokenEditMode::Single) {
+  if (_mode == TokenEditMode::ShowLineEditIfEmpty &&
+      _last->widget()->hasFocus()) {
     element->widget()->setFocus();
   }
 }
@@ -95,10 +96,12 @@ void TokenChain::remove(TokenChainElement* element, bool disconnect) {
     next->setPreviousElement(prev);
   }
 
-  if (prev) {
-    prev->widget()->setFocus();
-  } else if (next) {
-    next->widget()->setFocus();
+  if (element->widget()->hasFocus()) {
+    if (prev) {
+      prev->widget()->setFocus();
+    } else if (next) {
+      next->widget()->setFocus();
+    }
   }
 
   --_size;

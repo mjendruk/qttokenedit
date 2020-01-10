@@ -24,7 +24,7 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
  public:
   using Mode = TokenEditMode;
 
-  TokenEdit(TokenEditMode mode = TokenEditMode::Multiple,
+  TokenEdit(TokenEditMode mode = TokenEditMode::AlwaysShowLineEdit,
             QWidget* parent = nullptr);
   ~TokenEdit();
 
