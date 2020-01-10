@@ -20,62 +20,51 @@
       <property name="fieldGrowthPolicy">
        <enum>QFormLayout::ExpandingFieldsGrow</enum>
       </property>
-      <item row="1" column="0">
-       <widget class="QLabel" name="lineEditLabel">
-        <property name="text">
-         <string>LineEdit</string>
-        </property>
-        <property name="buddy">
-         <cstring>lineEditLineEdit</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEditLineEdit"/>
-      </item>
       <item row="0" column="1">
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="resetButton">
         <property name="text">
-         <string>PushButton</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>PushButton</string>
-        </property>
-        <property name="buddy">
-         <cstring>pushButton</cstring>
+         <string>Reset</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="comboBoxLabel">
+       <widget class="QLabel" name="lineEditLabel">
         <property name="text">
-         <string>ComboBox</string>
+         <string>Max. Line Count</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="dragEnabledCheckBox">
+        <property name="text">
+         <string>Drag Enabled</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QComboBox" name="comboBox">
-        <property name="editable">
-         <bool>true</bool>
+       <widget class="QSpinBox" name="maxLineCountSpinBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="currentText">
-         <string>S+U Potsdamer Platz</string>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>5</number>
+        </property>
+        <property name="value">
+         <number>3</number>
         </property>
        </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="doubleSpinBoxLabel">
-        <property name="text">
-         <string>DoubleSpinBox</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QDoubleSpinBox" name="doubleSpinBoxDoubleSpinBox"/>
       </item>
      </layout>
     </item>
@@ -87,7 +76,7 @@
      <x>0</x>
      <y>0</y>
      <width>689</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu">

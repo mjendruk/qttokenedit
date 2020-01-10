@@ -20,6 +20,7 @@ Token::Token(QString const& text, QWidget* parent)
     : QWidget{parent},
       _text{text},
       _chainElement{std::make_unique<TokenChainElement>(this)},
+      _dragEnabled{false},
       _dropIndicator{DropIndicator::None} {
   setAcceptDrops(true);
   setCursor(Qt::ArrowCursor);
@@ -39,6 +40,16 @@ QString const& Token::text() const { return _text; }
 void Token::setText(QString const& text) {
   _text = text;
   update();
+}
+
+bool Token::dragEnabled() const
+{
+  return _dragEnabled;
+}
+
+void Token::setDragEnabled(bool enable)
+{
+  _dragEnabled = enable;
 }
 
 QSize Token::sizeHint() const {
@@ -161,7 +172,7 @@ void Token::enterEvent(QEvent* event) {
 void Token::mousePressEvent(QMouseEvent* event) {
   QWidget::mousePressEvent(event);
 
-  if (event->buttons().testFlag(Qt::LeftButton)) {
+  if (dragEnabled() && event->buttons().testFlag(Qt::LeftButton)) {
     _mousePressedAt = event->pos();
   }
 }
@@ -245,6 +256,9 @@ QSize Token::elidedTextSize() const {
 QString Token::elidedText() const { return _elidedText; }
 
 bool Token::shouldStartDrag(QPoint const& mousePos) const {
+  if (!dragEnabled()) {
+    return false;
+  }
   auto const mouseMovement = mousePos - _mousePressedAt;
   return mouseMovement.manhattanLength() >= dragStartDistance();
 }

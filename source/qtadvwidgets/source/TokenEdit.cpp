@@ -33,6 +33,7 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
       _lineEdit{new TokenLineEdit{this}},
       _tokenChain{new TokenChain{mode, _lineEdit, this}},
       _maxLineCount{-1},
+      _dragEnabled{false},
       _spacing{3},
       _mode{mode},
       _scrollArea{new QScrollArea{this}},
@@ -96,6 +97,24 @@ int TokenEdit::maxLineCount() const { return _maxLineCount; }
 void TokenEdit::setMaxLineCount(int count) {
   _maxLineCount = count;
   updateHeight();
+}
+
+bool TokenEdit::dragEnabled() const
+{
+  return _dragEnabled;
+}
+
+void TokenEdit::setDragEnabled(bool enable)
+{
+  if (_dragEnabled == enable) {
+    return;
+  }
+
+  _dragEnabled = enable;
+
+  for (auto token : _items) {
+    token->setDragEnabled(_dragEnabled);
+  }
 }
 
 int TokenEdit::count() const { return _items.size(); }
@@ -162,6 +181,7 @@ void TokenEdit::insertItem(int index, QString const& text) {
            (_mode == Mode::Single && _items.empty() && index == 0));
 
   auto item = new Token{text, this};
+  item->setDragEnabled(dragEnabled());
 
   if (_mode == Mode::Single) {
     _lineEdit->hide();

@@ -5,32 +5,31 @@
 #include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenEdit.h>
 
+#include <QCheckBox>
 #include <QFormLayout>
 #include <QLineEdit>
-#include <QMessageBox>
-#include <QStringListModel>
 #include <QListView>
-#include <QTableView>
-#include <QStandardItemModel>
+#include <QMessageBox>
 #include <QRegularExpression>
+#include <QStandardItemModel>
+#include <QStringListModel>
+#include <QTableView>
 
 #include "ui_MainWindow.h"
 
-namespace
-{
-  QString abbreviation(QString const& str)
-  {
-    auto result = str;
-    result.remove(QRegularExpression{"\\W"});
-    
-    constexpr auto abbrSize = 6;
-    if (result.size() > abbrSize) {
-      result.truncate(abbrSize);
-    }
-    
-    return result.toUpper();
+namespace {
+QString abbreviation(QString const& str) {
+  auto result = str;
+  result.remove(QRegularExpression{"\\W"});
+
+  constexpr auto abbrSize = 6;
+  if (result.size() > abbrSize) {
+    result.truncate(abbrSize);
   }
+
+  return result.toUpper();
 }
+}  // namespace
 
 MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
   // Setup UI
@@ -44,36 +43,38 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
     tokenEdit->setPalette(palette);
 
     tokenEdit->setModelColumn(0);
-    
+
     auto listView = new QTableView{this};
-    
+
     auto const longNames = QStringList{
-      "S+U Potsdamer Platz",
-      "Stendaler Str.",
-      "Walther-Schreiber-Platz",
-      "S+U Berlin Hbf",
-      "U Spichernstr.",
-      "U Berliner Str.",
-      "S+U Bundesallee",
+        "S+U Potsdamer Platz", "Stendaler Str.", "Walther-Schreiber-Platz",
+        "S+U Berlin Hbf",      "U Spichernstr.", "U Berliner Str.",
+        "S+U Bundesallee",
     };
-    
+
     auto model = new QStringListModel{this};
-    
+
     model->setStringList(longNames);
 
     tokenEdit->setModel(model);
     listView->setModel(model);
-    
-    m_ui->formLayout->addRow("MultipleTokenEdit", tokenEdit);
-    m_ui->formLayout->addRow("ListView", listView);
-    
-    auto resetButton = new QPushButton{"Reset Model"};
-    m_ui->formLayout->addRow("Reset", resetButton);
-    
-    connect(resetButton, &QPushButton::clicked, [=]() {
+
+    m_ui->formLayout->addRow("Token Edit", tokenEdit);
+
+    connect(m_ui->resetButton, &QPushButton::clicked, [=]() {
       tokenEdit->setModel(nullptr);
       tokenEdit->setModel(model);
     });
+
+    connect(
+        m_ui->dragEnabledCheckBox, &QCheckBox::stateChanged,
+        [=](auto state) { tokenEdit->setDragEnabled(state == Qt::Checked); });
+
+    m_ui->maxLineCountSpinBox->setValue(3);
+    connect(m_ui->maxLineCountSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            [=](auto value) { tokenEdit->setMaxLineCount(value); });
+
+    m_ui->formLayout->addRow("TableView", listView);
 
     auto lineEdit = tokenEdit->lineEdit();
 
@@ -89,11 +90,11 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
   }
   {
     auto tokenEdit = new TokenEdit{TokenEditMode::Single, this};
-    
+
     auto model = new QStringListModel{this};
-    
+
     tokenEdit->setModel(model);
-    
+
     m_ui->formLayout->addRow("SingleTokenEdit", tokenEdit);
 
     auto lineEdit = tokenEdit->lineEdit();

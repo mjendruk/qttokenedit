@@ -24,6 +24,9 @@ class QTADVWIDGETS_API Token : public QWidget {
   QString const& text() const;
   void setText(QString const& text);
 
+  bool dragEnabled() const;
+  void setDragEnabled(bool enable); 
+
   QSize sizeHint() const override;
   QSize minimumSizeHint() const override;
 
@@ -93,6 +96,8 @@ class QTADVWIDGETS_API Token : public QWidget {
   int _elidedTextWidth;
   QString _elidedText;
 
+  // drag members
+  bool _dragEnabled;
   QPoint _mousePressedAt;
   DropIndicator _dropIndicator;
 };

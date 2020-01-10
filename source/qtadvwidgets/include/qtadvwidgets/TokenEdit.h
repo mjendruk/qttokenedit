@@ -31,6 +31,9 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   int maxLineCount() const;
   void setMaxLineCount(int count);
 
+  bool dragEnabled() const;
+  void setDragEnabled(bool enable);
+
   int count() const;
   int isEmpty() const;
 
@@ -69,6 +72,7 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   TokenChain* _tokenChain;
   FlexLayout* _layout;
   int _maxLineCount;
+  bool _dragEnabled;
   int _spacing;
   TokenEditMode _mode;
   QScrollArea* _scrollArea;
