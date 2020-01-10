@@ -5,8 +5,8 @@
 #include <QPainterPath>
 #include <cmath>
 
-RemoveButton::RemoveButton(QColor const& color, int diameter, QWidget* parent)
-    : QAbstractButton{parent}, _diameter{diameter}, _color{color} {
+RemoveButton::RemoveButton(QPalette::ColorRole colorRole, int diameter, QWidget* parent)
+    : QAbstractButton{parent}, _colorRole(colorRole), _diameter{diameter} {
   setCheckable(false);
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setCursor(Qt::PointingHandCursor);
@@ -17,16 +17,22 @@ RemoveButton::RemoveButton(QColor const& color, int diameter, QWidget* parent)
 
 QSize RemoveButton::sizeHint() const { return _size; }
 
-QColor RemoveButton::color() const { return _color; }
+QPalette::ColorRole RemoveButton::colorRole() const {
+  return _colorRole;
+}
 
-void RemoveButton::setColor(QColor const& color) {
-  _color = color;
+void RemoveButton::setColorRole(QPalette::ColorRole role) {
+  if (_colorRole == role) {
+    return;
+  }
+  
+  _colorRole = role;
   update();
 }
 
 void RemoveButton::draw(QPainter* painter) const
 {
-  painter->setBrush(QBrush{_color});
+  painter->setBrush(palette().color(_colorRole));
   painter->setPen(Qt::NoPen);
 
   auto const rect = QRectF{this->rect()};

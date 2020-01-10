@@ -73,7 +73,11 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
     m_ui->maxLineCountSpinBox->setValue(3);
     connect(m_ui->maxLineCountSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
             [=](auto value) { tokenEdit->setMaxLineCount(value); });
-
+    
+    connect(m_ui->enabledCheckBox, &QCheckBox::stateChanged, [=](auto state) {
+      tokenEdit->setEnabled(state == Qt::Checked);
+    });
+            
     m_ui->formLayout->addRow("TableView", listView);
 
     auto lineEdit = tokenEdit->lineEdit();

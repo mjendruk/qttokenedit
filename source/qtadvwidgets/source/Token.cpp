@@ -27,8 +27,7 @@ Token::Token(QString const& text, QWidget* parent)
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   setFocusPolicy(Qt::ClickFocus);
 
-  _button = new RemoveButton{palette().color(QPalette::ButtonText),
-                             contentHeight(), this};
+  _button = new RemoveButton{QPalette::ButtonText, contentHeight(), this};
 
   connect(_button, &RemoveButton::clicked, this, &Token::removeClicked);
 }
@@ -112,7 +111,7 @@ void Token::paintEvent(QPaintEvent* event) {
 
   auto brushRole = QPalette::Button;
 
-  if (underMouse() && _dropIndicator == DropIndicator::None) {
+  if (isEnabled() && underMouse() && _dropIndicator == DropIndicator::None) {
     brushRole = QPalette::Midlight;
   }
 
@@ -149,24 +148,28 @@ void Token::keyPressEvent(QKeyEvent* event) {
 }
 
 void Token::focusInEvent(QFocusEvent* event) {
-  _button->setColor(palette().color(QPalette::HighlightedText));
+  _button->setColorRole(QPalette::HighlightedText);
   QWidget::focusInEvent(event);
 }
 
 void Token::focusOutEvent(QFocusEvent* event) {
-  _button->setColor(palette().color(QPalette::ButtonText));
+  _button->setColorRole(QPalette::ButtonText);
 
   QWidget::focusOutEvent(event);
 }
 
 void Token::leaveEvent(QEvent* event) {
   QWidget::leaveEvent(event);
-  update();
+  if (isEnabled()) {
+    update();
+  }
 }
 
 void Token::enterEvent(QEvent* event) {
   QWidget::enterEvent(event);
-  update();
+  if (isEnabled()) {
+    update();
+  }
 }
 
 void Token::mousePressEvent(QMouseEvent* event) {
