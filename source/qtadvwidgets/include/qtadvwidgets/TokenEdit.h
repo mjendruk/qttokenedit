@@ -45,6 +45,9 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   int modelColumn() const;
   void setModelColumn(int column);
 
+  QModelIndex rootIndex() const;
+  void setRootIndex(QModelIndex const& index);
+
  private:
   void addItem(QString const& text);
   void insertItem(int index, QString const& text);

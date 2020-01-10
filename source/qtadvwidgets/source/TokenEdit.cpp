@@ -171,6 +171,18 @@ void TokenEdit::setModelColumn(int column) {
   onModelReset();
 }
 
+QModelIndex TokenEdit::rootIndex() const { return _rootModelIndex; }
+
+void TokenEdit::setRootIndex(QModelIndex const& index) {
+  if (_rootModelIndex == index) {
+    return;
+  }
+
+  _rootModelIndex = index;
+
+  onModelReset();
+}
+
 void TokenEdit::addItem(QString const& text) {
   auto const index = _items.size();
   insertItem(index, text);
