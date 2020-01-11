@@ -4,6 +4,7 @@
 #include <qt-widgets-extensions/qt-widgets-extensions-version.h>
 #include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenEdit.h>
+#include <qtadvwidgets/ElidableLabel.h>
 
 #include <QCheckBox>
 #include <QFormLayout>
@@ -118,6 +119,12 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
       lineEdit->clear();
     });
   }
+
+  auto elidableLabel = new ElidableLabel{"Nordische Botschaften/Adenauer-Stiftung", this};
+  elidableLabel->setMinVisibleCharacters(21);
+  elidableLabel->setTextColorRole(QPalette::HighlightedText);
+
+  m_ui->formLayout->addWidget(elidableLabel);
 }
 
 MainWindow::~MainWindow() {}

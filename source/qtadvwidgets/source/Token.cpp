@@ -6,7 +6,6 @@
 #include <QBoxLayout>
 #include <QDrag>
 #include <QKeyEvent>
-#include <QLabel>
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPaintEvent>
