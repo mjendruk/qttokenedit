@@ -34,6 +34,9 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
 
   int lineCount() const;
   int lineHeight(int index) const;
+  
+  void freeze();
+  void unfreeze();
 
  signals:
   void linesChanged() const;
@@ -72,7 +75,7 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
                                 std::vector<ItemMetrics> &itemMetrics) const;
 
   auto metricsForLine(LayoutItemConstIterator begin,
-                      LayoutItemConstIterator end, int width) const
+                      LayoutItemConstIterator end, int width, bool testOnly) const
       -> std::pair<std::vector<ItemMetrics>, LayoutItemConstIterator>;
 
   int doLayout(const QRect &rect, bool testOnly) const;
@@ -83,5 +86,6 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   QList<QLayoutItem *> _itemList;
   int _hSpacing;
   int _vSpacing;
+  bool _frozen;
   mutable QVector<int> _lineHeights;
 };

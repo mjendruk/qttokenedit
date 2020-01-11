@@ -133,9 +133,11 @@ void TokenEdit::setRemovable(bool enable) {
   
   _removable = enable;
   
+  _layout->freeze();
   for (auto token : _items) {
     token->setRemovable(_removable);
   }
+  _layout->unfreeze();
 }
 
 int TokenEdit::count() const { return _items.size(); }
