@@ -7,8 +7,9 @@
 #include <QWidget>
 #include <memory>
 
-class QFontMetrics;
+class QBoxLayout;
 
+class ElidableLabel;
 class RemoveButton;
 class TokenChainElement;
 
@@ -26,9 +27,6 @@ class QTADVWIDGETS_API Token : public QWidget {
 
   bool dragEnabled() const;
   void setDragEnabled(bool enable); 
-
-  QSize sizeHint() const override;
-  QSize minimumSizeHint() const override;
 
   TokenChainElement* chainElement() const;
 
@@ -58,19 +56,11 @@ class QTADVWIDGETS_API Token : public QWidget {
 
  private:
   void drawBackground(QPainter* painter, QBrush brush) const;
-  void drawText(QPainter* painter, QPen pen) const;
   
   int contentHeight() const;
   int horizontalTextMargin() const;
   int margin() const;
   int spacing() const;
-  QSize textSize() const;
-
-  void updateElidedText(QSize size);
-  void updateButtonPosition(QSize size);
-
-  QSize elidedTextSize() const;
-  QString elidedText() const;
 
   bool shouldStartDrag(QPoint const& mousePos) const;
   void startDrag(QPoint const& mousePos);
@@ -89,12 +79,10 @@ class QTADVWIDGETS_API Token : public QWidget {
   DropHint dropHint(QPoint const& mousePos) const;
 
  private:
-  QString _text;
   std::unique_ptr<TokenChainElement> _chainElement;
+  QBoxLayout* _layout;
+  ElidableLabel* _label;
   RemoveButton* _button;
-
-  int _elidedTextWidth;
-  QString _elidedText;
 
   // drag members
   bool _dragEnabled;

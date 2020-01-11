@@ -1,3 +1,4 @@
+#include <qtadvwidgets/ElidableLabel.h>
 #include <qtadvwidgets/RemoveButton.h>
 #include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenChainElement.h>
@@ -17,58 +18,35 @@
 
 Token::Token(QString const& text, QWidget* parent)
     : QWidget{parent},
-      _text{text},
       _chainElement{std::make_unique<TokenChainElement>(this)},
+      _layout{new QBoxLayout{QBoxLayout::LeftToRight, this}},
+      _label{new ElidableLabel{text, this}},
+      _button{new RemoveButton{_label->sizeHint().height(), this}},
       _dragEnabled{false},
       _dropIndicator{DropIndicator::None} {
+  _layout->addWidget(_label);
+  _layout->addWidget(_button);
+  _layout->setSpacing(spacing());
+  _layout->setContentsMargins(horizontalTextMargin(), margin(), margin(),
+                              margin());
+
   setAcceptDrops(true);
   setCursor(Qt::ArrowCursor);
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   setFocusPolicy(Qt::ClickFocus);
-
-  _button = new RemoveButton{QPalette::ButtonText, contentHeight(), this};
 
   connect(_button, &RemoveButton::clicked, this, &Token::removeClicked);
 }
 
 Token::~Token() = default;
 
-QString const& Token::text() const { return _text; }
+QString const& Token::text() const { return _label->text(); }
 
-void Token::setText(QString const& text) {
-  _text = text;
-  update();
-}
+void Token::setText(QString const& text) { _label->setText(text); }
 
-bool Token::dragEnabled() const
-{
-  return _dragEnabled;
-}
+bool Token::dragEnabled() const { return _dragEnabled; }
 
-void Token::setDragEnabled(bool enable)
-{
-  _dragEnabled = enable;
-}
-
-QSize Token::sizeHint() const {
-  auto const margins =
-      QSize{horizontalTextMargin() + margin(), margin() + margin()};
-  auto const buttonWidth = _button->sizeHint().width();
-
-  return textSize() + margins + QSize{buttonWidth + spacing(), 0};
-}
-
-QSize Token::minimumSizeHint() const {
-  auto const margins =
-      QSize{horizontalTextMargin() + margin(), margin() + margin()};
-
-  auto const buttonWidth = _button->sizeHint().width();
-
-  auto const minimalTextWidth =
-      fontMetrics().averageCharWidth() * std::min(5, _text.size());
-
-  return margins + QSize{minimalTextWidth + buttonWidth + spacing(), 0};
-}
+void Token::setDragEnabled(bool enable) { _dragEnabled = enable; }
 
 TokenChainElement* Token::chainElement() const { return _chainElement.get(); }
 
@@ -81,7 +59,11 @@ QPixmap Token::toPixmap() const {
   painter.setRenderHint(QPainter::Antialiasing, true);
 
   drawBackground(&painter, palette().brush(QPalette::Highlight));
-  drawText(&painter, palette().color(QPalette::HighlightedText));
+
+  painter.save();
+  painter.translate(_label->pos());
+  _label->draw(&painter);
+  painter.restore();
 
   painter.save();
   painter.translate(_button->pos());
@@ -91,17 +73,13 @@ QPixmap Token::toPixmap() const {
   return pixmap;
 }
 
-int Token::contentHeight() const { return fontMetrics().height(); }
+int Token::contentHeight() const { return _label->sizeHint().height(); }
 
 int Token::horizontalTextMargin() const { return margin() * 2; }
 
 int Token::margin() const { return std::lround(contentHeight() / 6.0); }
 
 int Token::spacing() const { return std::lround(contentHeight() * 0.25); }
-
-QSize Token::textSize() const {
-  return fontMetrics().size(Qt::TextSingleLine, _text);
-}
 
 void Token::paintEvent(QPaintEvent* event) {
   auto painter = QPainter{this};
@@ -122,19 +100,15 @@ void Token::paintEvent(QPaintEvent* event) {
 
   drawDropIndicator(&painter);
 
-  auto const penRole =
-      hasFocus() ? QPalette::HighlightedText : QPalette::ButtonText;
+  // auto const penRole =
+  //     hasFocus() ? QPalette::HighlightedText : QPalette::ButtonText;
 
-  drawText(&painter, palette().color(penRole));
+  // drawText(&painter, palette().color(penRole));
 
   QWidget::paintEvent(event);
 }
 
-void Token::resizeEvent(QResizeEvent* event) {
-  QWidget::resizeEvent(event);
-  updateElidedText(event->size());
-  updateButtonPosition(event->size());
-}
+void Token::resizeEvent(QResizeEvent* event) { QWidget::resizeEvent(event); }
 
 void Token::keyPressEvent(QKeyEvent* event) {
   if (event->key() == Qt::Key_Backspace) {
@@ -147,13 +121,14 @@ void Token::keyPressEvent(QKeyEvent* event) {
 }
 
 void Token::focusInEvent(QFocusEvent* event) {
+  _label->setTextColorRole(QPalette::HighlightedText);
   _button->setColorRole(QPalette::HighlightedText);
   QWidget::focusInEvent(event);
 }
 
 void Token::focusOutEvent(QFocusEvent* event) {
+  _label->setTextColorRole(QPalette::ButtonText);
   _button->setColorRole(QPalette::ButtonText);
-
   QWidget::focusOutEvent(event);
 }
 
@@ -224,38 +199,6 @@ void Token::drawBackground(QPainter* painter, QBrush brush) const {
 
   painter->restore();
 }
-
-void Token::drawText(QPainter* painter, QPen pen) const {
-  painter->save();
-  painter->setPen(pen);
-
-  auto const textPosition = QPointF(horizontalTextMargin(), margin());
-  auto const textSize =
-      QSizeF{QSize{elidedTextSize().width(), contentHeight()}};
-
-  painter->drawText(QRectF{textPosition, textSize},
-                    Qt::TextSingleLine | Qt::AlignLeft, _elidedText);
-  painter->restore();
-}
-
-void Token::updateElidedText(QSize size) {
-  auto availableWidth = size.width() - (horizontalTextMargin() + spacing() +
-                                        _button->sizeHint().width() + margin());
-
-  _elidedText = fontMetrics().elidedText(_text, Qt::ElideRight, availableWidth);
-}
-
-void Token::updateButtonPosition(QSize size) {
-  auto const x = size.width() - _button->sizeHint().width() - margin();
-  auto const y = margin();
-  _button->move(x, y);
-}
-
-QSize Token::elidedTextSize() const {
-  return fontMetrics().size(Qt::TextSingleLine, _elidedText);
-}
-
-QString Token::elidedText() const { return _elidedText; }
 
 bool Token::shouldStartDrag(QPoint const& mousePos) const {
   if (!dragEnabled()) {

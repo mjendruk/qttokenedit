@@ -8,6 +8,7 @@ class QTADVWIDGETS_API RemoveButton : public QAbstractButton {
   Q_OBJECT
 
  public:
+  RemoveButton(int diamter, QWidget* parent = nullptr);
   RemoveButton(QPalette::ColorRole colorRole, int diameter, QWidget* parent = nullptr);
 
   QSize sizeHint() const override;

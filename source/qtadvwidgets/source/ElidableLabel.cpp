@@ -6,12 +6,12 @@
 ElidableLabel::ElidableLabel(QWidget* parent) : ElidableLabel{{}, parent} {}
 
 ElidableLabel::ElidableLabel(QString const& text, QWidget* parent)
-  : QWidget{parent},
-    _text{text},
-    _minVisibleCharacters{0},
-    _colorRole{QPalette::Text} {
+    : QWidget{parent},
+      _text{text},
+      _minVisibleCharacters{0},
+      _colorRole{QPalette::Text} {
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-      
+
   updateTextSize();
 }
 
@@ -43,18 +43,22 @@ void ElidableLabel::setMinVisibleCharacters(int count) {
   update();
 }
 
-QPalette::ColorRole ElidableLabel::textColorRole() const {
-  return _colorRole;
-}
+QPalette::ColorRole ElidableLabel::textColorRole() const { return _colorRole; }
 
-void ElidableLabel::setTextColorRole(QPalette::ColorRole role)
-{
+void ElidableLabel::setTextColorRole(QPalette::ColorRole role) {
   if (_colorRole == role) {
     return;
   }
-  
+
   _colorRole = role;
   update();
+}
+
+void ElidableLabel::draw(QPainter* painter) const {
+  painter->save();
+  painter->setPen(palette().color(_colorRole));
+  painter->drawText(rect(), Qt::TextSingleLine | Qt::AlignLeft, elidedText());
+  painter->restore();
 }
 
 QSize ElidableLabel::sizeHint() const { return _textSize; }
@@ -65,9 +69,7 @@ void ElidableLabel::paintEvent(QPaintEvent* event) {
   auto painter = QPainter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(QRectF{event->rect()});
-  painter.setPen(palette().color(_colorRole));
-
-  painter.drawText(rect(), Qt::TextSingleLine | Qt::AlignLeft, elidedText());
+  draw(&painter);
 }
 
 void ElidableLabel::updateTextSize() {

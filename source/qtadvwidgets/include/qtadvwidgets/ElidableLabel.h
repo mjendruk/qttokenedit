@@ -1,9 +1,8 @@
 #pragma once
 
-#include <QWidget>
-
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+#include <QWidget>
 
 class QTADVWIDGETS_API ElidableLabel : public QWidget {
   Q_OBJECT
@@ -20,9 +19,11 @@ class QTADVWIDGETS_API ElidableLabel : public QWidget {
 
   QSize sizeHint() const override;
   QSize minimumSizeHint() const override;
-  
+
   QPalette::ColorRole textColorRole() const;
   void setTextColorRole(QPalette::ColorRole role);
+
+  void draw(QPainter* painter) const;
 
  protected:
   void paintEvent(QPaintEvent* event) override;

@@ -5,7 +5,11 @@
 #include <QPainterPath>
 #include <cmath>
 
-RemoveButton::RemoveButton(QPalette::ColorRole colorRole, int diameter, QWidget* parent)
+RemoveButton::RemoveButton(int diameter, QWidget* parent)
+    : RemoveButton{QPalette::Text, diameter, parent} {}
+
+RemoveButton::RemoveButton(QPalette::ColorRole colorRole, int diameter,
+                           QWidget* parent)
     : QAbstractButton{parent}, _colorRole(colorRole), _diameter{diameter} {
   setCheckable(false);
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -17,21 +21,18 @@ RemoveButton::RemoveButton(QPalette::ColorRole colorRole, int diameter, QWidget*
 
 QSize RemoveButton::sizeHint() const { return _size; }
 
-QPalette::ColorRole RemoveButton::colorRole() const {
-  return _colorRole;
-}
+QPalette::ColorRole RemoveButton::colorRole() const { return _colorRole; }
 
 void RemoveButton::setColorRole(QPalette::ColorRole role) {
   if (_colorRole == role) {
     return;
   }
-  
+
   _colorRole = role;
   update();
 }
 
-void RemoveButton::draw(QPainter* painter) const
-{
+void RemoveButton::draw(QPainter* painter) const {
   painter->setBrush(palette().color(_colorRole));
   painter->setPen(Qt::NoPen);
 
