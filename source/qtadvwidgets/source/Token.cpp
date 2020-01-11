@@ -22,6 +22,7 @@ Token::Token(QString const& text, QWidget* parent)
       _layout{new QBoxLayout{QBoxLayout::LeftToRight, this}},
       _label{new ElidableLabel{text, this}},
       _button{new RemoveButton{_label->sizeHint().height(), this}},
+      _removable{true},
       _dragEnabled{false},
       _dropIndicator{DropIndicator::None} {
   _layout->addWidget(_label);
@@ -34,6 +35,8 @@ Token::Token(QString const& text, QWidget* parent)
   setCursor(Qt::ArrowCursor);
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   setFocusPolicy(Qt::ClickFocus);
+        
+  setRemovable(false);
 
   connect(_button, &RemoveButton::clicked, this, &Token::removeClicked);
 }
@@ -47,6 +50,26 @@ void Token::setText(QString const& text) { _label->setText(text); }
 bool Token::dragEnabled() const { return _dragEnabled; }
 
 void Token::setDragEnabled(bool enable) { _dragEnabled = enable; }
+
+bool Token::removable() const { return _removable; }
+
+void Token::setRemovable(bool enable) {
+  if (_removable == enable) {
+    return;
+  }
+  
+  _removable = enable;
+  
+  if (_removable) {
+    _button->show();
+  } else {
+    _button->hide();
+  }
+  
+  auto margins = _layout->contentsMargins();
+  margins.setRight(_removable ? margin() : horizontalTextMargin());
+  _layout->setContentsMargins(margins);
+}
 
 TokenChainElement* Token::chainElement() const { return _chainElement.get(); }
 
@@ -111,7 +134,7 @@ void Token::paintEvent(QPaintEvent* event) {
 void Token::resizeEvent(QResizeEvent* event) { QWidget::resizeEvent(event); }
 
 void Token::keyPressEvent(QKeyEvent* event) {
-  if (event->key() == Qt::Key_Backspace) {
+  if (removable() && event->key() == Qt::Key_Backspace) {
     emit removeClicked();
     event->accept();
     return;

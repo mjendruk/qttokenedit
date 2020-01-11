@@ -26,7 +26,10 @@ class QTADVWIDGETS_API Token : public QWidget {
   void setText(QString const& text);
 
   bool dragEnabled() const;
-  void setDragEnabled(bool enable); 
+  void setDragEnabled(bool enable);
+  
+  bool removable() const;
+  void setRemovable(bool enable);
 
   TokenChainElement* chainElement() const;
 
@@ -83,6 +86,8 @@ class QTADVWIDGETS_API Token : public QWidget {
   QBoxLayout* _layout;
   ElidableLabel* _label;
   RemoveButton* _button;
+  
+  bool _removable;
 
   // drag members
   bool _dragEnabled;

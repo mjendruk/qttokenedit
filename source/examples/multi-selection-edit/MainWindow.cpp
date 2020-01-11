@@ -78,6 +78,10 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
     connect(m_ui->enabledCheckBox, &QCheckBox::stateChanged, [=](auto state) {
       tokenEdit->setEnabled(state == Qt::Checked);
     });
+    
+    connect(m_ui->removableCheckBox, &QCheckBox::stateChanged, [=](auto state) {
+      tokenEdit->setRemovable(state == Qt::Checked);
+    });
             
     m_ui->formLayout->addRow("TableView", listView);
 

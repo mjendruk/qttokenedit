@@ -34,6 +34,7 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
       _tokenChain{new TokenChain{mode, _lineEdit, this}},
       _maxLineCount{-1},
       _dragEnabled{false},
+      _removable{false},
       _spacing{3},
       _mode{mode},
       _scrollArea{new QScrollArea{this}},
@@ -69,7 +70,7 @@ TokenEdit::TokenEdit(TokenEditMode mode, QWidget* parent)
   _lineEdit->setFixedHeight(dummyItem->sizeHint().height());
 
   connect(_lineEdit, &TokenLineEdit::backspaceAtBeginning, [=]() {
-    if (_model && !isEmpty()) {
+    if (_model && !isEmpty() && removable()) {
       _model->removeRow(count() - 1);
     }
   });
@@ -120,6 +121,20 @@ void TokenEdit::setDragEnabled(bool enable)
 
   for (auto token : _items) {
     token->setDragEnabled(_dragEnabled);
+  }
+}
+
+bool TokenEdit::removable() const { return _removable; }
+
+void TokenEdit::setRemovable(bool enable) {
+  if (_removable == enable) {
+    return;
+  }
+  
+  _removable = enable;
+  
+  for (auto token : _items) {
+    token->setRemovable(_removable);
   }
 }
 
@@ -198,6 +213,7 @@ void TokenEdit::addItem(QString const& text) {
 void TokenEdit::insertItem(int index, QString const& text) {
   auto item = new Token{text, this};
   item->setDragEnabled(dragEnabled());
+  item->setRemovable(removable());
 
   if (_mode == Mode::ShowLineEditIfEmpty) {
     _lineEdit->hide();
