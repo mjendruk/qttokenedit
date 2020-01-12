@@ -37,6 +37,9 @@ Token::Token(QString const& text, QWidget* parent)
   setFocusPolicy(Qt::ClickFocus);
         
   setRemovable(false);
+        
+  _label->setTextColorRole(QPalette::ButtonText);
+  _button->setColorRole(QPalette::ButtonText);
 
   connect(_button, &RemoveButton::clicked, this, &Token::removeClicked);
 }
