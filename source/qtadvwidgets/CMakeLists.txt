@@ -46,6 +46,7 @@ set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/source")
 
 set(headers
     ${include_path}/baselib.h
+    ${include_path}/BaseToken.h
     ${include_path}/DarkStyle.h
     ${include_path}/ElidableLabel.h
     ${include_path}/FlexLayout.h
@@ -64,6 +65,7 @@ set(headers
 
 set(sources
     ${source_path}/baselib.cpp
+    ${source_path}/BaseToken.cpp
     ${source_path}/DarkStyle.cpp
     ${source_path}/ElidableLabel.cpp
     ${source_path}/FlexLayout.cpp

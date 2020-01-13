@@ -4,51 +4,33 @@
 #include <qtadvwidgets/TokenChainElement.h>
 #include <qtadvwidgets/TokenMimeData.h>
 
-#include <QBoxLayout>
 #include <QDrag>
 #include <QKeyEvent>
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPaintEvent>
 #include <QPainter>
-#include <QPainterPath>
-#include <QResizeEvent>
-#include <QToolButton>
 #include <cmath>
 
 Token::Token(QString const& text, QWidget* parent)
-    : QWidget{parent},
-      _chainElement{std::make_unique<TokenChainElement>(this)},
-      _layout{new QBoxLayout{QBoxLayout::LeftToRight, this}},
-      _label{new ElidableLabel{text, this}},
-      _button{new RemoveButton{_label->sizeHint().height(), this}},
+    : BaseToken{text, parent},
+      _button{new RemoveButton{contentHeight(), this}},
       _removable{true},
       _dragEnabled{false},
       _dropIndicator{DropIndicator::None} {
-  _layout->addWidget(_label);
-  _layout->addWidget(_button);
-  _layout->setSpacing(spacing());
-  _layout->setContentsMargins(horizontalTextMargin(), margin(), margin(),
-                              margin());
+  setRightWidget(_button);
 
   setAcceptDrops(true);
   setCursor(Qt::ArrowCursor);
-  setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  setFocusPolicy(Qt::ClickFocus);
-        
+
   setRemovable(false);
-        
-  _label->setTextColorRole(QPalette::ButtonText);
+
   _button->setColorRole(QPalette::ButtonText);
 
   connect(_button, &RemoveButton::clicked, this, &Token::removeClicked);
 }
 
 Token::~Token() = default;
-
-QString const& Token::text() const { return _label->text(); }
-
-void Token::setText(QString const& text) { _label->setText(text); }
 
 bool Token::dragEnabled() const { return _dragEnabled; }
 
@@ -69,27 +51,14 @@ void Token::setRemovable(bool enable) {
     _button->hide();
   }
   
-  auto margins = _layout->contentsMargins();
-  margins.setRight(_removable ? margin() : horizontalTextMargin());
-  _layout->setContentsMargins(margins);
+  updateMargins();
 }
 
-TokenChainElement* Token::chainElement() const { return _chainElement.get(); }
-
 QPixmap Token::toPixmap() const {
-  auto pixmap = QPixmap(size() * devicePixelRatio());
-  pixmap.setDevicePixelRatio(devicePixelRatio());
-  pixmap.fill(QColor{0, 0, 0, 0});
-
+  auto pixmap = BaseToken::toPixmap();
+  
   auto painter = QPainter{&pixmap};
   painter.setRenderHint(QPainter::Antialiasing, true);
-
-  drawBackground(&painter, palette().brush(QPalette::Highlight));
-
-  painter.save();
-  painter.translate(_label->pos());
-  _label->draw(&painter);
-  painter.restore();
 
   painter.save();
   painter.translate(_button->pos());
@@ -99,42 +68,15 @@ QPixmap Token::toPixmap() const {
   return pixmap;
 }
 
-int Token::contentHeight() const { return _label->sizeHint().height(); }
-
-int Token::horizontalTextMargin() const { return margin() * 2; }
-
-int Token::margin() const { return std::lround(contentHeight() / 6.0); }
-
-int Token::spacing() const { return std::lround(contentHeight() * 0.25); }
-
 void Token::paintEvent(QPaintEvent* event) {
+  BaseToken::paintEvent(event);
+
   auto painter = QPainter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(QRectF{event->rect()});
 
-  auto brushRole = QPalette::Button;
-
-  if (isEnabled() && underMouse() && _dropIndicator == DropIndicator::None) {
-    brushRole = QPalette::Midlight;
-  }
-
-  if (hasFocus()) {
-    brushRole = QPalette::Highlight;
-  }
-
-  drawBackground(&painter, palette().brush(brushRole));
-
   drawDropIndicator(&painter);
-
-  // auto const penRole =
-  //     hasFocus() ? QPalette::HighlightedText : QPalette::ButtonText;
-
-  // drawText(&painter, palette().color(penRole));
-
-  QWidget::paintEvent(event);
 }
-
-void Token::resizeEvent(QResizeEvent* event) { QWidget::resizeEvent(event); }
 
 void Token::keyPressEvent(QKeyEvent* event) {
   if (removable() && event->key() == Qt::Key_Backspace) {
@@ -147,29 +89,13 @@ void Token::keyPressEvent(QKeyEvent* event) {
 }
 
 void Token::focusInEvent(QFocusEvent* event) {
-  _label->setTextColorRole(QPalette::HighlightedText);
   _button->setColorRole(QPalette::HighlightedText);
   QWidget::focusInEvent(event);
 }
 
 void Token::focusOutEvent(QFocusEvent* event) {
-  _label->setTextColorRole(QPalette::ButtonText);
   _button->setColorRole(QPalette::ButtonText);
   QWidget::focusOutEvent(event);
-}
-
-void Token::leaveEvent(QEvent* event) {
-  QWidget::leaveEvent(event);
-  if (isEnabled()) {
-    update();
-  }
-}
-
-void Token::enterEvent(QEvent* event) {
-  QWidget::enterEvent(event);
-  if (isEnabled()) {
-    update();
-  }
 }
 
 void Token::mousePressEvent(QMouseEvent* event) {
@@ -210,20 +136,6 @@ void Token::dropEvent(QDropEvent* event) {
   if (acceptsDrag(event)) {
     finishDrag(event);
   }
-}
-
-void Token::drawBackground(QPainter* painter, QBrush brush) const {
-  painter->save();
-
-  auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}};
-
-  auto const rounding = contentHeight() / 8.0;
-
-  painter->setBrush(brush);
-  painter->setPen(Qt::NoPen);
-  painter->drawRoundedRect(rect, rounding, rounding);
-
-  painter->restore();
 }
 
 bool Token::shouldStartDrag(QPoint const& mousePos) const {

@@ -1,0 +1,156 @@
+#include <qtadvwidgets/ElidableLabel.h>
+#include <qtadvwidgets/BaseToken.h>
+#include <qtadvwidgets/TokenChainElement.h>
+
+#include <QBoxLayout>
+#include <QPaintEvent>
+#include <QPainter>
+#include <QPainterPath>
+#include <cmath>
+
+BaseToken::BaseToken(QString const& text, QWidget* parent)
+    : QWidget{parent},
+      _chainElement{std::make_unique<TokenChainElement>(this)},
+      _layout{new QBoxLayout{QBoxLayout::LeftToRight, this}},
+      _label{new ElidableLabel{text, this}},
+      _rightWidget{nullptr} {
+  _layout->addWidget(_label);
+  _layout->setSpacing(spacing());
+  _layout->setContentsMargins(horizontalTextMargin(), margin(),
+                              horizontalTextMargin(), margin());
+
+  setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  setFocusPolicy(Qt::ClickFocus);
+        
+  _label->setTextColorRole(QPalette::ButtonText);
+}
+
+BaseToken::~BaseToken() = default;
+
+QString const& BaseToken::text() const { return _label->text(); }
+
+void BaseToken::setText(QString const& text) { _label->setText(text); }
+
+TokenChainElement* BaseToken::chainElement() const { return _chainElement.get(); }
+
+QPixmap BaseToken::toPixmap() const {
+  auto pixmap = QPixmap(size() * devicePixelRatio());
+  pixmap.setDevicePixelRatio(devicePixelRatio());
+  pixmap.fill(QColor{0, 0, 0, 0});
+
+  auto painter = QPainter{&pixmap};
+  painter.setRenderHint(QPainter::Antialiasing, true);
+
+  drawBackground(&painter, palette().brush(QPalette::Highlight));
+
+  painter.save();
+  painter.translate(_label->pos());
+  _label->draw(&painter);
+  painter.restore();
+
+  return pixmap;
+}
+
+QWidget* BaseToken::rightWidget() const
+{
+  return _rightWidget;
+}
+
+void BaseToken::setRightWidget(QWidget* widget)
+{
+  if (_rightWidget == widget) {
+    return;
+  }
+
+  if (_rightWidget) {
+    _layout->removeWidget(_rightWidget);
+    if (_rightWidget->parent() == this) {
+      delete _rightWidget;
+    }
+  }
+
+  if (widget) {
+    _layout->addWidget(widget);
+  }
+
+  _rightWidget = widget;
+  updateMargins();
+}
+
+void BaseToken::updateMargins()
+{
+  _layout->setContentsMargins(margins());
+}
+
+void BaseToken::drawBackground(QPainter* painter, QBrush brush) const {
+  painter->save();
+
+  auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}};
+
+  auto const rounding = contentHeight() / 8.0;
+
+  painter->setBrush(brush);
+  painter->setPen(Qt::NoPen);
+  painter->drawRoundedRect(rect, rounding, rounding);
+
+  painter->restore();
+}
+
+int BaseToken::contentHeight() const { return _label->sizeHint().height(); }
+
+int BaseToken::horizontalTextMargin() const { return margin() * 2; }
+
+int BaseToken::margin() const { return std::lround(contentHeight() / 6.0); }
+
+int BaseToken::spacing() const { return std::lround(contentHeight() * 0.25); }
+
+QMargins BaseToken::margins() const {
+  auto const rightMargin = _rightWidget && _rightWidget->isVisible()
+                               ? margin()
+                               : horizontalTextMargin();
+  return QMargins{horizontalTextMargin(), margin(), rightMargin, margin()};
+}
+
+void BaseToken::paintEvent(QPaintEvent* event) {
+  auto painter = QPainter{this};
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  painter.setClipRect(QRectF{event->rect()});
+
+  auto brushRole = QPalette::Button;
+
+  if (isEnabled() && underMouse()) {
+    brushRole = QPalette::Midlight;
+  }
+
+  if (hasFocus()) {
+    brushRole = QPalette::Highlight;
+  }
+
+  drawBackground(&painter, palette().brush(brushRole));
+
+  QWidget::paintEvent(event);
+}
+
+void BaseToken::focusInEvent(QFocusEvent* event) {
+  _label->setTextColorRole(QPalette::HighlightedText);
+  QWidget::focusInEvent(event);
+}
+
+void BaseToken::focusOutEvent(QFocusEvent* event) {
+  _label->setTextColorRole(QPalette::ButtonText);
+  QWidget::focusOutEvent(event);
+}
+
+void BaseToken::leaveEvent(QEvent* event) {
+  QWidget::leaveEvent(event);
+  if (isEnabled()) {
+    update();
+  }
+}
+
+void BaseToken::enterEvent(QEvent* event) {
+  QWidget::enterEvent(event);
+  if (isEnabled()) {
+    update();
+  }
+}

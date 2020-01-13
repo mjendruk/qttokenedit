@@ -1,19 +1,14 @@
 #pragma once
 
 #include <qtadvwidgets/qtadvwidgets_api.h>
+#include <qtadvwidgets/BaseToken.h>
 
 #include <QString>
-#include <QVariant>
-#include <QWidget>
 #include <memory>
 
-class QBoxLayout;
-
-class ElidableLabel;
 class RemoveButton;
-class TokenChainElement;
 
-class QTADVWIDGETS_API Token : public QWidget {
+class QTADVWIDGETS_API Token : public BaseToken {
   Q_OBJECT
 
  public:
@@ -22,18 +17,13 @@ class QTADVWIDGETS_API Token : public QWidget {
   Token(QString const& text, QWidget* parent = nullptr);
   ~Token();
 
-  QString const& text() const;
-  void setText(QString const& text);
-
   bool dragEnabled() const;
   void setDragEnabled(bool enable);
   
   bool removable() const;
   void setRemovable(bool enable);
 
-  TokenChainElement* chainElement() const;
-
-  QPixmap toPixmap() const;
+  QPixmap toPixmap() const override;
 
  signals:
   void removeClicked();
@@ -41,13 +31,9 @@ class QTADVWIDGETS_API Token : public QWidget {
 
  protected:
   void paintEvent(QPaintEvent* event) override;
-  void resizeEvent(QResizeEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
   void focusInEvent(QFocusEvent* event) override;
   void focusOutEvent(QFocusEvent* event) override;
-
-  void leaveEvent(QEvent* event) override;
-  void enterEvent(QEvent* event) override;
 
   void mousePressEvent(QMouseEvent* event) override;
   void mouseMoveEvent(QMouseEvent* event) override;
@@ -58,13 +44,6 @@ class QTADVWIDGETS_API Token : public QWidget {
   void dropEvent(QDropEvent* event) override;
 
  private:
-  void drawBackground(QPainter* painter, QBrush brush) const;
-  
-  int contentHeight() const;
-  int horizontalTextMargin() const;
-  int margin() const;
-  int spacing() const;
-
   bool shouldStartDrag(QPoint const& mousePos) const;
   void startDrag(QPoint const& mousePos);
   bool acceptsDrag(QDropEvent* event) const;
@@ -82,9 +61,6 @@ class QTADVWIDGETS_API Token : public QWidget {
   DropHint dropHint(QPoint const& mousePos) const;
 
  private:
-  std::unique_ptr<TokenChainElement> _chainElement;
-  QBoxLayout* _layout;
-  ElidableLabel* _label;
   RemoveButton* _button;
   
   bool _removable;
