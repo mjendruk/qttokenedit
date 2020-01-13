@@ -286,9 +286,7 @@ void TokenEdit::updateHeight() {
     height += _spacing;
   }
 
-  height += 2;
-
-  setFixedHeight(height);
+  _scrollArea->setMaximumHeight(height);
   _scrollArea->verticalScrollBar()->triggerAction(
       QAbstractSlider::SliderToMaximum);
 }
