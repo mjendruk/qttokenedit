@@ -17,7 +17,7 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
 
   Qt::Orientations expandingDirections() const override;
   bool hasHeightForWidth() const override;
-  int heightForWidth(int) const override;
+  int heightForWidth(int width) const override;
   int count() const override;
   QLayoutItem *itemAt(int index) const override;
   QSize minimumSize() const override;
@@ -32,6 +32,7 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   void insertLayout(int index, QLayout *layout);
   void insertWidget(int index, QWidget *widget);
 
+  int lineCountForWidth(int width) const;
   int lineCount() const;
   int lineHeight(int index) const;
   
@@ -78,7 +79,13 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
                       LayoutItemConstIterator end, int width, bool testOnly) const
       -> std::pair<std::vector<ItemMetrics>, LayoutItemConstIterator>;
 
-  int doLayout(const QRect &rect, bool testOnly) const;
+  struct LayoutProperties
+  {
+    int height;
+    int lineCount;
+  };
+  
+  LayoutProperties doLayout(const QRect &rect, bool testOnly) const;
 
   int smartSpacing(QStyle::PixelMetric pm) const;
 
