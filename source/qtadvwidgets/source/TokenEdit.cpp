@@ -106,22 +106,15 @@ void TokenEdit::setMaxLineCount(int count) {
   updateHeight();
 }
 
-bool TokenEdit::dragEnabled() const
-{
-  return _dragEnabled;
-}
+bool TokenEdit::dragEnabled() const { return _dragEnabled; }
 
-void TokenEdit::setDragEnabled(bool enable)
-{
+void TokenEdit::setDragEnabled(bool enable) {
   if (_dragEnabled == enable) {
     return;
   }
 
   _dragEnabled = enable;
-
-  for (auto token : _items) {
-    token->setDragEnabled(_dragEnabled);
-  }
+  emit dragStateChanged(enable);
 }
 
 bool TokenEdit::removable() const { return _removable; }
@@ -130,13 +123,11 @@ void TokenEdit::setRemovable(bool enable) {
   if (_removable == enable) {
     return;
   }
-  
+
   _removable = enable;
-  
+
   _layout->freeze();
-  for (auto token : _items) {
-    token->setRemovable(_removable);
-  }
+  emit removableStateChanged(enable);
   _layout->unfreeze();
 }
 
@@ -207,39 +198,24 @@ void TokenEdit::setRootIndex(QModelIndex const& index) {
   onModelReset();
 }
 
-void TokenEdit::addItem(QString const& text) {
+BaseToken const* TokenEdit::at(int index) const { return _items.at(index); }
+
+BaseToken* TokenEdit::at(int index) { return _items.at(index); }
+
+void TokenEdit::addItem(BaseToken* token) {
   auto const index = _items.size();
-  insertItem(index, text);
+  insertItem(index, token);
 }
 
-void TokenEdit::insertItem(int index, QString const& text) {
-  auto item = new Token{text, this};
-  item->setDragEnabled(dragEnabled());
-  item->setRemovable(removable());
-
+void TokenEdit::insertItem(int index, BaseToken* token) {
   if (_mode == Mode::ShowLineEditIfEmpty) {
     _lineEdit->hide();
-    _scrollArea->setFocusProxy(item);
+    _scrollArea->setFocusProxy(token);
   }
 
-  _items.insert(index, item);
-  _layout->insertWidget(index, item);
-  _tokenChain->insert(index, item->chainElement());
-
-  connect(item, &Token::removeClicked, [=]() {
-    auto index = _items.indexOf(item);
-    _model->removeRow(index);
-  });
-
-  connect(item, &Token::dragged,
-          [=](auto target, auto hint) { onItemDragged(item, target, hint); });
-}
-
-void TokenEdit::setItemText(int index, QString const& text) {
-  auto item = _items.at(index);
-  item->setText(text);
-  _layout->invalidate();
-  updateHeight();
+  _items.insert(index, token);
+  _layout->insertWidget(index, token);
+  _tokenChain->insert(index, token->chainElement());
 }
 
 void TokenEdit::moveItem(int from, int to) {
@@ -319,8 +295,27 @@ void TokenEdit::onRowsInserted(QModelIndex const& parent, int first, int last) {
   for (auto row = first; row <= last; ++row) {
     auto const index = _model->index(row, _modelColumn, parent);
     auto const text = index.data(Qt::DisplayRole).toString();
-    auto stdText = text.toStdString();
-    insertItem(row, text);
+
+    auto token = new Token{text, this};
+    token->setDragEnabled(dragEnabled());
+    token->setRemovable(removable());
+
+    connect(token, &Token::removeClicked, [=]() {
+      auto index = _items.indexOf(token);
+      _model->removeRow(index);
+    });
+
+    connect(token, &Token::dragged, [=](auto target, auto hint) {
+      onItemDragged(token, target, hint);
+    });
+
+    connect(this, &TokenEdit::dragStateChanged,
+            [=](auto enable) { token->setDragEnabled(enable); });
+
+    connect(this, &TokenEdit::removableStateChanged,
+            [=](auto enable) { token->setRemovable(enable); });
+
+    insertItem(row, token);
   }
 }
 
@@ -370,8 +365,8 @@ void TokenEdit::onDataChanged(const QModelIndex& topLeft,
   if (roles.contains(Qt::DisplayRole)) {
     for (auto row = topLeft.row(); row <= bottomRight.row(); ++row) {
       auto const index = _model->index(row, _modelColumn, parent);
-
-      setItemText(row, _model->data(index, Qt::DisplayRole).toString());
+      auto token = at(row);
+      token->setText(index.data(Qt::DisplayRole).toString());
     }
   }
 }

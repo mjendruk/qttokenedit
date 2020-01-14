@@ -13,7 +13,7 @@
 class QLineEdit;
 class QAbstractItemModel;
 
-class Token;
+class BaseToken;
 class FlexLayout;
 class TokenLineEdit;
 class TokenChain;
@@ -50,11 +50,16 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
 
   QModelIndex rootIndex() const;
   void setRootIndex(QModelIndex const& index);
+  
+ signals:
+  void dragStateChanged(bool enabled);
+  void removableStateChanged(bool enabled);
 
  private:
-  void addItem(QString const& text);
-  void insertItem(int index, QString const& text);
-  void setItemText(int index, QString const& text);
+  BaseToken const* at(int index) const;
+  BaseToken* at(int index);
+  void addItem(BaseToken* token);
+  void insertItem(int index, BaseToken* token);
   void moveItem(int from, int to);
   void removeItem(int index);
 
@@ -73,7 +78,7 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   void onItemDragged(Token* source, Token* target, Token::DropHint hint);
 
  private:
-  QVector<Token*> _items;
+  QVector<BaseToken*> _items;
   TokenLineEdit* _lineEdit;
   TokenChain* _tokenChain;
   FlexLayout* _layout;
