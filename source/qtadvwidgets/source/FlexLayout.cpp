@@ -17,7 +17,7 @@ FlexLayout::~FlexLayout() {
   while ((item = takeAt(0))) delete item;
 }
 
-void FlexLayout::addItem(QLayoutItem *item) { insertItem(-1, item); }
+void FlexLayout::addItem(QLayoutItem *item) { insertItem(_itemList.size(), item); }
 
 int FlexLayout::horizontalSpacing() const {
   if (_hSpacing >= 0) {
