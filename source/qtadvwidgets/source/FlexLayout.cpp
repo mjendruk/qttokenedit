@@ -61,8 +61,8 @@ int FlexLayout::heightForWidth(int width) const {
     return _itemList.last()->geometry().bottom();
   }
   
-  int height = doLayout(QRect(0, 0, width, 0), true);
-  return height;
+  auto properties = doLayout(QRect(0, 0, width, 0), true);
+  return properties.height;
 }
 
 void FlexLayout::setGeometry(const QRect &rect) {
@@ -266,7 +266,7 @@ auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
   return std::pair{std::move(itemMetrics), nextLineIt};
 }
 
-int FlexLayout::doLayout(QRect const &rect, bool testOnly) const {
+auto FlexLayout::doLayout(QRect const &rect, bool testOnly) const -> LayoutProperties {
   int left, top, right, bottom;
   getContentsMargins(&left, &top, &right, &bottom);
   QRect effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
@@ -281,6 +281,8 @@ int FlexLayout::doLayout(QRect const &rect, bool testOnly) const {
   }
     
   auto lastVSpacing = 0;
+
+  auto lineCount = 0;
 
   while (itemIt != itemEnd) {
     auto const [itemMetrics, nextLineItemIt] =
@@ -307,9 +309,11 @@ int FlexLayout::doLayout(QRect const &rect, bool testOnly) const {
       _lineHeights.append(lineHeight);
     }
     lastVSpacing = vSpacing;
+    ++lineCount;
   }
 
-  return lineY - lastVSpacing - rect.y() + bottom;
+  auto const height = lineY - lastVSpacing - rect.y() + bottom;
+  return LayoutProperties{height, lineCount};
 }
 
 int FlexLayout::smartSpacing(QStyle::PixelMetric pm) const {
@@ -324,9 +328,16 @@ int FlexLayout::smartSpacing(QStyle::PixelMetric pm) const {
   }
 }
 
+int FlexLayout::lineCountForWidth(int width) const
+{
+  auto properties = doLayout(QRect(0, 0, width, 0), true);
+  return properties.lineCount;
+}
+
 int FlexLayout::lineCount() const { return _lineHeights.size(); }
 
 int FlexLayout::lineHeight(int index) const { return _lineHeights.at(index); }
 
 void FlexLayout::freeze() { _frozen = true; }
+
 void FlexLayout::unfreeze() { _frozen = false; invalidate(); }
