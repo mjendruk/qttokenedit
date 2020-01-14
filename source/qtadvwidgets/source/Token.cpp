@@ -90,12 +90,12 @@ void Token::keyPressEvent(QKeyEvent* event) {
 
 void Token::focusInEvent(QFocusEvent* event) {
   _button->setColorRole(QPalette::HighlightedText);
-  QWidget::focusInEvent(event);
+  BaseToken::focusInEvent(event);
 }
 
 void Token::focusOutEvent(QFocusEvent* event) {
   _button->setColorRole(QPalette::ButtonText);
-  QWidget::focusOutEvent(event);
+  BaseToken::focusOutEvent(event);
 }
 
 void Token::mousePressEvent(QMouseEvent* event) {
