@@ -251,6 +251,29 @@ void TokenEdit::removeItem(int index) {
   delete item;
 }
 
+BaseToken* TokenEdit::createToken(QString const& text) {
+  auto token = new Token{text, this};
+  token->setDragEnabled(dragEnabled());
+  token->setRemovable(removable());
+
+  connect(token, &Token::removeClicked, [=]() {
+    auto index = _items.indexOf(token);
+    _model->removeRow(index);
+  });
+
+  connect(token, &Token::dragged, [=](auto target, auto hint) {
+    onItemDragged(token, target, hint);
+  });
+
+  connect(this, &TokenEdit::dragStateChanged,
+          [=](auto enable) { token->setDragEnabled(enable); });
+
+  connect(this, &TokenEdit::removableStateChanged,
+          [=](auto enable) { token->setRemovable(enable); });
+  
+  return token;
+}
+
 void TokenEdit::updateHeight() {
   auto const actualMaxRows = _maxLineCount <= 0 ? 3 : _maxLineCount;
   auto const actualRows = std::min(actualMaxRows, _layout->lineCount());
@@ -296,24 +319,7 @@ void TokenEdit::onRowsInserted(QModelIndex const& parent, int first, int last) {
     auto const index = _model->index(row, _modelColumn, parent);
     auto const text = index.data(Qt::DisplayRole).toString();
 
-    auto token = new Token{text, this};
-    token->setDragEnabled(dragEnabled());
-    token->setRemovable(removable());
-
-    connect(token, &Token::removeClicked, [=]() {
-      auto index = _items.indexOf(token);
-      _model->removeRow(index);
-    });
-
-    connect(token, &Token::dragged, [=](auto target, auto hint) {
-      onItemDragged(token, target, hint);
-    });
-
-    connect(this, &TokenEdit::dragStateChanged,
-            [=](auto enable) { token->setDragEnabled(enable); });
-
-    connect(this, &TokenEdit::removableStateChanged,
-            [=](auto enable) { token->setRemovable(enable); });
+    auto token = createToken(text);
 
     insertItem(row, token);
   }

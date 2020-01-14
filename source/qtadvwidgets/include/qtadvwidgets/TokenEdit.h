@@ -62,6 +62,8 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
   void insertItem(int index, BaseToken* token);
   void moveItem(int from, int to);
   void removeItem(int index);
+  
+  BaseToken* createToken(QString const& text);
 
   void updateHeight();
   void init();
