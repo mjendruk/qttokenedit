@@ -265,11 +265,8 @@ BaseToken* TokenEdit::createToken(QString const& text) {
     onItemDragged(token, target, hint);
   });
 
-  connect(this, &TokenEdit::dragStateChanged,
-          [=](auto enable) { token->setDragEnabled(enable); });
-
-  connect(this, &TokenEdit::removableStateChanged,
-          [=](auto enable) { token->setRemovable(enable); });
+  connect(this, &TokenEdit::dragStateChanged, token, &Token::setDragEnabled);
+  connect(this, &TokenEdit::removableStateChanged, token, &Token::setRemovable);
   
   return token;
 }
