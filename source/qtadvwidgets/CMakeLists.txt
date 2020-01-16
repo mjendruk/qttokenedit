@@ -46,13 +46,14 @@ set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/source")
 
 set(headers
     ${include_path}/baselib.h
+    ${include_path}/AbstractTokenButton.h
     ${include_path}/BaseToken.h
     ${include_path}/DarkStyle.h
     ${include_path}/ElidableLabel.h
     ${include_path}/FlexLayout.h
     ${include_path}/LineEditChainElement.h
+    ${include_path}/PlusButton.h
     ${include_path}/RemoveButton.h
-    ${include_path}/RoundRemoveButton.h
     ${include_path}/Token.h
     ${include_path}/TokenChain.h
     ${include_path}/TokenChainElement.h
@@ -65,13 +66,14 @@ set(headers
 
 set(sources
     ${source_path}/baselib.cpp
+    ${source_path}/AbstractTokenButton.cpp
     ${source_path}/BaseToken.cpp
     ${source_path}/DarkStyle.cpp
     ${source_path}/ElidableLabel.cpp
     ${source_path}/FlexLayout.cpp
     ${source_path}/LineEditChainElement.cpp
+    ${source_path}/PlusButton.cpp
     ${source_path}/RemoveButton.cpp
-    ${source_path}/RoundRemoveButton.cpp
     ${source_path}/Token.cpp
     ${source_path}/TokenChain.cpp
     ${source_path}/TokenChainElement.cpp

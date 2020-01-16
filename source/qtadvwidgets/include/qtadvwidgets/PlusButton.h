@@ -3,12 +3,12 @@
 #include <qtadvwidgets/AbstractTokenButton.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
-class QTADVWIDGETS_API RemoveButton : public AbstractTokenButton {
+class QTADVWIDGETS_API PlusButton : public AbstractTokenButton {
   Q_OBJECT
 
  public:
-  RemoveButton(int extent, QWidget* parent = nullptr);
-  RemoveButton(int extent, QPalette::ColorRole colorRole,
+  PlusButton(int extent, QWidget* parent = nullptr);
+  PlusButton(int extent, QPalette::ColorRole colorRole,
                QWidget* parent = nullptr);
 
  private:

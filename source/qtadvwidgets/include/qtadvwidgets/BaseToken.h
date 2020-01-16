@@ -21,19 +21,19 @@ class QTADVWIDGETS_API BaseToken : public QWidget {
   QString const& text() const;
   void setText(QString const& text);
 
+  QWidget* rightWidget() const;
+  void setRightWidget(QWidget* widget);
+
   TokenChainElement* chainElement() const;
   
   virtual QPixmap toPixmap() const;
  
+  int contentHeight() const;
+
  protected:
-  QWidget* rightWidget() const;
-  void setRightWidget(QWidget* widget);
-  
   void updateMargins();
 
   void drawBackground(QPainter* painter, QBrush brush) const;
-  
-  int contentHeight() const;
 
  protected:
   void paintEvent(QPaintEvent* event) override;

@@ -1,19 +1,19 @@
-#include <qtadvwidgets/RemoveButton.h>
+#include <qtadvwidgets/PlusButton.h>
 
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPainterPath>
 #include <cmath>
 
-RemoveButton::RemoveButton(int extent, QWidget* parent)
-    : RemoveButton{extent, QPalette::Text, parent} {}
+PlusButton::PlusButton(int extent, QWidget* parent)
+    : PlusButton{extent, QPalette::Text, parent} {}
 
-RemoveButton::RemoveButton(int extent, QPalette::ColorRole colorRole,
+PlusButton::PlusButton(int extent, QPalette::ColorRole colorRole,
                            QWidget* parent)
     : AbstractTokenButton{createPath(extent), QSize{extent, extent}, colorRole,
                           parent} {}
 
-QPainterPath RemoveButton::createPath(int extent) const {
+QPainterPath PlusButton::createPath(int extent) const {
   auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF(extent, extent)};
 
   auto crossPath = QPainterPath{};
@@ -29,10 +29,5 @@ QPainterPath RemoveButton::createPath(int extent) const {
 
   auto const center = rect.center();
 
-  auto transform = QTransform{};
-  transform.translate(center.x(), center.y());
-  transform.rotate(45.0);
-  transform.translate(-center.x(), -center.y());
-
-  return transform.map(crossPath);
+  return crossPath;
 }

@@ -1,5 +1,5 @@
-#include <qtadvwidgets/ElidableLabel.h>
 #include <qtadvwidgets/BaseToken.h>
+#include <qtadvwidgets/ElidableLabel.h>
 #include <qtadvwidgets/TokenChainElement.h>
 
 #include <QBoxLayout>
@@ -21,7 +21,7 @@ BaseToken::BaseToken(QString const& text, QWidget* parent)
 
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   setFocusPolicy(Qt::ClickFocus);
-        
+
   _label->setTextColorRole(QPalette::ButtonText);
 }
 
@@ -31,33 +31,9 @@ QString const& BaseToken::text() const { return _label->text(); }
 
 void BaseToken::setText(QString const& text) { _label->setText(text); }
 
-TokenChainElement* BaseToken::chainElement() const { return _chainElement.get(); }
+QWidget* BaseToken::rightWidget() const { return _rightWidget; }
 
-QPixmap BaseToken::toPixmap() const {
-  auto pixmap = QPixmap(size() * devicePixelRatio());
-  pixmap.setDevicePixelRatio(devicePixelRatio());
-  pixmap.fill(QColor{0, 0, 0, 0});
-
-  auto painter = QPainter{&pixmap};
-  painter.setRenderHint(QPainter::Antialiasing, true);
-
-  drawBackground(&painter, palette().brush(QPalette::Highlight));
-
-  painter.save();
-  painter.translate(_label->pos());
-  _label->draw(&painter);
-  painter.restore();
-
-  return pixmap;
-}
-
-QWidget* BaseToken::rightWidget() const
-{
-  return _rightWidget;
-}
-
-void BaseToken::setRightWidget(QWidget* widget)
-{
+void BaseToken::setRightWidget(QWidget* widget) {
   if (_rightWidget == widget) {
     return;
   }
@@ -77,10 +53,31 @@ void BaseToken::setRightWidget(QWidget* widget)
   updateMargins();
 }
 
-void BaseToken::updateMargins()
-{
-  _layout->setContentsMargins(margins());
+TokenChainElement* BaseToken::chainElement() const {
+  return _chainElement.get();
 }
+
+QPixmap BaseToken::toPixmap() const {
+  auto pixmap = QPixmap(size() * devicePixelRatio());
+  pixmap.setDevicePixelRatio(devicePixelRatio());
+  pixmap.fill(QColor{0, 0, 0, 0});
+
+  auto painter = QPainter{&pixmap};
+  painter.setRenderHint(QPainter::Antialiasing, true);
+
+  drawBackground(&painter, palette().brush(QPalette::Highlight));
+
+  painter.save();
+  painter.translate(_label->pos());
+  _label->draw(&painter);
+  painter.restore();
+
+  return pixmap;
+}
+
+int BaseToken::contentHeight() const { return _label->sizeHint().height(); }
+
+void BaseToken::updateMargins() { _layout->setContentsMargins(margins()); }
 
 void BaseToken::drawBackground(QPainter* painter, QBrush brush) const {
   painter->save();
@@ -95,8 +92,6 @@ void BaseToken::drawBackground(QPainter* painter, QBrush brush) const {
 
   painter->restore();
 }
-
-int BaseToken::contentHeight() const { return _label->sizeHint().height(); }
 
 int BaseToken::horizontalTextMargin() const { return margin() * 2; }
 
