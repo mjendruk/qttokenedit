@@ -19,6 +19,7 @@ class TokenLineEdit;
 class TokenEditView;
 class TokenEditMode;
 class TokenEditEditingMode;
+class TokenEditDisplayMode;
 
 class QTADVWIDGETS_API TokenEdit : public TokenEditFrame,
                                        public TokenEditModeAccess {
@@ -83,7 +84,7 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditFrame,
   TokenEditView* _view;
   TokenEditMode* _activeMode;
   TokenEditEditingMode* _editingMode;
-  TokenEditMode* _displayMode;
+  TokenEditDisplayMode* _displayMode;
 
   QScrollArea* _scrollArea;
 

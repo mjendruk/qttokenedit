@@ -326,5 +326,12 @@ void TokenEdit::updateHeight() {
 }
 
 void TokenEdit::ensureVisible(QWidget* widget) {
-  _scrollArea->ensureWidgetVisible(widget, _view->xSpacing(), _view->ySpacing());
+  auto ySpacing = _view->ySpacing();
+  
+  // y-margin is not properly resprected for line edit
+  if (widget == lineEdit()) {
+    ySpacing *= 2;
+  }
+  
+  _scrollArea->ensureWidgetVisible(widget, _view->xSpacing(), ySpacing);
 }

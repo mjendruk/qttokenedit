@@ -27,6 +27,8 @@ class QTADVWIDGETS_API TokenEditDisplayMode : public TokenEditMode {
   void activate() override;
   void deactivate() override;
   
+  QWidget* omissionToken() const;
+  
  private:
   int omittedTokens() const;
  

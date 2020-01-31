@@ -6,6 +6,7 @@ OmissionToken::OmissionToken(QWidget* parent)
       _count{-1} {
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   setCount(0);
+  setFocusPolicy(Qt::NoFocus);
 }
 
 int OmissionToken::count() const { return _count; }

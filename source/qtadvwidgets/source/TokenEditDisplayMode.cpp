@@ -130,6 +130,10 @@ void TokenEditDisplayMode::deactivate() {
   _omissionToken->hide();
 }
 
+QWidget* TokenEditDisplayMode::omissionToken() const {
+  return _omissionToken;
+}
+
 int TokenEditDisplayMode::omittedTokens() const {
   return access()->count() - view()->count();
 }
