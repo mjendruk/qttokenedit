@@ -1,5 +1,5 @@
 #include <qtadvwidgets/Token.h>
-#include <qtadvwidgets/TokenEditViewport.h>
+#include <qtadvwidgets/TokenEditFrame.h>
 
 #include <QBoxLayout>
 #include <QChildEvent>
@@ -7,9 +7,9 @@
 #include <QPainter>
 #include <QStyleOptionFocusRect>
 
-class TokenEditViewportFrame : public QWidget {
+class TokenEditFrameOverlay : public QWidget {
  public:
-  TokenEditViewportFrame(TokenEditViewport* parent = nullptr)
+  TokenEditFrameOverlay(TokenEditFrame* parent = nullptr)
       : QWidget{parent}, _parent{parent} {
     setFocusPolicy(Qt::NoFocus);
     setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -30,42 +30,55 @@ class TokenEditViewportFrame : public QWidget {
   }
 
  private:
-  TokenEditViewport* _parent;
+  TokenEditFrame* _parent;
 };
 
-TokenEditViewport::TokenEditViewport(QWidget* parent)
+TokenEditFrame::TokenEditFrame(QWidget* parent)
     : QWidget{parent},
       _widget{nullptr},
       _layout{new QBoxLayout{QBoxLayout::TopToBottom}},
-      _frame{new TokenEditViewportFrame{this}},
+      _frame{new TokenEditFrameOverlay{this}},
       _shownAsFocused{false} {
   setFocusPolicy(Qt::NoFocus);
+  setBackgroundRole(QPalette::Base);
   _layout->setContentsMargins(contentMargins());
   setLayout(_layout);
 }
 
-void TokenEditViewport::setWidget(QWidget* widget) {
-  if (_widget) {
-    _layout->removeWidget(_widget);
-    if (_widget->parent() == this) {
-      delete _widget;
-    }
+QWidget* TokenEditFrame::takeWidget() {
+  if (!_widget) {
+    return nullptr;
   }
-
-  _widget = widget;
-  _layout->addWidget(_widget);
-  _frame->raise();
-  _frame->update();
+  
+  auto widget = _widget;
+  _layout->removeWidget(widget);
+  widget->setParent(nullptr);
+  
+  _widget = nullptr;
+  return widget;
 }
 
-bool TokenEditViewport::shownAsFocused() const { return _shownAsFocused; }
+void TokenEditFrame::setWidget(QWidget* widget) {
+  if (_widget) {
+    auto widget = takeWidget();
+    delete widget;
+  }
 
-void TokenEditViewport::setShownAsFocused(bool value) {
+  _layout->addWidget(widget);
+  _frame->raise();
+  _frame->update();
+  
+  _widget = widget;
+}
+
+bool TokenEditFrame::shownAsFocused() const { return _shownAsFocused; }
+
+void TokenEditFrame::setShownAsFocused(bool value) {
   _shownAsFocused = value;
   _frame->update();
 }
 
-void TokenEditViewport::paintEvent(QPaintEvent* event) {
+void TokenEditFrame::paintEvent(QPaintEvent* event) {
   auto painter = QPainter{this};
   painter.setClipRect(event->rect());
 
@@ -80,23 +93,23 @@ void TokenEditViewport::paintEvent(QPaintEvent* event) {
   QWidget::paintEvent(event);
 }
 
-void TokenEditViewport::resizeEvent(QResizeEvent* event) {
+void TokenEditFrame::resizeEvent(QResizeEvent* event) {
   _frame->resize(size());
 
   QWidget::resizeEvent(event);
 }
 
-void TokenEditViewport::leaveEvent(QEvent* event) {
+void TokenEditFrame::leaveEvent(QEvent* event) {
   update();
   QWidget::leaveEvent(event);
 }
 
-void TokenEditViewport::enterEvent(QEvent* event) {
+void TokenEditFrame::enterEvent(QEvent* event) {
   update();
   QWidget::enterEvent(event);
 }
 
-QRect TokenEditViewport::contentRect() const {
+QRect TokenEditFrame::contentRect() const {
   auto option = QStyleOptionFrame{};
   option.initFrom(this);
   option.frameShape = QFrame::StyledPanel;
@@ -104,7 +117,7 @@ QRect TokenEditViewport::contentRect() const {
   return style()->subElementRect(QStyle::SE_ShapedFrameContents, &option);
 }
 
-QMargins TokenEditViewport::contentMargins() const {
+QMargins TokenEditFrame::contentMargins() const {
   auto rect = QWidget::rect();
   auto contentRect = this->contentRect();
 

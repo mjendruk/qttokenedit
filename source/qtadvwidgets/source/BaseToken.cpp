@@ -1,6 +1,5 @@
 #include <qtadvwidgets/BaseToken.h>
 #include <qtadvwidgets/ElidableLabel.h>
-#include <qtadvwidgets/TokenChainElement.h>
 
 #include <QBoxLayout>
 #include <QPaintEvent>
@@ -8,9 +7,10 @@
 #include <QPainterPath>
 #include <cmath>
 
+BaseToken::BaseToken(QWidget* parent) : BaseToken{{}, parent} {}
+
 BaseToken::BaseToken(QString const& text, QWidget* parent)
     : QWidget{parent},
-      _chainElement{std::make_unique<TokenChainElement>(this)},
       _layout{new QBoxLayout{QBoxLayout::LeftToRight, this}},
       _label{new ElidableLabel{text, this}},
       _rightWidget{nullptr} {
@@ -18,8 +18,7 @@ BaseToken::BaseToken(QString const& text, QWidget* parent)
   _layout->setSpacing(spacing());
   _layout->setContentsMargins(horizontalTextMargin(), margin(),
                               horizontalTextMargin(), margin());
-
-  setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  
   setFocusPolicy(Qt::ClickFocus);
 
   _label->setTextColorRole(QPalette::ButtonText);
@@ -46,15 +45,11 @@ void BaseToken::setRightWidget(QWidget* widget) {
   }
 
   if (widget) {
-    _layout->addWidget(widget);
+    _layout->addWidget(widget, 0, Qt::AlignCenter);
   }
 
   _rightWidget = widget;
   updateMargins();
-}
-
-TokenChainElement* BaseToken::chainElement() const {
-  return _chainElement.get();
 }
 
 QPixmap BaseToken::toPixmap() const {

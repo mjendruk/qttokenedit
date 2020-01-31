@@ -3,17 +3,14 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QStyle>
 
-AbstractTokenButton::AbstractTokenButton(QPainterPath path, QSize size,
-                                         QWidget* parent)
-    : AbstractTokenButton{path, size, QPalette::Text, parent} {}
+AbstractTokenButton::AbstractTokenButton(QWidget* parent)
+    : AbstractTokenButton{QPalette::Text, parent} {}
 
-AbstractTokenButton::AbstractTokenButton(QPainterPath path, QSize size,
-                                         QPalette::ColorRole colorRole,
+AbstractTokenButton::AbstractTokenButton(QPalette::ColorRole colorRole,
                                          QWidget* parent)
     : QAbstractButton{parent},
-      _path{std::move(path)},
-      _size{size},
       _colorRole{colorRole} {
   setCheckable(false);
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -21,7 +18,10 @@ AbstractTokenButton::AbstractTokenButton(QPainterPath path, QSize size,
   setFocusPolicy(Qt::ClickFocus);
 }
 
-QSize AbstractTokenButton::sizeHint() const { return _size; }
+QSize AbstractTokenButton::sizeHint() const {
+  auto extent = this->extent();
+  return QSize{extent, extent};
+}
 
 QPalette::ColorRole AbstractTokenButton::colorRole() const {
   return _colorRole;
@@ -40,8 +40,6 @@ void AbstractTokenButton::draw(QPainter* painter) const {
   painter->setBrush(palette().color(_colorRole));
   painter->setPen(Qt::NoPen);
 
-  auto const rect = QRectF{this->rect()};
-
   painter->drawPath(_path);
 }
 
@@ -53,4 +51,10 @@ void AbstractTokenButton::paintEvent(QPaintEvent* event) {
   painter.setClipRect(clippingRect);
 
   draw(&painter);
+}
+
+void AbstractTokenButton::setPath(QPainterPath const& path) { _path = path; }
+
+int AbstractTokenButton::extent() const { 
+  return fontMetrics().height();
 }

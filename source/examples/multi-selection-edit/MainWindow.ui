@@ -27,17 +27,34 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="lineEditLabel">
-        <property name="text">
-         <string>Max. Line Count</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="1">
        <widget class="QCheckBox" name="dragEnabledCheckBox">
         <property name="text">
          <string>Drag Enabled</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="enabledCheckBox">
+        <property name="text">
+         <string>Enabled</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QCheckBox" name="removableCheckBox">
+        <property name="text">
+         <string>Removable</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="lineEditLabel">
+        <property name="text">
+         <string>Max. Line Count</string>
         </property>
        </widget>
       </item>
@@ -66,20 +83,43 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QCheckBox" name="enabledCheckBox">
+      <item row="5" column="0">
+       <widget class="QLabel" name="widthLabel">
         <property name="text">
-         <string>Enabled</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
+         <string>Width</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="QCheckBox" name="removableCheckBox">
+      <item row="5" column="1">
+       <widget class="QSpinBox" name="widthSpinBox">
+        <property name="minimum">
+         <number>200</number>
+        </property>
+        <property name="maximum">
+         <number>800</number>
+        </property>
+        <property name="value">
+         <number>300</number>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="heightLabel">
         <property name="text">
-         <string>Removable</string>
+         <string>Height</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QSpinBox" name="heightSpinBox">
+        <property name="minimum">
+         <number>100</number>
+        </property>
+        <property name="maximum">
+         <number>500</number>
+        </property>
+        <property name="value">
+         <number>100</number>
         </property>
        </widget>
       </item>

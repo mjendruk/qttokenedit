@@ -9,12 +9,12 @@
 class QBoxLayout;
 
 class ElidableLabel;
-class TokenChainElement;
 
 class QTADVWIDGETS_API BaseToken : public QWidget {
   Q_OBJECT
 
  public:
+  BaseToken(QWidget* parent = nullptr);
   BaseToken(QString const& text, QWidget* parent = nullptr);
   ~BaseToken();
 
@@ -23,8 +23,6 @@ class QTADVWIDGETS_API BaseToken : public QWidget {
 
   QWidget* rightWidget() const;
   void setRightWidget(QWidget* widget);
-
-  TokenChainElement* chainElement() const;
   
   virtual QPixmap toPixmap() const;
  
@@ -50,7 +48,6 @@ class QTADVWIDGETS_API BaseToken : public QWidget {
   QMargins margins() const;
 
  private:
-  std::unique_ptr<TokenChainElement> _chainElement;
   QBoxLayout* _layout;
   ElidableLabel* _label;
   QWidget* _rightWidget;

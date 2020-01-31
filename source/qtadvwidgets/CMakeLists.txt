@@ -51,15 +51,19 @@ set(headers
     ${include_path}/DarkStyle.h
     ${include_path}/ElidableLabel.h
     ${include_path}/FlexLayout.h
-    ${include_path}/LineEditChainElement.h
     ${include_path}/PlusButton.h
     ${include_path}/RemoveButton.h
     ${include_path}/Token.h
-    ${include_path}/TokenChain.h
-    ${include_path}/TokenChainElement.h
+    ${include_path}/FocusChain.h
+    ${include_path}/FocusChainElement.h
+    ${include_path}/FocusChainNavigation.h
+    ${include_path}/OmissionToken.h
     ${include_path}/TokenEdit.h
+    ${include_path}/TokenEditDisplayMode.h
+    ${include_path}/TokenEditEditingMode.h
     ${include_path}/TokenEditMode.h
-    ${include_path}/TokenEditViewport.h
+    ${include_path}/TokenEditFrame.h
+    ${include_path}/TokenEditView.h
     ${include_path}/TokenLineEdit.h
     ${include_path}/TokenMimeData.h
 )
@@ -71,14 +75,19 @@ set(sources
     ${source_path}/DarkStyle.cpp
     ${source_path}/ElidableLabel.cpp
     ${source_path}/FlexLayout.cpp
-    ${source_path}/LineEditChainElement.cpp
     ${source_path}/PlusButton.cpp
     ${source_path}/RemoveButton.cpp
     ${source_path}/Token.cpp
-    ${source_path}/TokenChain.cpp
-    ${source_path}/TokenChainElement.cpp
+    ${source_path}/FocusChain.cpp
+    ${source_path}/FocusChainElement.cpp
+    ${source_path}/FocusChainNavigation.cpp
+    ${source_path}/OmissionToken.cpp
     ${source_path}/TokenEdit.cpp
-    ${source_path}/TokenEditViewport.cpp
+    ${source_path}/TokenEditDisplayMode.cpp
+    ${source_path}/TokenEditEditingMode.cpp
+    ${source_path}/TokenEditMode.cpp
+    ${source_path}/TokenEditFrame.cpp
+    ${source_path}/TokenEditView.cpp
     ${source_path}/TokenLineEdit.cpp
     ${source_path}/TokenMimeData.cpp
 )

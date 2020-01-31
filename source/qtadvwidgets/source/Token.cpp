@@ -1,7 +1,7 @@
 #include <qtadvwidgets/ElidableLabel.h>
 #include <qtadvwidgets/RemoveButton.h>
 #include <qtadvwidgets/Token.h>
-#include <qtadvwidgets/TokenChainElement.h>
+#include <qtadvwidgets/FocusChainElement.h>
 #include <qtadvwidgets/TokenMimeData.h>
 
 #include <QDrag>
@@ -14,7 +14,7 @@
 
 Token::Token(QString const& text, QWidget* parent)
     : BaseToken{text, parent},
-      _button{new RemoveButton{contentHeight(), this}},
+      _button{new RemoveButton{this}},
       _removable{true},
       _dragEnabled{false},
       _dropIndicator{DropIndicator::None} {
@@ -23,6 +23,10 @@ Token::Token(QString const& text, QWidget* parent)
   setAcceptDrops(true);
   setCursor(Qt::ArrowCursor);
 
+  auto sizePolicy = QSizePolicy{QSizePolicy::Preferred, QSizePolicy::Fixed};
+  sizePolicy.setRetainSizeWhenHidden(true);
+  setSizePolicy(sizePolicy);
+        
   setRemovable(false);
 
   _button->setColorRole(QPalette::ButtonText);

@@ -6,14 +6,15 @@
 
 class QBoxLayout;
 
-class TokenEditViewportFrame;
+class TokenEditFrameOverlay;
 
-class QTADVWIDGETS_API TokenEditViewport : public QWidget {
+class QTADVWIDGETS_API TokenEditFrame : public QWidget {
   Q_OBJECT
 
  public:
-  TokenEditViewport(QWidget* parent = nullptr);
+  TokenEditFrame(QWidget* parent = nullptr);
 
+  QWidget* takeWidget();
   void setWidget(QWidget* widget);
 
   bool shownAsFocused() const;
@@ -32,6 +33,6 @@ class QTADVWIDGETS_API TokenEditViewport : public QWidget {
  private:
   QWidget* _widget;
   QBoxLayout* _layout;
-  TokenEditViewportFrame* _frame;
+  TokenEditFrameOverlay* _frame;
   bool _shownAsFocused;
 };

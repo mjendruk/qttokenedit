@@ -5,14 +5,14 @@
 #include <QPainterPath>
 #include <cmath>
 
-PlusButton::PlusButton(int extent, QWidget* parent)
-    : PlusButton{extent, QPalette::Text, parent} {}
+PlusButton::PlusButton(QWidget* parent)
+    : PlusButton{QPalette::Text, parent} {}
 
-PlusButton::PlusButton(int extent, QPalette::ColorRole colorRole,
-                           QWidget* parent)
-    : AbstractTokenButton{createPath(extent), QSize{extent, extent}, colorRole,
-                          parent} {}
-
+PlusButton::PlusButton(QPalette::ColorRole colorRole,
+                       QWidget* parent)
+    : AbstractTokenButton{colorRole, parent} {
+  setPath(createPath(this->extent()));
+}
 QPainterPath PlusButton::createPath(int extent) const {
   auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF(extent, extent)};
 
@@ -26,8 +26,6 @@ QPainterPath PlusButton::createPath(int extent) const {
                     crossLineWidth, crossLength);
   crossPath.addRect(crossMargin, rect.center().y() - (crossLineWidth * 0.5),
                     crossLength, crossLineWidth);
-
-  auto const center = rect.center();
 
   return crossPath;
 }

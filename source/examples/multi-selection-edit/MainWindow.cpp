@@ -15,6 +15,7 @@
 #include <QStandardItemModel>
 #include <QStringListModel>
 #include <QTableView>
+#include <QCompleter>
 
 #include "ui_MainWindow.h"
 
@@ -37,12 +38,8 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
   m_ui->setupUi(this);
 
   {
-    auto tokenEdit = new TokenEdit{TokenEditMode::AlwaysShowLineEdit, this};
-
-    auto palette = tokenEdit->palette();
-    palette.setColor(QPalette::Highlight, QColor(3, 158, 230));
-    tokenEdit->setPalette(palette);
-
+    auto tokenEdit = new TokenEdit{this};
+    
     tokenEdit->setModelColumn(0);
 
     auto listView = new QTableView{this};
@@ -50,7 +47,8 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
     auto const longNames = QStringList{
         "S+U Potsdamer Platz", "Stendaler Str.", "Walther-Schreiber-Platz",
         "S+U Berlin Hbf",      "U Spichernstr.", "U Berliner Str.",
-        "S+U Bundesallee",
+        "S+U Bundesallee", "U Birkenstraße", "U Osloer Straße", "S+U Zoologischer Garten",
+        "U Güntzelstraße", "S+U Rathaus Steglitz", "Schloßstraße",
     };
 
     auto model = new QStringListModel{this};
@@ -74,61 +72,46 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
     m_ui->maxLineCountSpinBox->setValue(3);
     connect(m_ui->maxLineCountSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
             [=](auto value) { tokenEdit->setMaxLineCount(value); });
-    
+
     connect(m_ui->enabledCheckBox, &QCheckBox::stateChanged, [=](auto state) {
       tokenEdit->setEnabled(state == Qt::Checked);
     });
-    
+
     connect(m_ui->removableCheckBox, &QCheckBox::stateChanged, [=](auto state) {
       tokenEdit->setRemovable(state == Qt::Checked);
     });
             
     m_ui->formLayout->addRow("TableView", listView);
 
-    auto lineEdit = tokenEdit->lineEdit();
-
-    lineEdit->setPlaceholderText("Halt hinzufügen");
-
-    connect(lineEdit, &QLineEdit::returnPressed, [=]() {
-      auto const row = model->rowCount();
-      auto const text = lineEdit->text();
-      model->insertRow(row);
-      model->setData(model->index(row), text);
-      lineEdit->clear();
-    });
+   auto lineEdit = tokenEdit->lineEdit();
     
-    auto neverShowLineEditTokenEdit = new TokenEdit{TokenEditMode::NeverShowLineEdit, this};
+    auto completer = new QCompleter{longNames, this};
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->popup()->setMinimumWidth(200);
+    completer->setFilterMode(Qt::MatchContains);
+    lineEdit->setCompleter(completer);
 
-    neverShowLineEditTokenEdit->setModel(model);
-
-    m_ui->formLayout->addWidget(neverShowLineEditTokenEdit);
+   connect(completer, QOverload<QString const&>::of(&QCompleter::activated), this,[=](QString const& text) {
+     auto const row = model->rowCount();
+     model->insertRow(row);
+     model->setData(model->index(row), text);
+     lineEdit->clear();
+   }, Qt::QueuedConnection);
+    
+    auto otherTokenEdit = new TokenEdit{};
+    otherTokenEdit->setModel(model);
+    otherTokenEdit->setDragEnabled(true);
+    
+    otherTokenEdit->show();
   }
-  {
-    auto tokenEdit = new TokenEdit{TokenEditMode::ShowLineEditIfEmpty, this};
-
-    auto model = new QStringListModel{this};
-
-    tokenEdit->setModel(model);
-
-    m_ui->formLayout->addRow("SingleTokenEdit", tokenEdit);
-
-    auto lineEdit = tokenEdit->lineEdit();
-
-    lineEdit->setPlaceholderText("Halt auswählen");
-
-    connect(lineEdit, &QLineEdit::returnPressed, [=]() {
-      auto const row = model->rowCount();
-      model->insertRow(row);
-      model->setData(model->index(row), lineEdit->text());
-      lineEdit->clear();
-    });
-  }
-
-  auto elidableLabel = new ElidableLabel{"Nordische Botschaften/Adenauer-Stiftung", this};
-  elidableLabel->setMinVisibleCharacters(21);
-  elidableLabel->setTextColorRole(QPalette::HighlightedText);
-
-  m_ui->formLayout->addWidget(elidableLabel);
+  
+  connect(m_ui->widthSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [=](auto value) {
+    resize(value, height());
+  });
+  
+  connect(m_ui->heightSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [=](auto value) {
+    resize(width(), value);
+  });
 }
 
 MainWindow::~MainWindow() {}

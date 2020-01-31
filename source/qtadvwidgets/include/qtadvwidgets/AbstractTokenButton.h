@@ -8,9 +8,8 @@ class QTADVWIDGETS_API AbstractTokenButton : public QAbstractButton {
   Q_OBJECT
 
  public:
-  AbstractTokenButton(QPainterPath path, QSize size, QWidget* parent = nullptr);
-  AbstractTokenButton(QPainterPath path, QSize size,
-                      QPalette::ColorRole colorRole, QWidget* parent = nullptr);
+  AbstractTokenButton(QWidget* parent = nullptr);
+  AbstractTokenButton(QPalette::ColorRole colorRole, QWidget* parent = nullptr);
 
   QSize sizeHint() const override;
 
@@ -21,6 +20,10 @@ class QTADVWIDGETS_API AbstractTokenButton : public QAbstractButton {
 
  protected:
   void paintEvent(QPaintEvent* event) override;
+
+ protected:
+  void setPath(QPainterPath const& path);
+  int extent() const;
 
  private:
   void initSize();

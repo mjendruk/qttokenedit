@@ -4,11 +4,15 @@
 #include <QWidget>
 #include <QWidgetItem>
 #include <cmath>
+#include <limits>
 
 FlexLayout::FlexLayout(QWidget *parent) : FlexLayout{-1, -1, -1, parent} {}
 
 FlexLayout::FlexLayout(int margin, int hSpacing, int vSpacing, QWidget *parent)
-    : QLayout{parent}, _hSpacing{hSpacing}, _vSpacing{vSpacing}, _frozen{false} {
+    : QLayout{parent},
+      _hSpacing{hSpacing},
+      _vSpacing{vSpacing},
+      _frozen{Frozen::No} {
   setContentsMargins(margin, margin, margin, margin);
 }
 
@@ -44,7 +48,13 @@ QLayoutItem *FlexLayout::itemAt(int index) const {
 QLayoutItem *FlexLayout::takeAt(int index) {
   if (index >= 0 && index < _itemList.size()) {
     auto item = _itemList.takeAt(index);
-    invalidate();
+
+    if (_frozen != Frozen::No) {
+      _frozen = Frozen::YesWithChanges;
+    } else {
+      invalidate();
+    }
+
     return item;
   }
   return nullptr;
@@ -57,20 +67,24 @@ Qt::Orientations FlexLayout::expandingDirections() const {
 bool FlexLayout::hasHeightForWidth() const { return true; }
 
 int FlexLayout::heightForWidth(int width) const {
-  if (_frozen) {
-    return _itemList.last()->geometry().bottom();
+  if (_frozen != Frozen::No) {
+    return geometry().height();
   }
-  
   auto properties = doLayout(QRect(0, 0, width, 0), true);
   return properties.height;
 }
 
 void FlexLayout::setGeometry(const QRect &rect) {
   QLayout::setGeometry(rect);
-  if (!_frozen) {
-    doLayout(rect, false);
-    emit linesChanged();
+  
+  if (_frozen != Frozen::No) {
+    _frozen = Frozen::YesWithChanges;
+    return;
   }
+  
+  auto properties = doLayout(rect, false);
+  
+  emit geometryChanged();
 }
 
 QSize FlexLayout::sizeHint() const { return minimumSize(); }
@@ -83,12 +97,18 @@ QSize FlexLayout::minimumSize() const {
   auto margins = contentsMargins();
   size +=
       QSize(margins.left() + margins.right(), margins.top() + margins.bottom());
+
   return size;
 }
 
 void FlexLayout::insertItem(int index, QLayoutItem *item) {
   _itemList.insert(index, item);
-  invalidate();
+
+  if (_frozen != Frozen::No) {
+    _frozen = Frozen::YesWithChanges;
+  } else {
+    invalidate();
+  }
 }
 
 void FlexLayout::insertLayout(int index, QLayout *layout) {
@@ -275,10 +295,6 @@ auto FlexLayout::doLayout(QRect const &rect, bool testOnly) const -> LayoutPrope
   auto const itemEnd = _itemList.cend();
 
   auto lineY = effectiveRect.y();
-  
-  if (!testOnly) {
-    _lineHeights.clear();
-  }
     
   auto lastVSpacing = 0;
 
@@ -304,10 +320,7 @@ auto FlexLayout::doLayout(QRect const &rect, bool testOnly) const -> LayoutPrope
 
     itemIt = nextLineItemIt;
     lineY = lineY + lineHeight + vSpacing;
-
-    if (!testOnly) {
-      _lineHeights.append(lineHeight);
-    }
+    
     lastVSpacing = vSpacing;
     ++lineCount;
   }
@@ -328,16 +341,17 @@ int FlexLayout::smartSpacing(QStyle::PixelMetric pm) const {
   }
 }
 
-int FlexLayout::lineCountForWidth(int width) const
-{
-  auto properties = doLayout(QRect(0, 0, width, 0), true);
+int FlexLayout::lineCountForWidth(int width) const {
+  auto properties = doLayout(QRect{0, 0, width, 0}, true);
   return properties.lineCount;
 }
 
-int FlexLayout::lineCount() const { return _lineHeights.size(); }
+void FlexLayout::freeze() { _frozen = Frozen::Yes; }
 
-int FlexLayout::lineHeight(int index) const { return _lineHeights.at(index); }
+void FlexLayout::unfreeze() {
+  if (_frozen == Frozen::YesWithChanges) {
+    invalidate();
+  }
 
-void FlexLayout::freeze() { _frozen = true; }
-
-void FlexLayout::unfreeze() { _frozen = false; invalidate(); }
+  _frozen = Frozen::No;
+}

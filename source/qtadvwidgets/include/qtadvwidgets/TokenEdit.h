@@ -1,7 +1,7 @@
 #pragma once
 
+#include <qtadvwidgets/TokenEditFrame.h>
 #include <qtadvwidgets/TokenEditMode.h>
-#include <qtadvwidgets/TokenEditViewport.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
 #include <QModelIndex>
@@ -11,36 +11,33 @@
 #include <cstdint>
 
 class QLineEdit;
+class QStackedWidget;
 class QAbstractItemModel;
+class QScrollArea;
 
-class BaseToken;
-class FlexLayout;
 class TokenLineEdit;
-class TokenChain;
+class TokenEditView;
+class TokenEditMode;
+class TokenEditEditingMode;
 
-class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
+class QTADVWIDGETS_API TokenEdit : public TokenEditFrame,
+                                       public TokenEditModeAccess {
   Q_OBJECT
 
  public:
-  using Mode = TokenEditMode;
-
-  TokenEdit(TokenEditMode mode = TokenEditMode::AlwaysShowLineEdit,
-            QWidget* parent = nullptr);
+  TokenEdit(QWidget* parent = nullptr);
   ~TokenEdit();
 
-  int maxLineCount() const;
+  int maxLineCount() const override;
   void setMaxLineCount(int count);
 
   bool dragEnabled() const;
   void setDragEnabled(bool enable);
-  
+
   bool removable() const;
   void setRemovable(bool enable);
 
-  int count() const;
-  int isEmpty() const;
-
-  QLineEdit* lineEdit();
+  QLineEdit* lineEdit() const;
 
   QAbstractItemModel* model() const;
   void setModel(QAbstractItemModel* model);
@@ -50,22 +47,19 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
 
   QModelIndex rootIndex() const;
   void setRootIndex(QModelIndex const& index);
-  
+
+  int count() const override;
+  Token* createToken(QString const& text, QWidget* parent) override;
+  QString text(int index) const override;
+
  signals:
   void dragStateChanged(bool enabled);
   void removableStateChanged(bool enabled);
+                                         
+ protected:
+  bool eventFilter(QObject* object, QEvent* event) override;
 
  private:
-  BaseToken const* at(int index) const;
-  BaseToken* at(int index);
-  void addItem(BaseToken* token);
-  void insertItem(int index, BaseToken* token);
-  void moveItem(int from, int to);
-  void removeItem(int index);
-  
-  BaseToken* createToken(QString const& text);
-
-  void updateHeight();
   void init();
   void clear();
 
@@ -79,17 +73,23 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditViewport {
 
   void onItemDragged(Token* source, Token* target, Token::DropHint hint);
 
+  void onFocusChanged(QWidget* prev, QWidget* now);
+
+  void setActiveMode(TokenEditMode* mode);
+  void updateHeight();
+  void ensureVisible(QWidget* widget);
+
  private:
-  QVector<BaseToken*> _items;
-  TokenLineEdit* _lineEdit;
-  TokenChain* _tokenChain;
-  FlexLayout* _layout;
+  TokenEditView* _view;
+  TokenEditMode* _activeMode;
+  TokenEditEditingMode* _editingMode;
+  TokenEditMode* _displayMode;
+
+  QScrollArea* _scrollArea;
+
   int _maxLineCount;
   bool _dragEnabled;
   bool _removable;
-  int _spacing;
-  TokenEditMode _mode;
-  QScrollArea* _scrollArea;
 
   // model members
   QAbstractItemModel* _model;

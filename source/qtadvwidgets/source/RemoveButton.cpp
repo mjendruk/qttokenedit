@@ -5,13 +5,15 @@
 #include <QPainterPath>
 #include <cmath>
 
-RemoveButton::RemoveButton(int extent, QWidget* parent)
-    : RemoveButton{extent, QPalette::Text, parent} {}
+RemoveButton::RemoveButton(QWidget* parent)
+    : RemoveButton{QPalette::Text, parent} {}
 
-RemoveButton::RemoveButton(int extent, QPalette::ColorRole colorRole,
+RemoveButton::RemoveButton(QPalette::ColorRole colorRole,
                            QWidget* parent)
-    : AbstractTokenButton{createPath(extent), QSize{extent, extent}, colorRole,
-                          parent} {}
+    : AbstractTokenButton{colorRole, parent} {
+  setFocusPolicy(Qt::NoFocus);
+  setPath(createPath(this->extent()));
+}
 
 QPainterPath RemoveButton::createPath(int extent) const {
   auto const rect = QRectF{QPointF{0.0, 0.0}, QSizeF(extent, extent)};
@@ -19,7 +21,7 @@ QPainterPath RemoveButton::createPath(int extent) const {
   auto crossPath = QPainterPath{};
   crossPath.setFillRule(Qt::WindingFill);
 
-  auto const crossMargin = std::round(rect.height() * 0.2);
+  auto const crossMargin = std::round(rect.height() * 0.1);
   auto const crossLength = rect.height() - (2.0 * crossMargin);
   auto const crossLineWidth = std::round(rect.height() * 0.1);
   crossPath.addRect(rect.center().x() - (crossLineWidth * 0.5), crossMargin,

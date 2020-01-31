@@ -7,8 +7,8 @@ class QTADVWIDGETS_API RemoveButton : public AbstractTokenButton {
   Q_OBJECT
 
  public:
-  RemoveButton(int extent, QWidget* parent = nullptr);
-  RemoveButton(int extent, QPalette::ColorRole colorRole,
+  RemoveButton(QWidget* parent = nullptr);
+  RemoveButton(QPalette::ColorRole colorRole,
                QWidget* parent = nullptr);
 
  private:

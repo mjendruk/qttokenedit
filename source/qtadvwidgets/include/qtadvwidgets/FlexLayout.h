@@ -33,14 +33,12 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   void insertWidget(int index, QWidget *widget);
 
   int lineCountForWidth(int width) const;
-  int lineCount() const;
-  int lineHeight(int index) const;
   
   void freeze();
   void unfreeze();
-
+  
  signals:
-  void linesChanged() const;
+  void geometryChanged();
 
  private:
   struct ItemMetrics {
@@ -93,6 +91,13 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   QList<QLayoutItem *> _itemList;
   int _hSpacing;
   int _vSpacing;
-  bool _frozen;
-  mutable QVector<int> _lineHeights;
+  mutable int _lineCount;
+
+  enum class Frozen : std::int8_t {
+    No,
+    Yes,
+    YesWithChanges,
+  };
+
+  Frozen _frozen;
 };
