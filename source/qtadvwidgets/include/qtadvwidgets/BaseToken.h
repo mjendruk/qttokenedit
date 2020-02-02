@@ -38,9 +38,6 @@ class QTADVWIDGETS_API BaseToken : public QWidget {
   void focusInEvent(QFocusEvent* event) override;
   void focusOutEvent(QFocusEvent* event) override;
 
-  void leaveEvent(QEvent* event) override;
-  void enterEvent(QEvent* event) override;
-
  private:
   int horizontalTextMargin() const;
   int margin() const;

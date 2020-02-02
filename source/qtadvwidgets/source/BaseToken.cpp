@@ -22,6 +22,8 @@ BaseToken::BaseToken(QString const& text, QWidget* parent)
   setFocusPolicy(Qt::ClickFocus);
 
   _label->setTextColorRole(QPalette::ButtonText);
+        
+  setAttribute(Qt::WA_Hover);
 }
 
 BaseToken::~BaseToken() = default;
@@ -108,15 +110,18 @@ void BaseToken::paintEvent(QPaintEvent* event) {
 
   auto brushRole = QPalette::Button;
 
-  if (isEnabled() && underMouse()) {
-    brushRole = QPalette::Midlight;
-  }
-
   if (hasFocus()) {
     brushRole = QPalette::Highlight;
   }
+  
+  auto brush = palette().brush(brushRole);
+  
+  if (underMouse()) {
+    auto color = brush.color().toHsv();
+    brush.setColor(color.lighter(103));
+  }
 
-  drawBackground(&painter, palette().brush(brushRole));
+  drawBackground(&painter, brush);
 
   QWidget::paintEvent(event);
 }
@@ -129,18 +134,4 @@ void BaseToken::focusInEvent(QFocusEvent* event) {
 void BaseToken::focusOutEvent(QFocusEvent* event) {
   _label->setTextColorRole(QPalette::ButtonText);
   QWidget::focusOutEvent(event);
-}
-
-void BaseToken::leaveEvent(QEvent* event) {
-  QWidget::leaveEvent(event);
-  if (isEnabled()) {
-    update();
-  }
-}
-
-void BaseToken::enterEvent(QEvent* event) {
-  QWidget::enterEvent(event);
-  if (isEnabled()) {
-    update();
-  }
 }
