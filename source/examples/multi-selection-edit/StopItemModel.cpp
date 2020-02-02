@@ -122,7 +122,7 @@ bool StopItemModel::moveRows(QModelIndex const& sourceParent, int sourceRow,
   auto firstRow = sourceRow;
   auto lastRow = sourceRow + (count - 1);
 
-  Q_ASSERT(!(firstRow <= destinationChild && destinationChild <= lastRow + 1));
+  Q_ASSERT(!(firstRow <= destinationChild && destinationChild < lastRow + 1));
 
   beginMoveRows(sourceParent, firstRow, lastRow, destinationParent,
                 destinationChild);
