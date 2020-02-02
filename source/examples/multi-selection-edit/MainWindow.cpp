@@ -19,18 +19,10 @@
 
 #include "ui_MainWindow.h"
 
+#include "StopItemModel.h"
+
 namespace {
-QString abbreviation(QString const& str) {
-  auto result = str;
-  result.remove(QRegularExpression{"\\W"});
 
-  constexpr auto abbrSize = 6;
-  if (result.size() > abbrSize) {
-    result.truncate(abbrSize);
-  }
-
-  return result.toUpper();
-}
 }  // namespace
 
 MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
@@ -40,7 +32,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
   {
     auto tokenEdit = new TokenEdit{this};
     
-    tokenEdit->setModelColumn(0);
+    tokenEdit->setModelColumn(1);
 
     auto listView = new QTableView{this};
 
@@ -51,9 +43,9 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
         "U Güntzelstraße", "S+U Rathaus Steglitz", "Schloßstraße",
     };
 
-    auto model = new QStringListModel{this};
+    auto model = new StopItemModel{longNames, this};
 
-    model->setStringList(longNames);
+    // model->setStringList(longNames);
 
     tokenEdit->setModel(model);
     listView->setModel(model);
@@ -94,15 +86,15 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
    connect(completer, QOverload<QString const&>::of(&QCompleter::activated), this,[=](QString const& text) {
      auto const row = model->rowCount();
      model->insertRow(row);
-     model->setData(model->index(row), text);
+     model->setData(model->index(row, 0), text);
      lineEdit->clear();
    }, Qt::QueuedConnection);
     
-    auto otherTokenEdit = new TokenEdit{};
-    otherTokenEdit->setModel(model);
-    otherTokenEdit->setDragEnabled(true);
+    // auto otherTokenEdit = new TokenEdit{};
+    // otherTokenEdit->setModel(model);
+    // otherTokenEdit->setDragEnabled(true);
     
-    otherTokenEdit->show();
+    // otherTokenEdit->show();
   }
   
   connect(m_ui->widthSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [=](auto value) {

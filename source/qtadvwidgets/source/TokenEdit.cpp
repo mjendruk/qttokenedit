@@ -50,6 +50,9 @@ TokenEdit::TokenEdit(QWidget* parent)
   });
         
   connect(_view, &TokenEditView::sizeChanged, [=]() {
+    if (!_model && !_activeMode) {
+        return;
+    }
     _activeMode->invalidate();
     ensureVisible(focusWidget());
     updateHeight();
@@ -161,7 +164,12 @@ void TokenEdit::setRootIndex(QModelIndex const& index) {
   onModelReset();
 }
 
-int TokenEdit::count() const { return _model->rowCount(); }
+int TokenEdit::count() const {
+  if (!_model) {
+    return -1;
+  }
+  return _model->rowCount();
+}
 
 Token* TokenEdit::createToken(QString const& text, QWidget* parent) {
   auto token = new Token{text, parent};
@@ -201,11 +209,11 @@ bool TokenEdit::eventFilter(QObject* object, QEvent* event) {
 }
 
 void TokenEdit::init() {
-  setActiveMode(_displayMode);
-  
-  if (auto rows = _model->rowCount(_rootModelIndex); rows > 0) {
-    onRowsInserted(_rootModelIndex, 0, (rows - 1));
+  if (!_model) {
+    return;
   }
+  setActiveMode(_displayMode);
+  _displayMode->activate();
 }
 
 void TokenEdit::clear() {
@@ -277,9 +285,6 @@ void TokenEdit::onItemDragged(Token* source, Token* target,
   Q_ASSERT(to >= 0);
 
   if (hint == Token::DropHint::After) ++to;
-
-  to = from > to ? to + 1 : to;  // wrong implementation of QStringListModel
-  // https://code.woboq.org/qt5/qtbase/src/corelib/itemmodels/qstringlistmodel.cpp.html#34fromRow
 
   _model->moveRow(_rootModelIndex, from, _rootModelIndex, to);
 }

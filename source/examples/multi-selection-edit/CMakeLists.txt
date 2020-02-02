@@ -42,6 +42,8 @@ set(sources
     MainWindow.cpp
     MainWindow.h
     MainWindow.ui
+    StopItemModel.cpp
+    StopItemModel.h
 )
 
 

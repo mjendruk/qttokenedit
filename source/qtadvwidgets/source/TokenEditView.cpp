@@ -46,9 +46,9 @@ void TokenEditView::move(int from, int to) {
   if (from == to) {
     return;
   }
-
-  auto insertAt = to - 1;
-
+  
+  auto insertAt = from > to ? to : (to - 1);
+  
   if (to < _tokens.size()) {
     _tokens.move(from, insertAt);
   } else {
