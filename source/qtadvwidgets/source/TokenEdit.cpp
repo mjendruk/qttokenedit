@@ -228,6 +228,7 @@ void TokenEdit::onRowsInserted(QModelIndex const& parent, int first, int last) {
   }
 
   _activeMode->inserted(first, last);
+  updateHeight();
 }
 
 void TokenEdit::onRowsRemoved(QModelIndex const& parent, int first, int last) {
@@ -236,6 +237,7 @@ void TokenEdit::onRowsRemoved(QModelIndex const& parent, int first, int last) {
   }
 
   _activeMode->removed(first, last);
+  updateHeight();
 }
 
 void TokenEdit::onRowsMoved(QModelIndex const& parent, int first, int last,
@@ -246,6 +248,7 @@ void TokenEdit::onRowsMoved(QModelIndex const& parent, int first, int last,
 
   if (parent == destination) {
     _activeMode->moved(first, last, to);
+    updateHeight();
   } else {
     onRowsRemoved(parent, first, last);
   }
@@ -268,6 +271,7 @@ void TokenEdit::onDataChanged(const QModelIndex& topLeft,
 
   if (roles.contains(Qt::DisplayRole)) {
     _activeMode->changed(topLeft.row(), bottomRight.row());
+    updateHeight();
   }
 }
 
