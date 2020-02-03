@@ -1,7 +1,7 @@
 #include <qtadvwidgets/ElidableLabel.h>
+#include <qtadvwidgets/FocusChainElement.h>
 #include <qtadvwidgets/RemoveButton.h>
 #include <qtadvwidgets/Token.h>
-#include <qtadvwidgets/FocusChainElement.h>
 #include <qtadvwidgets/TokenMimeData.h>
 
 #include <QDrag>
@@ -11,6 +11,8 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <cmath>
+
+Token::Token(QWidget* parent) : Token{{}, parent} {}
 
 Token::Token(QString const& text, QWidget* parent)
     : BaseToken{text, parent},
@@ -26,7 +28,7 @@ Token::Token(QString const& text, QWidget* parent)
   auto sizePolicy = QSizePolicy{QSizePolicy::Preferred, QSizePolicy::Fixed};
   sizePolicy.setRetainSizeWhenHidden(true);
   setSizePolicy(sizePolicy);
-        
+
   setRemovable(false);
 
   _button->setColorRole(QPalette::ButtonText);
@@ -46,21 +48,21 @@ void Token::setRemovable(bool enable) {
   if (_removable == enable) {
     return;
   }
-  
+
   _removable = enable;
-  
+
   if (_removable) {
     _button->show();
   } else {
     _button->hide();
   }
-  
+
   updateMargins();
 }
 
 QPixmap Token::toPixmap() const {
   auto pixmap = BaseToken::toPixmap();
-  
+
   auto painter = QPainter{&pixmap};
   painter.setRenderHint(QPainter::Antialiasing, true);
 

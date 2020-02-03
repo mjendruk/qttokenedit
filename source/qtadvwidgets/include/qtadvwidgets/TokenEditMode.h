@@ -7,18 +7,19 @@
 class Token;
 class TokenEditView;
 
-class TokenEditModeAccess {
+class AbstractTokenEditModeAccess {
  public:
   virtual int maxLineCount() const = 0;
   virtual int count() const = 0;
-  virtual Token* createToken(QString const& text, QWidget* parent = nullptr) = 0;
-  virtual QString text(int index) const = 0;
+  
+  virtual Token* createToken(int index, QWidget* parent = nullptr) const = 0;
+  virtual void updateToken(int index, Token* token, QVector<int> const& roles) const = 0;
 };
 
 class QTADVWIDGETS_API TokenEditMode : public QObject {
   Q_OBJECT
  public:
-  TokenEditMode(TokenEditView* view, TokenEditModeAccess* access,
+  TokenEditMode(TokenEditView* view, AbstractTokenEditModeAccess* access,
                 QObject* parent = nullptr);
   
   virtual ~TokenEditMode() = default;
@@ -26,7 +27,7 @@ class QTADVWIDGETS_API TokenEditMode : public QObject {
   virtual void inserted(int first, int last) = 0;
   virtual void removed(int first, int last) = 0;
   virtual void moved(int first, int last, int to) = 0;
-  virtual void changed(int first, int last) = 0;
+  virtual void changed(int first, int last, QVector<int> const& roles) = 0;
 
   virtual void clear() = 0;
   virtual void invalidate() = 0;
@@ -37,9 +38,9 @@ class QTADVWIDGETS_API TokenEditMode : public QObject {
 
  protected:
   TokenEditView* view() const;
-  TokenEditModeAccess* access() const;
+  AbstractTokenEditModeAccess* access() const;
 
  private:
   TokenEditView* _view;
-  TokenEditModeAccess* _access;
+  AbstractTokenEditModeAccess* _access;
 };

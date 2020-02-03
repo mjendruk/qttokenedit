@@ -14,6 +14,7 @@ class QTADVWIDGETS_API Token : public BaseToken {
  public:
   enum class DropHint { Before, After };
 
+  Token(QWidget* parent = nullptr);
   Token(QString const& text, QWidget* parent = nullptr);
   ~Token();
 

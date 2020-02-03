@@ -34,7 +34,7 @@ QVariant StopItemModel::data(QModelIndex const& index, int role) const {
       return abbreviation(_stops.at(index.row()));
     }
   }
-  
+
   if (role == Qt::ToolTipRole) {
     if (index.column() == 1) {
       return _stops.at(index.row());
@@ -51,17 +51,18 @@ bool StopItemModel::setData(QModelIndex const& index, QVariant const& value,
   if (role != Qt::EditRole) {
     return false;
   }
-  
+
   if (index.isValid() && index.column() == 0) {
     auto stop = value.toString();
     _stops.replace(index.row(), stop);
-    
+
     auto topLeftIndex = index;
     auto bottomRightIndex = this->index(index.row(), 1);
-    emit dataChanged(topLeftIndex, bottomRightIndex, {Qt::DisplayRole, Qt::EditRole});
+    emit dataChanged(topLeftIndex, bottomRightIndex,
+                     {Qt::DisplayRole, Qt::EditRole, Qt::ToolTipRole});
     return true;
   }
-  
+
   return false;
 }
 
@@ -92,8 +93,7 @@ QVariant StopItemModel::headerData(int section, Qt::Orientation orientation,
   return QVariant{};
 }
 
-bool StopItemModel::insertRows(int row, int count,
-                  QModelIndex const& parent) {
+bool StopItemModel::insertRows(int row, int count, QModelIndex const& parent) {
   if (parent.isValid()) {
     return false;
   }
@@ -102,11 +102,11 @@ bool StopItemModel::insertRows(int row, int count,
   auto lastRow = row + (count - 1);
 
   beginInsertRows(parent, firstRow, lastRow);
-  
+
   for (auto insertRow = firstRow; insertRow <= lastRow; ++insertRow) {
     _stops.insert(insertRow, {});
   }
-  
+
   endInsertRows();
 
   return true;
@@ -135,7 +135,7 @@ bool StopItemModel::moveRows(QModelIndex const& sourceParent, int sourceRow,
   }
 
   endMoveRows();
-  
+
   return true;
 }
 
@@ -143,18 +143,18 @@ bool StopItemModel::removeRows(int row, int count, QModelIndex const& parent) {
   if (parent.isValid()) {
     return false;
   }
-  
+
   auto firstRow = row;
   auto lastRow = row + (count - 1);
-  
+
   beginRemoveRows(parent, firstRow, lastRow);
-  
+
   for (auto removeRow = lastRow; removeRow >= firstRow; --removeRow) {
     _stops.removeAt(removeRow);
   }
-  
+
   endRemoveRows();
-  
+
   return true;
 }
 

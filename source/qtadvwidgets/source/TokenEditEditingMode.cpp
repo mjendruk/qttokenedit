@@ -8,7 +8,7 @@
 #include <QScrollBar>
 
 TokenEditEditingMode::TokenEditEditingMode(TokenEditView* view,
-                                           TokenEditModeAccess* access,
+                                           AbstractTokenEditModeAccess* access,
                                            QObject* parent)
     : TokenEditMode{view, access, parent}, _lineEdit{new TokenLineEdit{}} {
   auto dummyToken = QScopedPointer{new Token{"dummy"}};
@@ -23,7 +23,7 @@ TokenEditEditingMode::~TokenEditEditingMode() {
 
 void TokenEditEditingMode::inserted(int first, int last) {
   for (auto index = first; index <= last; ++index) {
-    auto token = access()->createToken(access()->text(index));
+    auto token = access()->createToken(index);
 
     view()->insert(index, token);
   }
@@ -41,10 +41,11 @@ void TokenEditEditingMode::moved(int first, int last, int to) {
   }
 }
 
-void TokenEditEditingMode::changed(int first, int last) {
+void TokenEditEditingMode::changed(int first, int last,
+                                   QVector<int> const& roles) {
   for (auto index = first; index <= last; ++index) {
     auto token = view()->at(index);
-    token->setText(access()->text(index));
+    access()->updateToken(index, token, roles);
   }
 }
 

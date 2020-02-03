@@ -5,20 +5,84 @@
 #include <qtadvwidgets/TokenEditView.h>
 #include <qtadvwidgets/TokenLineEdit.h>
 
-#include <QLineEdit>
-#include <QtDebug>
-#include <QScrollBar>
 #include <QApplication>
+#include <QLineEdit>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QtDebug>
 #include <QtGlobal>
 #include <algorithm>
-#include <QScrollArea>
+
+class TokenEditModeAccess : public AbstractTokenEditModeAccess {
+ public:
+  TokenEditModeAccess(TokenEdit* tokenEdit) : _tokenEdit{tokenEdit} {}
+
+  int maxLineCount() const override { return _tokenEdit->maxLineCount(); }
+
+  int count() const override {
+    if (auto model = _tokenEdit->model()) {
+      return model->rowCount();
+    }
+    return -1;
+  }
+
+  Token* createToken(int index, QWidget* parent) const override {
+    auto token = new Token{parent};
+    token->setDragEnabled(_tokenEdit->dragEnabled());
+    token->setRemovable(_tokenEdit->removable());
+
+    QObject::connect(token, &Token::removeClicked, [=]() {
+      auto index = _tokenEdit->view()->indexOf(token);
+      _tokenEdit->model()->removeRow(index);
+      _tokenEdit->updateHeight();
+    });
+
+    QObject::connect(token, &Token::dragged, [=](auto target, auto hint) {
+      _tokenEdit->onItemDragged(token, target, hint);
+    });
+
+    QObject::connect(_tokenEdit, &TokenEdit::dragStateChanged, token,
+                     &Token::setDragEnabled);
+    QObject::connect(_tokenEdit, &TokenEdit::removableStateChanged, token,
+                     &Token::setRemovable);
+
+    updateToken(index, token, {});
+
+    return token;
+  }
+
+  void updateToken(int index, Token* token,
+                   QVector<int> const& roles) const override {
+    auto updateText = roles.empty() || roles.contains(Qt::DisplayRole);
+    auto updateToolTip = roles.empty() || roles.contains(Qt::ToolTipRole);
+
+    if (updateText) {
+      token->setText(data(index, Qt::DisplayRole).toString());
+    }
+
+    if (updateToolTip) {
+      token->setToolTip(data(index, Qt::ToolTipRole).toString());
+    }
+  }
+
+ private:
+  QVariant data(int index, int role) const {
+    auto const modelIndex = _tokenEdit->model()->index(
+        index, _tokenEdit->modelColumn(), _tokenEdit->rootIndex());
+    return modelIndex.data(role);
+  }
+
+ private:
+  TokenEdit* _tokenEdit;
+};
 
 TokenEdit::TokenEdit(QWidget* parent)
     : TokenEditFrame{parent},
+      _access{new TokenEditModeAccess{this}},
       _view{new TokenEditView{this}},
       _activeMode{nullptr},
-      _editingMode{new TokenEditEditingMode{_view, this, this}},
-      _displayMode{new TokenEditDisplayMode{_view, this, this}},
+      _editingMode{new TokenEditEditingMode{_view, _access.get(), this}},
+      _displayMode{new TokenEditDisplayMode{_view, _access.get(), this}},
       _scrollArea{new QScrollArea{this}},
       _maxLineCount{3},
       _dragEnabled{false},
@@ -27,10 +91,10 @@ TokenEdit::TokenEdit(QWidget* parent)
       _rootModelIndex{QModelIndex{}},
       _modelColumn{0} {
   setWidget(_scrollArea);
-        
+
   _view->setFocusPolicy(Qt::StrongFocus);
   _view->installEventFilter(this);
-        
+
   _scrollArea->setFrameShape(QFrame::NoFrame);
   _scrollArea->setWidgetResizable(true);
   _scrollArea->setFocusPolicy(Qt::ClickFocus);
@@ -44,25 +108,25 @@ TokenEdit::TokenEdit(QWidget* parent)
   _scrollArea->verticalScrollBar()->setSingleStep(singleStep);
 
   _scrollArea->setWidget(_view);
-        
-  connect(_view, &TokenEditView::gotFocus, [=](auto widget) {
-    ensureVisible(widget);
-  });
-        
+
+  connect(_view, &TokenEditView::gotFocus,
+          [=](auto widget) { ensureVisible(widget); });
+
   connect(_view, &TokenEditView::sizeChanged, [=]() {
     if (!_model && !_activeMode) {
-        return;
+      return;
     }
     _activeMode->invalidate();
     ensureVisible(focusWidget());
     updateHeight();
   });
 
-  connect(_editingMode->lineEdit(), &TokenLineEdit::backspaceAtBeginning, [=]() {
-    if (_model && !_view->isEmpty() && removable()) {
-      _model->removeRow(_view->count() - 1);
-    }
-  });
+  connect(_editingMode->lineEdit(), &TokenLineEdit::backspaceAtBeginning,
+          [=]() {
+            if (_model && !_view->isEmpty() && removable()) {
+              _model->removeRow(_view->count() - 1);
+            }
+          });
 
   connect(qApp, &QApplication::focusChanged, this, &TokenEdit::onFocusChanged);
 }
@@ -164,49 +228,19 @@ void TokenEdit::setRootIndex(QModelIndex const& index) {
   onModelReset();
 }
 
-int TokenEdit::count() const {
-  if (!_model) {
-    return -1;
-  }
-  return _model->rowCount();
-}
-
-Token* TokenEdit::createToken(QString const& text, QWidget* parent) {
-  auto token = new Token{text, parent};
-  token->setDragEnabled(dragEnabled());
-  token->setRemovable(removable());
-
-  connect(token, &Token::removeClicked, [=]() {
-    auto index = _view->indexOf(token);
-    _model->removeRow(index);
-    updateHeight();
-  });
-
-  connect(token, &Token::dragged,
-          [=](auto target, auto hint) { onItemDragged(token, target, hint); });
-
-  connect(this, &TokenEdit::dragStateChanged, token, &Token::setDragEnabled);
-  connect(this, &TokenEdit::removableStateChanged, token, &Token::setRemovable);
-
-  return token;
-}
-
-QString TokenEdit::text(int index) const {
-  auto modelIndex = _model->index(index, _modelColumn, _rootModelIndex);
-  return modelIndex.data(Qt::DisplayRole).toString();
-}
-
 bool TokenEdit::eventFilter(QObject* object, QEvent* event) {
   Q_ASSERT(_view == object);
-  
+
   if (event->type() == QEvent::FocusIn) {
     setActiveMode(_editingMode);
     lineEdit()->setFocus();
     return true;
   }
-  
+
   return false;
 }
+
+TokenEditView* TokenEdit::view() const { return _view; }
 
 void TokenEdit::init() {
   if (!_model) {
@@ -265,14 +299,8 @@ void TokenEdit::onDataChanged(const QModelIndex& topLeft,
     return;
   }
 
-  if (!roles.contains(Qt::DisplayRole) && !roles.contains(Qt::UserRole)) {
-    return;
-  }
-
-  if (roles.contains(Qt::DisplayRole)) {
-    _activeMode->changed(topLeft.row(), bottomRight.row());
-    updateHeight();
-  }
+  _activeMode->changed(topLeft.row(), bottomRight.row(), roles);
+  updateHeight();
 }
 
 void TokenEdit::onModelReset() {
@@ -301,7 +329,7 @@ void TokenEdit::onFocusChanged(QWidget* prev, QWidget* now) {
 
   auto prevIsChild = isChild(prev);
   auto nowIsChild = isChild(now);
-    
+
   if (prevIsChild && !nowIsChild) {
     setActiveMode(_displayMode);
     setShownAsFocused(false);
@@ -313,22 +341,22 @@ void TokenEdit::onFocusChanged(QWidget* prev, QWidget* now) {
 
 void TokenEdit::setActiveMode(TokenEditMode* mode) {
   Q_ASSERT(mode);
-  
+
   if (_activeMode == mode) {
     return;
   }
-  
+
   if (_activeMode) {
     _activeMode->deactivate();
   }
-  
+
   mode->activate();
   _activeMode = mode;
 }
-        
+
 void TokenEdit::updateHeight() {
   auto height = _activeMode->heightHint();
-        
+
   if (_scrollArea->height() != height) {
     _scrollArea->setFixedHeight(height);
   }
@@ -336,11 +364,11 @@ void TokenEdit::updateHeight() {
 
 void TokenEdit::ensureVisible(QWidget* widget) {
   auto ySpacing = _view->ySpacing();
-  
+
   // y-margin is not properly resprected for line edit
   if (widget == lineEdit()) {
     ySpacing *= 2;
   }
-  
+
   _scrollArea->ensureWidgetVisible(widget, _view->xSpacing(), ySpacing);
 }

@@ -20,16 +20,17 @@ class TokenEditView;
 class TokenEditMode;
 class TokenEditEditingMode;
 class TokenEditDisplayMode;
+class AbstractTokenEditModeAccess;
 
-class QTADVWIDGETS_API TokenEdit : public TokenEditFrame,
-                                       public TokenEditModeAccess {
+
+class QTADVWIDGETS_API TokenEdit : public TokenEditFrame {
   Q_OBJECT
 
  public:
   TokenEdit(QWidget* parent = nullptr);
   ~TokenEdit();
 
-  int maxLineCount() const override;
+  int maxLineCount() const;
   void setMaxLineCount(int count);
 
   bool dragEnabled() const;
@@ -47,11 +48,7 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditFrame,
   void setModelColumn(int column);
 
   QModelIndex rootIndex() const;
-  void setRootIndex(QModelIndex const& index);
-
-  int count() const override;
-  Token* createToken(QString const& text, QWidget* parent) override;
-  QString text(int index) const override;
+  void setRootIndex(QModelIndex const& index);  
 
  signals:
   void dragStateChanged(bool enabled);
@@ -61,6 +58,10 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditFrame,
   bool eventFilter(QObject* object, QEvent* event) override;
 
  private:
+  friend class TokenEditModeAccess;
+               
+  TokenEditView* view() const;
+  
   void init();
   void clear();
 
@@ -81,6 +82,8 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditFrame,
   void ensureVisible(QWidget* widget);
 
  private:
+  QScopedPointer<AbstractTokenEditModeAccess> _access;
+  
   TokenEditView* _view;
   TokenEditMode* _activeMode;
   TokenEditEditingMode* _editingMode;
