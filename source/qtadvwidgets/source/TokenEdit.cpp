@@ -318,6 +318,9 @@ void TokenEdit::onItemDragged(Token* source, Token* target,
 
   if (hint == Token::DropHint::After) ++to;
 
+  if (from == to || from == (to - 1)) {
+    return;
+  }
   _model->moveRow(_rootModelIndex, from, _rootModelIndex, to);
 }
 
