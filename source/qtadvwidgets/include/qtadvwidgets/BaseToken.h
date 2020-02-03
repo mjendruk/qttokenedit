@@ -23,8 +23,6 @@ class QTADVWIDGETS_API BaseToken : public QWidget {
 
   QWidget* rightWidget() const;
   void setRightWidget(QWidget* widget);
-  
-  virtual QPixmap toPixmap() const;
  
   int contentHeight() const;
 

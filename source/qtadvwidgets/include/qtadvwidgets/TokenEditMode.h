@@ -9,6 +9,8 @@ class TokenEditView;
 
 class AbstractTokenEditModeAccess {
  public:
+  virtual ~AbstractTokenEditModeAccess() = default;
+  
   virtual int maxLineCount() const = 0;
   virtual int count() const = 0;
   

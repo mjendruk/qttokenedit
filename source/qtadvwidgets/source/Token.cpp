@@ -60,20 +60,6 @@ void Token::setRemovable(bool enable) {
   updateMargins();
 }
 
-QPixmap Token::toPixmap() const {
-  auto pixmap = BaseToken::toPixmap();
-
-  auto painter = QPainter{&pixmap};
-  painter.setRenderHint(QPainter::Antialiasing, true);
-
-  painter.save();
-  painter.translate(_button->pos());
-  _button->draw(&painter);
-  painter.restore();
-
-  return pixmap;
-}
-
 void Token::paintEvent(QPaintEvent* event) {
   BaseToken::paintEvent(event);
 
@@ -128,7 +114,7 @@ void Token::dragEnterEvent(QDragEnterEvent* event) {
   }
 }
 
-void Token::dragLeaveEvent(QDragLeaveEvent* event) { resetDropIndicator(); }
+void Token::dragLeaveEvent(QDragLeaveEvent* /* event */) { resetDropIndicator(); }
 
 void Token::dragMoveEvent(QDragMoveEvent* event) {
   if (acceptsDrag(event)) {
@@ -142,6 +128,19 @@ void Token::dropEvent(QDropEvent* event) {
   if (acceptsDrag(event)) {
     finishDrag(event);
   }
+}
+
+QPixmap Token::toPixmap() {
+  auto pixmap = QPixmap(size() * devicePixelRatio());
+  pixmap.setDevicePixelRatio(devicePixelRatio());
+  pixmap.fill(QColor{0, 0, 0, 0});
+
+  auto painter = QPainter{&pixmap};
+  painter.setRenderHint(QPainter::Antialiasing, true);
+
+  render(&painter);
+
+  return pixmap;
 }
 
 bool Token::shouldStartDrag(QPoint const& mousePos) const {

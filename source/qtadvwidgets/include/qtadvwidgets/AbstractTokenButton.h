@@ -16,8 +16,6 @@ class QTADVWIDGETS_API AbstractTokenButton : public QAbstractButton {
   QPalette::ColorRole colorRole() const;
   void setColorRole(QPalette::ColorRole role);
 
-  void draw(QPainter* painter) const;
-
  protected:
   void paintEvent(QPaintEvent* event) override;
 

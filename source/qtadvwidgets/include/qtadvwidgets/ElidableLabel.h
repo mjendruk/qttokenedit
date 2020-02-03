@@ -23,8 +23,6 @@ class QTADVWIDGETS_API ElidableLabel : public QWidget {
   QPalette::ColorRole textColorRole() const;
   void setTextColorRole(QPalette::ColorRole role);
 
-  void draw(QPainter* painter) const;
-
  protected:
   void paintEvent(QPaintEvent* event) override;
 

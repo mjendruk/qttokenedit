@@ -24,8 +24,6 @@ class QTADVWIDGETS_API Token : public BaseToken {
   bool removable() const;
   void setRemovable(bool enable);
 
-  QPixmap toPixmap() const override;
-
  signals:
   void removeClicked();
   void dragged(Token* target, DropHint hint);
@@ -45,6 +43,8 @@ class QTADVWIDGETS_API Token : public BaseToken {
   void dropEvent(QDropEvent* event) override;
 
  private:
+  QPixmap toPixmap();
+
   bool shouldStartDrag(QPoint const& mousePos) const;
   void startDrag(QPoint const& mousePos);
   bool acceptsDrag(QDropEvent* event) const;

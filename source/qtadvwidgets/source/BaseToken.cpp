@@ -54,24 +54,6 @@ void BaseToken::setRightWidget(QWidget* widget) {
   updateMargins();
 }
 
-QPixmap BaseToken::toPixmap() const {
-  auto pixmap = QPixmap(size() * devicePixelRatio());
-  pixmap.setDevicePixelRatio(devicePixelRatio());
-  pixmap.fill(QColor{0, 0, 0, 0});
-
-  auto painter = QPainter{&pixmap};
-  painter.setRenderHint(QPainter::Antialiasing, true);
-
-  drawBackground(&painter, palette().brush(QPalette::Highlight));
-
-  painter.save();
-  painter.translate(_label->pos());
-  _label->draw(&painter);
-  painter.restore();
-
-  return pixmap;
-}
-
 int BaseToken::contentHeight() const { return _label->sizeHint().height(); }
 
 void BaseToken::updateMargins() { _layout->setContentsMargins(margins()); }

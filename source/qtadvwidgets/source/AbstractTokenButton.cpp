@@ -36,13 +36,6 @@ void AbstractTokenButton::setColorRole(QPalette::ColorRole role) {
   update();
 }
 
-void AbstractTokenButton::draw(QPainter* painter) const {
-  painter->setBrush(palette().color(_colorRole));
-  painter->setPen(Qt::NoPen);
-
-  painter->drawPath(_path);
-}
-
 void AbstractTokenButton::paintEvent(QPaintEvent* event) {
   auto const clippingRect = QRectF{event->rect()};
 
@@ -50,7 +43,10 @@ void AbstractTokenButton::paintEvent(QPaintEvent* event) {
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(clippingRect);
 
-  draw(&painter);
+  painter.setBrush(palette().color(_colorRole));
+  painter.setPen(Qt::NoPen);
+
+  painter.drawPath(_path);
 }
 
 void AbstractTokenButton::setPath(QPainterPath const& path) { _path = path; }
