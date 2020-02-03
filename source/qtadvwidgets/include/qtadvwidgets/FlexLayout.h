@@ -33,12 +33,9 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   void insertWidget(int index, QWidget *widget);
 
   int lineCountForWidth(int width) const;
-  
+
   void freeze();
   void unfreeze();
-  
- signals:
-  void geometryChanged();
 
  private:
   struct ItemMetrics {
@@ -66,7 +63,7 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
   void tryRemoveOverflow(int overflow, QLayoutItem const *item,
                          QSize &size) const;
 
-  auto expandingItemIndices(std::vector<ItemMetrics> const& itemMetrics) const
+  auto expandingItemIndices(std::vector<ItemMetrics> const &itemMetrics) const
       -> std::vector<std::size_t>;
 
   void distributeRemainingWidth(int width,
@@ -74,15 +71,15 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
                                 std::vector<ItemMetrics> &itemMetrics) const;
 
   auto metricsForLine(LayoutItemConstIterator begin,
-                      LayoutItemConstIterator end, int width, bool testOnly) const
+                      LayoutItemConstIterator end, int width,
+                      bool testOnly) const
       -> std::pair<std::vector<ItemMetrics>, LayoutItemConstIterator>;
 
-  struct LayoutProperties
-  {
+  struct LayoutProperties {
     int height;
     int lineCount;
   };
-  
+
   LayoutProperties doLayout(const QRect &rect, bool testOnly) const;
 
   int smartSpacing(QStyle::PixelMetric pm) const;

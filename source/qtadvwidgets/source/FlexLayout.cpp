@@ -21,7 +21,9 @@ FlexLayout::~FlexLayout() {
   while ((item = takeAt(0))) delete item;
 }
 
-void FlexLayout::addItem(QLayoutItem *item) { insertItem(_itemList.size(), item); }
+void FlexLayout::addItem(QLayoutItem *item) {
+  insertItem(_itemList.size(), item);
+}
 
 int FlexLayout::horizontalSpacing() const {
   if (_hSpacing >= 0) {
@@ -76,15 +78,13 @@ int FlexLayout::heightForWidth(int width) const {
 
 void FlexLayout::setGeometry(const QRect &rect) {
   QLayout::setGeometry(rect);
-  
+
   if (_frozen != Frozen::No) {
     _frozen = Frozen::YesWithChanges;
     return;
   }
-  
-  auto properties = doLayout(rect, false);
-  
-  emit geometryChanged();
+
+  doLayout(rect, false);
 }
 
 QSize FlexLayout::sizeHint() const { return minimumSize(); }
@@ -263,7 +263,8 @@ void FlexLayout::distributeRemainingWidth(
 }
 
 auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
-                                LayoutItemConstIterator end, int width, bool testOnly) const
+                                LayoutItemConstIterator end, int width,
+                                bool testOnly) const
     -> std::pair<std::vector<ItemMetrics>, LayoutItemConstIterator> {
   auto const [nextLineIt, remainingWidth] = findNextLine(begin, end, width);
   auto itemMetrics = this->itemMetrics(begin, nextLineIt);
@@ -271,7 +272,7 @@ auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
   if (testOnly) {
     return std::pair{std::move(itemMetrics), nextLineIt};
   }
-      
+
   if (remainingWidth < 0) {
     Q_ASSERT(itemMetrics.size() == 1u);
 
@@ -286,7 +287,8 @@ auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
   return std::pair{std::move(itemMetrics), nextLineIt};
 }
 
-auto FlexLayout::doLayout(QRect const &rect, bool testOnly) const -> LayoutProperties {
+auto FlexLayout::doLayout(QRect const &rect, bool testOnly) const
+    -> LayoutProperties {
   int left, top, right, bottom;
   getContentsMargins(&left, &top, &right, &bottom);
   QRect effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
@@ -295,7 +297,7 @@ auto FlexLayout::doLayout(QRect const &rect, bool testOnly) const -> LayoutPrope
   auto const itemEnd = _itemList.cend();
 
   auto lineY = effectiveRect.y();
-    
+
   auto lastVSpacing = 0;
 
   auto lineCount = 0;
@@ -320,7 +322,7 @@ auto FlexLayout::doLayout(QRect const &rect, bool testOnly) const -> LayoutPrope
 
     itemIt = nextLineItemIt;
     lineY = lineY + lineHeight + vSpacing;
-    
+
     lastVSpacing = vSpacing;
     ++lineCount;
   }
