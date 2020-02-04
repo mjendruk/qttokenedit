@@ -7,6 +7,7 @@
 
 #include "TokenDragDropHandler.h"
 
+#include <QScopedValueRollback>
 #include <QApplication>
 #include <QLineEdit>
 #include <QScrollArea>
@@ -33,8 +34,8 @@ class TokenEditModeAccess : public AbstractTokenEditModeAccess {
     token->setRemovable(_tokenEdit->removable());
 
     QObject::connect(token, &Token::removeClicked, [=]() {
-      auto index = _tokenEdit->view()->indexOf(token);
-      _tokenEdit->model()->removeRow(index);
+      auto index = _tokenEdit->indexOf(token);
+      _tokenEdit->remove(index, UpdateFocus::Yes);
       _tokenEdit->updateHeight();
     });
 
@@ -84,6 +85,7 @@ TokenEdit::TokenEdit(QWidget* parent)
       _dragEnabled{false},
       _dragDropMode{QAbstractItemView::NoDragDrop},
       _removable{false},
+      _updateFocus{UpdateFocus::No},
       _model{nullptr},
       _rootModelIndex{QModelIndex{}},
       _modelColumn{0} {
@@ -121,7 +123,7 @@ TokenEdit::TokenEdit(QWidget* parent)
   connect(_editingMode->lineEdit(), &TokenLineEdit::backspaceAtBeginning,
           [=]() {
             if (_model && !_view->isEmpty() && removable()) {
-              _model->removeRow(_view->count() - 1);
+              this->remove(_view->count() - 1, UpdateFocus::No);
             }
           });
 
@@ -256,15 +258,22 @@ int TokenEdit::indexOf(Token const* token) const {
 }
 
 QModelIndex TokenEdit::index(int row) const {
-  if (!_model) {
-    return {};
-  }
-
+  Q_ASSERT(_model);
   return _model->index(row, _modelColumn, _rootModelIndex);
 }
 
 QModelIndex TokenEdit::index(Token const* token) const {
   return index(indexOf(token));
+}
+
+QScopedValueRollback<UpdateFocus> TokenEdit::enableUpdateFocus() {
+  return QScopedValueRollback{_updateFocus, UpdateFocus::Yes};
+}
+
+bool TokenEdit::remove(int row, UpdateFocus uf) {
+  Q_ASSERT(_model);
+  QScopedValueRollback svr{_updateFocus, uf};
+  return _model->removeRow(row);
 }
 
 void TokenEdit::init() {
@@ -277,7 +286,7 @@ void TokenEdit::init() {
 
 void TokenEdit::clear() {
   while (!_view->isEmpty()) {
-    _view->remove(0);
+    _view->remove(0, UpdateFocus::No);
   }
 }
 
@@ -286,7 +295,7 @@ void TokenEdit::onRowsInserted(QModelIndex const& parent, int first, int last) {
     return;
   }
 
-  _activeMode->inserted(first, last);
+  _activeMode->inserted(first, last, _updateFocus);
   updateHeight();
 }
 
@@ -295,7 +304,7 @@ void TokenEdit::onRowsRemoved(QModelIndex const& parent, int first, int last) {
     return;
   }
 
-  _activeMode->removed(first, last);
+  _activeMode->removed(first, last, _updateFocus);
   updateHeight();
 }
 

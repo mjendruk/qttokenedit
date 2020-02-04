@@ -14,12 +14,10 @@ class QTADVWIDGETS_API TokenEditEditingMode : public TokenEditMode {
 
   ~TokenEditEditingMode();
 
-  void inserted(int first, int last) override;
-  void removed(int first, int last) override;
+  void inserted(int first, int last, UpdateFocus uf) override;
+  void removed(int first, int last, UpdateFocus uf) override;
   void moved(int first, int last, int to) override;
   void changed(int first, int last, QVector<int> const& roles) override;
-
-  void clear() override;
 
   void invalidate() override;
   int heightHint() const override;

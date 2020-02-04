@@ -7,16 +7,16 @@
 #include <QtGlobal>
 #include <algorithm>
 
-FocusChain::FocusChain(QObject* parent)
-    : QObject{parent} {}
+FocusChain::FocusChain(QObject* parent) : QObject{parent} {}
 
 FocusChain::~FocusChain() = default;
 
-void FocusChain::add(QWidget* widget, FocusChainNavigation* navigation) {
-  insert(count(), widget, navigation);
+void FocusChain::add(QWidget* widget, UpdateFocus updateFocus,
+                     FocusChainNavigation* navigation) {
+  insert(count(), widget, updateFocus, navigation);
 }
 
-void FocusChain::insert(int index, QWidget* widget,
+void FocusChain::insert(int index, QWidget* widget, UpdateFocus updateFocus,
                         FocusChainNavigation* navigation) {
   Q_ASSERT(widget);
 
@@ -24,6 +24,10 @@ void FocusChain::insert(int index, QWidget* widget,
     navigation = new DefaultFocusChainNavigation{};
   }
 
+  if (updateFocus == UpdateFocus::Yes) {
+    widget->setFocus();
+  }
+  
   auto element = new FocusChainElement{widget, navigation, this};
   insert(index, element, UpdateSignalConnection::Yes);
 }
@@ -37,10 +41,10 @@ void FocusChain::move(int from, int to) {
   insert(to, element, UpdateSignalConnection::No);
 }
 
-void FocusChain::remove(QWidget* widget) {
+void FocusChain::remove(QWidget* widget, UpdateFocus updateFocus) {
   auto index = indexOf(widget);
   Q_ASSERT(index >= 0);
-  auto element = takeAt(index, UpdateSignalConnection::Yes, UpdateFocus::Yes);
+  auto element = takeAt(index, UpdateSignalConnection::Yes, updateFocus);
   delete element;
 }
 
@@ -53,10 +57,9 @@ void FocusChain::insert(int index, FocusChainElement* element,
   Q_ASSERT(0 <= index && index <= count());
 
   if (updateConnection == UpdateSignalConnection::Yes) {
-     connect(element, &FocusChainElement::gotFocus,
-             this, &FocusChain::gotFocus);
-     connect(element, &FocusChainElement::lostFocus, this,
-             &FocusChain::lostFocus);
+    connect(element, &FocusChainElement::gotFocus, this, &FocusChain::gotFocus);
+    connect(element, &FocusChainElement::lostFocus, this,
+            &FocusChain::lostFocus);
   }
 
   if (isEmpty()) {
@@ -85,7 +88,7 @@ void FocusChain::insert(int index, FocusChainElement* element,
 
   element->setPreviousElement(prev);
   element->setNextElement(next);
-  
+
   _elements.insert(index, element);
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <qtadvwidgets/FocusChainElement.h>
+#include <qtadvwidgets/Global.h>
 #include <qtadvwidgets/TokenEditMode.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
@@ -12,17 +13,23 @@ class FocusChainNavigation;
 
 class QTADVWIDGETS_API FocusChain : public QObject {
   Q_OBJECT
-  
+
  public:
   FocusChain(QObject* parent = nullptr);
   ~FocusChain();
 
-  void add(QWidget* widget, FocusChainNavigation* navigation = nullptr);
-  void insert(int index, QWidget* widget, FocusChainNavigation* navigation = nullptr);
+  void add(QWidget* widget, UpdateFocus updateFocus,
+           FocusChainNavigation* navigation = nullptr);
+
+  void insert(int index, QWidget* widget, UpdateFocus updateFocus,
+              FocusChainNavigation* navigation = nullptr);
+
   void move(int from, int to);
-  void remove(QWidget* widget);
-  
+
+  void remove(QWidget* widget, UpdateFocus updateFocus);
+
   int count() const;
+  
   bool isEmpty() const;
 
  signals:
@@ -31,7 +38,6 @@ class QTADVWIDGETS_API FocusChain : public QObject {
 
  private:
   enum class UpdateSignalConnection : std::int8_t { Yes, No };
-  enum class UpdateFocus : std::int8_t { Yes, No };
 
   void insert(int index, FocusChainElement* element,
               UpdateSignalConnection updateConnection);

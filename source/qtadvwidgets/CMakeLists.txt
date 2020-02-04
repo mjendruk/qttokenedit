@@ -57,6 +57,7 @@ set(headers
     ${include_path}/FocusChain.h
     ${include_path}/FocusChainElement.h
     ${include_path}/FocusChainNavigation.h
+    ${include_path}/Global.h
     ${include_path}/OmissionToken.h
     ${include_path}/TokenEdit.h
     ${include_path}/TokenEditDisplayMode.h

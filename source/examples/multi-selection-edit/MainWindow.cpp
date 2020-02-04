@@ -31,7 +31,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
   {
     auto tokenEdit = new TokenEdit{this};
 
-    tokenEdit->setModelColumn(0);
+    tokenEdit->setModelColumn(1);
 
     auto listView = new QTableView{this};
 
@@ -58,7 +58,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
     tokenEdit->setModel(model);
 
     listView->setModel(model);
-    listView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    listView->setSelectionBehavior(QAbstractItemView::SelectItems);
     listView->setDragDropMode(QAbstractItemView::DragDrop);
     listView->setDefaultDropAction(Qt::MoveAction);
     listView->setDragDropOverwriteMode(false);
@@ -119,11 +119,11 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
         },
         Qt::QueuedConnection);
 
-    // auto otherTokenEdit = new TokenEdit{};
-    // otherTokenEdit->setModel(model);
-    // otherTokenEdit->setDragEnabled(true);
-
-    // otherTokenEdit->show();
+//     auto otherTokenEdit = new TokenEdit{};
+//     otherTokenEdit->setModel(model);
+//     otherTokenEdit->setDragEnabled(true);
+//
+//     otherTokenEdit->show();
   }
 
   connect(m_ui->widthSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),

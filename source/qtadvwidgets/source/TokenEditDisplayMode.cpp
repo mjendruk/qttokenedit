@@ -18,27 +18,26 @@ TokenEditDisplayMode::~TokenEditDisplayMode() {
   }
 }
 
-void TokenEditDisplayMode::inserted(int first, int last) {
+void TokenEditDisplayMode::inserted(int first, int last, UpdateFocus uf) {
   if (view()->count() < first) {
     return;
   }
 
   for (auto index = first; index <= last; ++index) {
     auto token = access()->createToken(index);
-
-    view()->insert(index, token);
+    view()->insert(index, token, uf);
   }
 
   invalidate();
 }
 
-void TokenEditDisplayMode::removed(int first, int last) {
-  if (view()->count() <= first) {
+void TokenEditDisplayMode::removed(int first, int last, UpdateFocus uf) {
+  if (view()->count() <= last) {
     return;
   }
 
   for (int index = last; index >= first; --index) {
-    view()->remove(index);
+    view()->remove(index, uf);
   }
 
   invalidate();
@@ -52,9 +51,9 @@ void TokenEditDisplayMode::moved(int first, int last, int to) {
   }
 
   if (view()->count() <= first) {
-    inserted(realTo, realTo + (last - first));
+    inserted(realTo, realTo + (last - first), UpdateFocus::No);
   } else if (view()->count() <= realTo) {
-    removed(first, last);
+    removed(first, last, UpdateFocus::No);
   } else {
     for (int from = last; from >= first; --from) {
       view()->move(from, to);
@@ -78,12 +77,6 @@ void TokenEditDisplayMode::changed(int first, int last,
   invalidate();
 }
 
-void TokenEditDisplayMode::clear() {
-  while (!view()->isEmpty()) {
-    view()->remove(0);
-  }
-}
-
 void TokenEditDisplayMode::invalidate() {
   view()->freezeLayout();
 
@@ -97,18 +90,18 @@ void TokenEditDisplayMode::invalidate() {
   while (!allTokensShown() && lineCountConstraintMet()) {
     auto index = view()->count();
     auto token = access()->createToken(index);
-    view()->add(token);
+    view()->add(token, UpdateFocus::No);
   }
 
   while (!lineCountConstraintMet()) {
-    view()->remove(view()->count() - 1);
+    view()->remove(view()->count() - 1, UpdateFocus::No);
   }
 
   if (omittedTokens() > 0) {
     _omissionToken->show();
 
     while (!lineCountConstraintMet()) {
-      view()->remove(view()->count() - 1);
+      view()->remove(view()->count() - 1, UpdateFocus::No);
     }
 
     _omissionToken->setCount(omittedTokens());

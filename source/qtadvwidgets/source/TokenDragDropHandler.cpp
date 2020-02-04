@@ -4,6 +4,7 @@
 
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
+#include <QScopedValueRollback>
 
 TokenDragDropHandler::TokenDragDropHandler(TokenEdit* tokenEdit)
     : _tokenEdit{tokenEdit} {}
@@ -85,13 +86,14 @@ bool TokenDragDropHandler::dropMimeData(const Token* target,
     ++targetRow;
   }
 
+  auto updateFocusEnabled = _tokenEdit->enableUpdateFocus();
   return model()->dropMimeData(data, Qt::MoveAction, targetRow,
                                _tokenEdit->modelColumn(),
                                _tokenEdit->rootIndex());
 }
 
 bool TokenDragDropHandler::dropAccepted(Token* token) {
-  return model()->removeRow(_tokenEdit->indexOf(token));
+  return _tokenEdit->remove(_tokenEdit->indexOf(token), UpdateFocus::No);
 }
 
 QAbstractItemModel* TokenDragDropHandler::model() const {

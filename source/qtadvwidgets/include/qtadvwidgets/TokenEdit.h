@@ -3,12 +3,14 @@
 #include <qtadvwidgets/TokenEditFrame.h>
 #include <qtadvwidgets/TokenEditMode.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
+#include <qtadvwidgets/Global.h>
 
 #include <QModelIndex>
 #include <QScrollArea>
 #include <QVariant>
 #include <QVector>
 #include <QAbstractItemView>
+#include <QScopedValueRollback>
 #include <cstdint>
 
 class QLineEdit;
@@ -73,6 +75,9 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditFrame {
   QModelIndex index(int row) const;
   QModelIndex index(Token const* token) const;
   
+  QScopedValueRollback<UpdateFocus> enableUpdateFocus();
+  bool remove(int row, UpdateFocus uf);
+  
   void init();
   void clear();
 
@@ -105,6 +110,8 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditFrame {
   bool _dragEnabled;
   QAbstractItemView::DragDropMode _dragDropMode;
   bool _removable;
+  
+  UpdateFocus _updateFocus;
 
   // model members
   QAbstractItemModel* _model;

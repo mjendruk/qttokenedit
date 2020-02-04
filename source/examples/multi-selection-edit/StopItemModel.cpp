@@ -9,7 +9,7 @@ StopItemModel::StopItemModel(QStringList const& stops, QObject* parent)
     : QAbstractTableModel{parent}, _stops{stops} {}
 
 Qt::DropActions StopItemModel::supportedDropActions() const {
-  return Qt::MoveAction | Qt::CopyAction;
+  return Qt::MoveAction;
 }
 
 QStringList StopItemModel::mimeTypes() const { return {"application/json"}; }
@@ -18,7 +18,6 @@ QMimeData* StopItemModel::mimeData(QModelIndexList const& indexes) const {
   auto stopList = QStringList{};
   std::transform(indexes.cbegin(), indexes.cend(), std::back_inserter(stopList),
                  [=](auto index) {
-                   Q_ASSERT(index.column() == 0);
                    return _stops.at(index.row());
                  });
 
@@ -34,17 +33,18 @@ bool StopItemModel::canDropMimeData(QMimeData const* data, Qt::DropAction action
                                     int column, QModelIndex const& parent) const {
   Q_UNUSED(action);
   Q_UNUSED(row);
+  Q_UNUSED(column);
   Q_UNUSED(parent);
   
   if (!data->hasFormat("application/json")) {
     return false;
   }
   
-  if (column != 0) {
+  if (parent.isValid()) {
     return false;
   }
   
-  if (parent.isValid()) {
+  if (!(0 <= row && row <= _stops.size())) {
     return false;
   }
   
@@ -150,7 +150,7 @@ bool StopItemModel::setData(QModelIndex const& index, QVariant const& value,
 Qt::ItemFlags StopItemModel::flags(const QModelIndex& index) const {
   auto defaultFlags = QAbstractTableModel::flags(index);
 
-  if (index.isValid() && index.column() == 0) {
+  if (index.isValid()) {
     return defaultFlags | Qt::ItemIsEditable | Qt::ItemIsDragEnabled |
            Qt::ItemIsDropEnabled;
   }

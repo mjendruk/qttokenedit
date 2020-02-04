@@ -28,14 +28,16 @@ int TokenEditView::indexOf(Token const* token) const {
   return _tokens.indexOf(_token);
 }
 
-void TokenEditView::add(Token* token) { insert(_tokens.size(), token); }
+void TokenEditView::add(Token* token, UpdateFocus uf) {
+  insert(_tokens.size(), token, uf);
+}
 
-void TokenEditView::insert(int index, Token* token) {
+void TokenEditView::insert(int index, Token* token, UpdateFocus uf) {
   Q_ASSERT(0 <= index && index <= count());
 
   _tokens.insert(index, token);
   _layout->insertWidget(index, token);
-  _focusChain->insert(index, token);
+  _focusChain->insert(index, token, uf);
 
   updateGeometry();
 }
@@ -47,9 +49,9 @@ void TokenEditView::move(int from, int to) {
   if (from == to) {
     return;
   }
-  
+
   auto insertAt = from > to ? to : (to - 1);
-  
+
   if (to < _tokens.size()) {
     _tokens.move(from, insertAt);
   } else {
@@ -62,12 +64,12 @@ void TokenEditView::move(int from, int to) {
   _focusChain->move(from, insertAt);
 }
 
-void TokenEditView::remove(int index) {
+void TokenEditView::remove(int index, UpdateFocus uf) {
   Q_ASSERT(0 <= index && index < count());
 
   auto item = _tokens.takeAt(index);
   auto layoutItem = _layout->takeAt(index);
-  _focusChain->remove(item);
+  _focusChain->remove(item, uf);
   delete layoutItem;
   item->hide();
   item->deleteLater();
@@ -86,7 +88,7 @@ QWidget* TokenEditView::takeFinalWidget() {
 
   auto widget = _finalWidget;
 
-  _focusChain->remove(widget);
+  _focusChain->remove(widget, UpdateFocus::No);
   _layout->removeWidget(widget);
 
   _finalWidget = nullptr;
@@ -105,7 +107,7 @@ void TokenEditView::setFinalWidget(QWidget* widget,
   }
 
   if (widget) {
-    _focusChain->add(widget, navigation);
+    _focusChain->add(widget, UpdateFocus::No, navigation);
     _layout->addWidget(widget);
   }
 
@@ -122,7 +124,9 @@ int TokenEditView::ySpacing() const {
 
 int TokenEditView::margin() const { return ySpacing(); }
 
-int TokenEditView::lineCount() const { return _layout->lineCountForWidth(width()); }
+int TokenEditView::lineCount() const {
+  return _layout->lineCountForWidth(width());
+}
 
 int TokenEditView::lineCountForWidth(int width) const {
   return _layout->lineCountForWidth(width);

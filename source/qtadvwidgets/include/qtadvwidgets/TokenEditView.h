@@ -1,5 +1,6 @@
 #pragma once
 
+#include <qtadvwidgets/Global.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
 #include <QVector>
@@ -23,10 +24,10 @@ class QTADVWIDGETS_API TokenEditView : public QWidget {
 
   Token* at(int index) const;
   int indexOf(Token const* token) const;
-  void add(Token* token);
-  void insert(int index, Token* token);
+  void add(Token* token, UpdateFocus uf);
+  void insert(int index, Token* token, UpdateFocus uf);
   void move(int from, int to);
-  void remove(int index);
+  void remove(int index, UpdateFocus uf);
   int count() const;
   int isEmpty() const;
 
@@ -42,7 +43,7 @@ class QTADVWIDGETS_API TokenEditView : public QWidget {
    * @name layout interface
    * @{
    */
-  
+
   int xSpacing() const;
   int ySpacing() const;
   int margin() const;

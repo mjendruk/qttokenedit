@@ -21,17 +21,16 @@ TokenEditEditingMode::~TokenEditEditingMode() {
   }
 }
 
-void TokenEditEditingMode::inserted(int first, int last) {
+void TokenEditEditingMode::inserted(int first, int last, UpdateFocus uf) {
   for (auto index = first; index <= last; ++index) {
-    auto token = access()->createToken(index);
-
-    view()->insert(index, token);
+    auto token = access()->createToken(index);    
+    view()->insert(index, token, uf);
   }
 }
 
-void TokenEditEditingMode::removed(int first, int last) {
+void TokenEditEditingMode::removed(int first, int last, UpdateFocus uf) {
   for (int index = last; index >= first; --index) {
-    view()->remove(index);
+    view()->remove(index, uf);
   }
 }
 
@@ -46,12 +45,6 @@ void TokenEditEditingMode::changed(int first, int last,
   for (auto index = first; index <= last; ++index) {
     auto token = view()->at(index);
     access()->updateToken(index, token, roles);
-  }
-}
-
-void TokenEditEditingMode::clear() {
-  while (!view()->isEmpty()) {
-    view()->remove(0);
   }
 }
 
@@ -75,7 +68,7 @@ void TokenEditEditingMode::activate() {
   _lineEdit->show();
 
   if (view()->count() < access()->count()) {
-    inserted(view()->count(), access()->count() - 1);
+    inserted(view()->count(), access()->count() - 1, UpdateFocus::No);
   }
 }
 
