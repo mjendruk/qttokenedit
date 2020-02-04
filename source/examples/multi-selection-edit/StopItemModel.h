@@ -8,6 +8,18 @@ class StopItemModel : public QAbstractTableModel {
  public:
   StopItemModel(QStringList const& stops, QObject* parent = nullptr);
 
+  Qt::DropActions supportedDropActions() const override;
+
+  QStringList mimeTypes() const override;
+
+  QMimeData* mimeData(QModelIndexList const& indexes) const override;
+
+  bool canDropMimeData(QMimeData const* data, Qt::DropAction action, int row,
+                       int column, QModelIndex const& parent) const override;
+
+  bool dropMimeData(QMimeData const* data, Qt::DropAction action, int row,
+                    int column, QModelIndex const& parent) override;
+
   int rowCount(QModelIndex const& parent = QModelIndex()) const override;
   int columnCount(QModelIndex const& parent = QModelIndex()) const override;
 

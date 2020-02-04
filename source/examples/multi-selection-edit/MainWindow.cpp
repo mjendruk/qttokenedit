@@ -16,6 +16,7 @@
 #include <QStringListModel>
 #include <QTableView>
 #include <QCompleter>
+#include <QHeaderView>
 
 #include "ui_MainWindow.h"
 
@@ -49,6 +50,17 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
 
     tokenEdit->setModel(model);
     listView->setModel(model);
+    listView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    listView->setDragDropMode(QAbstractItemView::InternalMove);
+    listView->setDefaultDropAction(Qt::MoveAction);
+    listView->setDragDropOverwriteMode(false);
+//    listView->setDragEnabled(true);
+    
+    listView->verticalHeader()->hide();
+    auto hHeader = listView->horizontalHeader();
+    
+    hHeader->setSectionsMovable(true);
+//    hHeader->
 
     m_ui->formLayout->addRow("Token Edit", tokenEdit);
 

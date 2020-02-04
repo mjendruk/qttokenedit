@@ -1,9 +1,90 @@
 #include "StopItemModel.h"
 
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QMimeData>
 #include <QRegularExpression>
 
 StopItemModel::StopItemModel(QStringList const& stops, QObject* parent)
     : QAbstractTableModel{parent}, _stops{stops} {}
+
+Qt::DropActions StopItemModel::supportedDropActions() const {
+  return Qt::MoveAction;
+}
+
+QStringList StopItemModel::mimeTypes() const { return {"application/json"}; }
+
+QMimeData* StopItemModel::mimeData(QModelIndexList const& indexes) const {
+  auto stopList = QStringList{};
+  std::transform(indexes.cbegin(), indexes.cend(), std::back_inserter(stopList),
+                 [=](auto index) {
+                   Q_ASSERT(index.column() == 0);
+                   return _stops.at(index.row());
+                 });
+
+  auto jsonData =
+      QJsonDocument{QJsonArray::fromStringList(stopList)}.toBinaryData();
+
+  auto mimeData = new QMimeData{};
+  mimeData->setData("application/json", jsonData);
+  return mimeData;
+}
+
+bool StopItemModel::canDropMimeData(QMimeData const* data, Qt::DropAction action, int row,
+                                    int column, QModelIndex const& parent) const {
+  Q_UNUSED(action);
+  Q_UNUSED(row);
+  Q_UNUSED(parent);
+  
+  if (!data->hasFormat("application/json")) {
+    return false;
+  }
+  
+  if (column > 0) {
+    return false;
+  }
+  
+  if (!parent.isValid()) {
+    return false;
+  }
+  
+  return true;
+}
+
+bool StopItemModel::dropMimeData(QMimeData const* data, Qt::DropAction action, int row,
+                  int column, QModelIndex const& parent) {
+  if (!canDropMimeData(data, action, row, column, parent)) {
+    return false;
+  }
+  
+  if (action == Qt::IgnoreAction) {
+    return true;
+  }
+  
+  QByteArray encodedData = data->data("application/json");
+  
+  auto json = QJsonDocument::fromBinaryData(encodedData);
+  
+  if (!json.isArray()) {
+    return false;
+  }
+  
+  auto jsonArray = json.array();
+  
+  auto currentRow = parent.row();
+  
+  insertRows(currentRow, jsonArray.count());
+  
+  for (auto jsonValue : json.array()) {
+    auto index = this->index(currentRow, 0);
+    if (!setData(index, jsonValue.toVariant(), Qt::EditRole)) {
+      return false;
+    }
+    ++currentRow;
+  }
+  
+  return true;
+}
 
 int StopItemModel::rowCount(QModelIndex const& parent) const {
   if (parent.isValid()) {
@@ -67,13 +148,14 @@ bool StopItemModel::setData(QModelIndex const& index, QVariant const& value,
 }
 
 Qt::ItemFlags StopItemModel::flags(const QModelIndex& index) const {
-  auto flags = QAbstractTableModel::flags(index);
+  auto defaultFlags = QAbstractTableModel::flags(index);
 
   if (index.isValid() && index.column() == 0) {
-    flags.setFlag(Qt::ItemIsEditable);
+    return defaultFlags | Qt::ItemIsEditable | Qt::ItemIsDragEnabled |
+           Qt::ItemIsDropEnabled;
   }
 
-  return flags;
+  return defaultFlags | Qt::ItemIsDropEnabled;
 }
 
 QVariant StopItemModel::headerData(int section, Qt::Orientation orientation,
