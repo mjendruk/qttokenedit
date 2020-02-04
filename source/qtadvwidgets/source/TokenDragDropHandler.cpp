@@ -66,8 +66,9 @@ bool TokenDragDropHandler::canDropMimeData(const Token* target,
     ++targetRow;
   }
 
-  return model()->canDropMimeData(data, Qt::MoveAction, -1, -1,
-                                  _tokenEdit->index(targetRow));
+  return model()->canDropMimeData(data, Qt::MoveAction, targetRow,
+                                  _tokenEdit->modelColumn(),
+                                  _tokenEdit->rootIndex());
 }
 
 bool TokenDragDropHandler::dropMimeData(const Token* target,
@@ -84,8 +85,9 @@ bool TokenDragDropHandler::dropMimeData(const Token* target,
     ++targetRow;
   }
 
-  return model()->dropMimeData(data, Qt::MoveAction, -1, -1,
-                               _tokenEdit->index(targetRow));
+  return model()->dropMimeData(data, Qt::MoveAction, targetRow,
+                               _tokenEdit->modelColumn(),
+                               _tokenEdit->rootIndex());
 }
 
 bool TokenDragDropHandler::dropAccepted(Token* token) {

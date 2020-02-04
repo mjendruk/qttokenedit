@@ -40,7 +40,11 @@ bool StopItemModel::canDropMimeData(QMimeData const* data, Qt::DropAction action
     return false;
   }
   
-  if (column > 0) {
+  if (column != 0) {
+    return false;
+  }
+  
+  if (parent.isValid()) {
     return false;
   }
   
@@ -67,7 +71,7 @@ bool StopItemModel::dropMimeData(QMimeData const* data, Qt::DropAction action, i
   
   auto jsonArray = json.array();
   
-  auto currentRow = parent.isValid() ? parent.row() : _stops.size();
+  auto currentRow = row;
   
   insertRows(currentRow, jsonArray.count());
   
