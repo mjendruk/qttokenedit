@@ -1,6 +1,7 @@
 #include "TokenDragDropHandler.h"
 
 #include <qtadvwidgets/TokenEdit.h>
+#include <qtadvwidgets/Token.h>
 
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
@@ -38,10 +39,27 @@ QMimeData* TokenDragDropHandler::mimeData(const Token* source) const {
   return model()->mimeData({index});
 }
 
+bool TokenDragDropHandler::dropAccepted(Token* token) {
+  return _tokenEdit->remove(_tokenEdit->indexOf(token), UpdateFocus::No);
+}
+
 bool TokenDragDropHandler::canDropMimeData(const Token* target,
                                            const QMimeData* data,
                                            QObject* source,
                                            TokenDropHint dropHint) const {
+  auto targetRow = _tokenEdit->indexOf(target);
+
+  Q_ASSERT(targetRow >= 0);
+
+  if (dropHint == TokenDropHint::After) {
+    ++targetRow;
+  }
+
+  return canDropMimeData(targetRow, data, source);
+}
+
+bool TokenDragDropHandler::canDropMimeData(int row, QMimeData const* data,
+                                           QObject* source) const {
   auto mode = _tokenEdit->dragDropMode();
 
   if (mode == QAbstractItemView::NoDragDrop ||
@@ -59,15 +77,11 @@ bool TokenDragDropHandler::canDropMimeData(const Token* target,
     return false;
   }
 
-  auto targetRow = _tokenEdit->indexOf(target);
-
-  Q_ASSERT(targetRow >= 0);
-
-  if (dropHint == TokenDropHint::After) {
-    ++targetRow;
+  if (row == -1) {
+    row = model()->rowCount();
   }
 
-  return model()->canDropMimeData(data, Qt::MoveAction, targetRow,
+  return model()->canDropMimeData(data, Qt::MoveAction, row,
                                   _tokenEdit->modelColumn(),
                                   _tokenEdit->rootIndex());
 }
@@ -75,9 +89,6 @@ bool TokenDragDropHandler::canDropMimeData(const Token* target,
 bool TokenDragDropHandler::dropMimeData(const Token* target,
                                         const QMimeData* data, QObject* source,
                                         TokenDropHint dropHint) {
-  Q_UNUSED(source);
-  Q_ASSERT(canDropMimeData(target, data, source, dropHint));
-
   auto targetRow = _tokenEdit->indexOf(target);
 
   Q_ASSERT(targetRow >= 0);
@@ -86,14 +97,22 @@ bool TokenDragDropHandler::dropMimeData(const Token* target,
     ++targetRow;
   }
 
-  auto updateFocusEnabled = _tokenEdit->enableUpdateFocus();
-  return model()->dropMimeData(data, Qt::MoveAction, targetRow,
-                               _tokenEdit->modelColumn(),
-                               _tokenEdit->rootIndex());
+  return dropMimeData(targetRow, data, source);
 }
 
-bool TokenDragDropHandler::dropAccepted(Token* token) {
-  return _tokenEdit->remove(_tokenEdit->indexOf(token), UpdateFocus::No);
+bool TokenDragDropHandler::dropMimeData(int row, QMimeData const* data,
+                                        QObject* source) {
+  Q_UNUSED(source);
+  Q_ASSERT(canDropMimeData(row, data, source));
+  
+  if (row == -1) {
+    row = model()->rowCount();
+  }
+
+  auto updateFocusEnabled = _tokenEdit->enableUpdateFocus();
+  return model()->dropMimeData(data, Qt::MoveAction, row,
+                               _tokenEdit->modelColumn(),
+                               _tokenEdit->rootIndex());
 }
 
 QAbstractItemModel* TokenDragDropHandler::model() const {

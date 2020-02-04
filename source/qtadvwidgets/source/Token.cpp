@@ -2,6 +2,7 @@
 #include <qtadvwidgets/FocusChainElement.h>
 #include <qtadvwidgets/RemoveButton.h>
 #include <qtadvwidgets/Token.h>
+#include <qtadvwidgets/AbstractTokenDragDropHandler.h>
 
 #include <QDrag>
 #include <QKeyEvent>

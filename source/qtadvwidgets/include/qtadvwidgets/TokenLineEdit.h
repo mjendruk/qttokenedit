@@ -5,11 +5,17 @@
 
 #include <QLineEdit>
 
+
+class AbstractTokenDragDropHandler;
+
+
 class QTADVWIDGETS_API TokenLineEdit : public QLineEdit {
   Q_OBJECT
  public:
   TokenLineEdit(QWidget* parent = nullptr);
 
+  void setDragDropHandler(AbstractTokenDragDropHandler* handler);
+  
  signals:
   void backspaceAtBeginning();
 
@@ -17,10 +23,17 @@ class QTADVWIDGETS_API TokenLineEdit : public QLineEdit {
   void keyPressEvent(QKeyEvent* event) override;
   QSize sizeHint() const override;
 
+  void dragEnterEvent(QDragEnterEvent* event) override;
+  void dragMoveEvent(QDragMoveEvent* event) override;
+  void dropEvent(QDropEvent* event) override;
+
  private:
+  bool acceptsDrop(QDropEvent* event) const;
+
   void onTextChanged(QString const& text);
  
  private:
+  AbstractTokenDragDropHandler* _dragDropHandler;
   int _widthHint;
 };
 

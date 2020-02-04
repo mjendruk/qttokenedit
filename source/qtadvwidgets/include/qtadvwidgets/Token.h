@@ -1,6 +1,7 @@
 #pragma once
 
 #include <qtadvwidgets/BaseToken.h>
+#include <qtadvwidgets/Global.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
 #include <QString>
@@ -8,24 +9,9 @@
 
 class QMimeData;
 
+class AbstractTokenDragDropHandler;
 class RemoveButton;
 class Token;
-
-enum class TokenDropHint { Before, After };
-
-class AbstractTokenDragDropHandler {
- public:
-  virtual ~AbstractTokenDragDropHandler() = default;
-  
-  virtual bool canDrag(Token const* source) const = 0;
-  virtual QMimeData* mimeData(Token const* source) const = 0;
-  virtual bool canDropMimeData(Token const* target, QMimeData const* data,
-                               QObject* source, TokenDropHint dropHint) const = 0;
-  virtual bool dropMimeData(Token const* target, QMimeData const* data,
-                            QObject* source, TokenDropHint dropHint) = 0;
-  
-  virtual bool dropAccepted(Token* token) = 0;
-};
 
 class QTADVWIDGETS_API Token : public BaseToken {
   Q_OBJECT
@@ -33,7 +19,7 @@ class QTADVWIDGETS_API Token : public BaseToken {
  public:
   Token(AbstractTokenDragDropHandler* dragDropHandler = nullptr,
         QWidget* parent = nullptr);
-  
+
   Token(QString const& text, AbstractTokenDragDropHandler* dragDropHandler,
         QWidget* parent = nullptr);
   ~Token();

@@ -5,16 +5,16 @@
 #include <qtadvwidgets/TokenEditView.h>
 #include <qtadvwidgets/TokenLineEdit.h>
 
-#include "TokenDragDropHandler.h"
-
-#include <QScopedValueRollback>
 #include <QApplication>
 #include <QLineEdit>
+#include <QScopedValueRollback>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QtDebug>
 #include <QtGlobal>
 #include <algorithm>
+
+#include "TokenDragDropHandler.h"
 
 class TokenEditModeAccess : public AbstractTokenEditModeAccess {
  public:
@@ -89,6 +89,8 @@ TokenEdit::TokenEdit(QWidget* parent)
       _model{nullptr},
       _rootModelIndex{QModelIndex{}},
       _modelColumn{0} {
+  _editingMode->lineEdit()->setDragDropHandler(dragDropHandler());
+        
   setWidget(_scrollArea);
 
   _view->setFocusPolicy(Qt::StrongFocus);

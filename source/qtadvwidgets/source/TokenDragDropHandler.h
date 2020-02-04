@@ -1,6 +1,6 @@
 #pragma once
 
-#include <qtadvwidgets/Token.h>
+#include <qtadvwidgets/AbstractTokenDragDropHandler.h>
 
 class QAbstractItemModel;
 
@@ -14,13 +14,18 @@ class TokenDragDropHandler : public AbstractTokenDragDropHandler {
 
   QMimeData* mimeData(const Token* source) const override;
 
+  bool dropAccepted(Token* token) override;
+
   bool canDropMimeData(const Token* target, const QMimeData* data,
                        QObject* source, TokenDropHint dropHint) const override;
+
+  bool canDropMimeData(int row, QMimeData const* data,
+                       QObject* source) const override;
 
   bool dropMimeData(const Token* target, const QMimeData* data, QObject* source,
                     TokenDropHint dropHint) override;
 
-  bool dropAccepted(Token* token) override;
+  bool dropMimeData(int row, QMimeData const* data, QObject* source) override;
 
  private:
   QAbstractItemModel* model() const;
