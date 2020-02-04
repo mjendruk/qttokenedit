@@ -5,6 +5,8 @@
 #include <qtadvwidgets/TokenEditView.h>
 #include <qtadvwidgets/TokenLineEdit.h>
 
+#include "TokenDragDropHandler.h"
+
 #include <QApplication>
 #include <QLineEdit>
 #include <QScrollArea>
@@ -27,8 +29,7 @@ class TokenEditModeAccess : public AbstractTokenEditModeAccess {
   }
 
   Token* createToken(int index, QWidget* parent) const override {
-    auto token = new Token{parent};
-    token->setDragEnabled(_tokenEdit->dragEnabled());
+    auto token = new Token{_tokenEdit->dragDropHandler(), parent};
     token->setRemovable(_tokenEdit->removable());
 
     QObject::connect(token, &Token::removeClicked, [=]() {
@@ -37,12 +38,6 @@ class TokenEditModeAccess : public AbstractTokenEditModeAccess {
       _tokenEdit->updateHeight();
     });
 
-    QObject::connect(token, &Token::dragged, [=](auto target, auto hint) {
-      _tokenEdit->onItemDragged(token, target, hint);
-    });
-
-    QObject::connect(_tokenEdit, &TokenEdit::dragStateChanged, token,
-                     &Token::setDragEnabled);
     QObject::connect(_tokenEdit, &TokenEdit::removableStateChanged, token,
                      &Token::setRemovable);
 
@@ -79,6 +74,7 @@ class TokenEditModeAccess : public AbstractTokenEditModeAccess {
 TokenEdit::TokenEdit(QWidget* parent)
     : TokenEditFrame{parent},
       _access{new TokenEditModeAccess{this}},
+      _dragDropHandler{new TokenDragDropHandler{this}},
       _view{new TokenEditView{this}},
       _activeMode{nullptr},
       _editingMode{new TokenEditEditingMode{_view, _access.get(), this}},
@@ -86,6 +82,7 @@ TokenEdit::TokenEdit(QWidget* parent)
       _scrollArea{new QScrollArea{this}},
       _maxLineCount{3},
       _dragEnabled{false},
+      _dragDropMode{QAbstractItemView::NoDragDrop},
       _removable{false},
       _model{nullptr},
       _rootModelIndex{QModelIndex{}},
@@ -102,7 +99,7 @@ TokenEdit::TokenEdit(QWidget* parent)
   _scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   _scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-  auto dummyToken = QScopedPointer{new Token{"dummy"}};
+  auto dummyToken = QScopedPointer{new Token{}};
 
   auto singleStep = dummyToken->sizeHint().height() + _view->ySpacing();
   _scrollArea->verticalScrollBar()->setSingleStep(singleStep);
@@ -150,6 +147,14 @@ void TokenEdit::setDragEnabled(bool enable) {
 
   _dragEnabled = enable;
   emit dragStateChanged(enable);
+}
+
+QAbstractItemView::DragDropMode TokenEdit::dragDropMode() const {
+  return _dragDropMode;
+}
+
+void TokenEdit::setDragDropMode(QAbstractItemView::DragDropMode behavior) {
+  _dragDropMode = behavior;
 }
 
 bool TokenEdit::removable() const { return _removable; }
@@ -242,6 +247,26 @@ bool TokenEdit::eventFilter(QObject* object, QEvent* event) {
 
 TokenEditView* TokenEdit::view() const { return _view; }
 
+AbstractTokenDragDropHandler* TokenEdit::dragDropHandler() const {
+  return _dragDropHandler.get();
+}
+
+int TokenEdit::indexOf(Token const* token) const {
+  return _view->indexOf(token);
+}
+
+QModelIndex TokenEdit::index(int row) const {
+  if (!_model) {
+    return {};
+  }
+
+  return _model->index(row, _modelColumn, _rootModelIndex);
+}
+
+QModelIndex TokenEdit::index(Token const* token) const {
+  return index(indexOf(token));
+}
+
 void TokenEdit::init() {
   if (!_model) {
     return;
@@ -306,22 +331,6 @@ void TokenEdit::onDataChanged(const QModelIndex& topLeft,
 void TokenEdit::onModelReset() {
   clear();
   init();
-}
-
-void TokenEdit::onItemDragged(Token* source, Token* target,
-                              Token::DropHint hint) {
-  auto const from = _view->indexOf(source);
-
-  auto to = _view->indexOf(target);
-
-  Q_ASSERT(to >= 0);
-
-  if (hint == Token::DropHint::After) ++to;
-
-  if (from == to || from == (to - 1)) {
-    return;
-  }
-  _model->moveRow(_rootModelIndex, from, _rootModelIndex, to);
 }
 
 void TokenEdit::onFocusChanged(QWidget* prev, QWidget* now) {

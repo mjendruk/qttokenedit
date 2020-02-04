@@ -2,12 +2,15 @@
 #include "MainWindow.h"
 
 #include <qt-widgets-extensions/qt-widgets-extensions-version.h>
+#include <qtadvwidgets/ElidableLabel.h>
 #include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenEdit.h>
-#include <qtadvwidgets/ElidableLabel.h>
 
 #include <QCheckBox>
+#include <QCompleter>
+#include <QComboBox>
 #include <QFormLayout>
+#include <QHeaderView>
 #include <QLineEdit>
 #include <QListView>
 #include <QMessageBox>
@@ -15,16 +18,11 @@
 #include <QStandardItemModel>
 #include <QStringListModel>
 #include <QTableView>
-#include <QCompleter>
-#include <QHeaderView>
-
-#include "ui_MainWindow.h"
 
 #include "StopItemModel.h"
+#include "ui_MainWindow.h"
 
-namespace {
-
-}  // namespace
+namespace {}  // namespace
 
 MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
   // Setup UI
@@ -32,16 +30,25 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
 
   {
     auto tokenEdit = new TokenEdit{this};
-    
-    tokenEdit->setModelColumn(1);
+
+    tokenEdit->setModelColumn(0);
 
     auto listView = new QTableView{this};
 
     auto const longNames = QStringList{
-        "S+U Potsdamer Platz", "Stendaler Str.", "Walther-Schreiber-Platz",
-        "S+U Berlin Hbf",      "U Spichernstr.", "U Berliner Str.",
-        "S+U Bundesallee", "U Birkenstraße", "U Osloer Straße", "S+U Zoologischer Garten",
-        "U Güntzelstraße", "S+U Rathaus Steglitz", "Schloßstraße",
+        "S+U Potsdamer Platz",
+        "Stendaler Str.",
+        "Walther-Schreiber-Platz",
+        "S+U Berlin Hbf",
+        "U Spichernstr.",
+        "U Berliner Str.",
+        "S+U Bundesallee",
+        "U Birkenstraße",
+        "U Osloer Straße",
+        "S+U Zoologischer Garten",
+        "U Güntzelstraße",
+        "S+U Rathaus Steglitz",
+        "Schloßstraße",
     };
 
     auto model = new StopItemModel{longNames, this};
@@ -49,20 +56,20 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
     // model->setStringList(longNames);
 
     tokenEdit->setModel(model);
+
     listView->setModel(model);
     listView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    listView->setDragDropMode(QAbstractItemView::InternalMove);
+    listView->setDragDropMode(QAbstractItemView::DragDrop);
     listView->setDefaultDropAction(Qt::MoveAction);
     listView->setDragDropOverwriteMode(false);
-//    listView->setDragEnabled(true);
-    
+    listView->setDragEnabled(true);
+
     listView->verticalHeader()->hide();
     auto hHeader = listView->horizontalHeader();
-    
-    hHeader->setSectionsMovable(true);
-//    hHeader->
 
-    m_ui->formLayout->addRow("Token Edit", tokenEdit);
+    hHeader->setSectionsMovable(true);
+
+    m_ui->formLayout->addRow("TokenEdit", tokenEdit);
 
     connect(m_ui->resetButton, &QPushButton::clicked, [=]() {
       tokenEdit->setModel(nullptr);
@@ -73,49 +80,72 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
         m_ui->dragEnabledCheckBox, &QCheckBox::stateChanged,
         [=](auto state) { tokenEdit->setDragEnabled(state == Qt::Checked); });
 
+    m_ui->dragDropModeComboBox->addItems(
+        {"None", "Drag Only", "Drop Only", "Drag Drop", "Internal Move"});
+    
+    connect(m_ui->dragDropModeComboBox, qOverload<int>(&QComboBox::activated), [=](int index) {
+      auto dragDropMode = static_cast<QAbstractItemView::DragDropMode>(index);
+      tokenEdit->setDragDropMode(dragDropMode);
+    });
+
     m_ui->maxLineCountSpinBox->setValue(3);
-    connect(m_ui->maxLineCountSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+    connect(m_ui->maxLineCountSpinBox,
+            QOverload<int>::of(&QSpinBox::valueChanged),
             [=](auto value) { tokenEdit->setMaxLineCount(value); });
 
-    connect(m_ui->enabledCheckBox, &QCheckBox::stateChanged, [=](auto state) {
-      tokenEdit->setEnabled(state == Qt::Checked);
-    });
+    connect(m_ui->enabledCheckBox, &QCheckBox::stateChanged,
+            [=](auto state) { tokenEdit->setEnabled(state == Qt::Checked); });
 
-    connect(m_ui->removableCheckBox, &QCheckBox::stateChanged, [=](auto state) {
-      tokenEdit->setRemovable(state == Qt::Checked);
-    });
-            
+    connect(m_ui->removableCheckBox, &QCheckBox::stateChanged,
+            [=](auto state) { tokenEdit->setRemovable(state == Qt::Checked); });
+
     m_ui->formLayout->addRow("TableView", listView);
 
-   auto lineEdit = tokenEdit->lineEdit();
-    
+    auto lineEdit = tokenEdit->lineEdit();
+
     auto completer = new QCompleter{longNames, this};
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->popup()->setMinimumWidth(200);
     completer->setFilterMode(Qt::MatchContains);
     lineEdit->setCompleter(completer);
 
-   connect(completer, QOverload<QString const&>::of(&QCompleter::activated), this,[=](QString const& text) {
-     auto const row = model->rowCount();
-     model->insertRow(row);
-     model->setData(model->index(row, 0), text);
-     lineEdit->clear();
-   }, Qt::QueuedConnection);
-    
+    connect(
+        completer, QOverload<QString const&>::of(&QCompleter::activated), this,
+        [=](QString const& text) {
+          auto const row = model->rowCount();
+          model->insertRow(row);
+          model->setData(model->index(row, 0), text);
+          lineEdit->clear();
+        },
+        Qt::QueuedConnection);
+
     // auto otherTokenEdit = new TokenEdit{};
     // otherTokenEdit->setModel(model);
     // otherTokenEdit->setDragEnabled(true);
-    
+
     // otherTokenEdit->show();
   }
-  
-  connect(m_ui->widthSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [=](auto value) {
-    resize(value, height());
-  });
-  
-  connect(m_ui->heightSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [=](auto value) {
-    resize(width(), value);
-  });
+
+  connect(m_ui->widthSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+          [=](auto value) { resize(value, height()); });
+
+  connect(m_ui->heightSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+          [=](auto value) { resize(width(), value); });
+
+  {
+    auto const longNames = QStringList{
+        "S+U Potsdamer Platz",
+    };
+
+    auto model = new StopItemModel{longNames, this};
+
+    auto tokenEdit = new TokenEdit{this};
+    tokenEdit->setModelColumn(0);
+    tokenEdit->setDragDropMode(QAbstractItemView::DropOnly);
+    tokenEdit->setModel(model);
+
+    m_ui->formLayout->addRow("2nd TokenEdit", tokenEdit);
+  }
 }
 
 MainWindow::~MainWindow() {}

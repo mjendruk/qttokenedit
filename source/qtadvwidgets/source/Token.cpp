@@ -2,7 +2,6 @@
 #include <qtadvwidgets/FocusChainElement.h>
 #include <qtadvwidgets/RemoveButton.h>
 #include <qtadvwidgets/Token.h>
-#include <qtadvwidgets/TokenMimeData.h>
 
 #include <QDrag>
 #include <QKeyEvent>
@@ -12,13 +11,15 @@
 #include <QPainter>
 #include <cmath>
 
-Token::Token(QWidget* parent) : Token{{}, parent} {}
+Token::Token(AbstractTokenDragDropHandler* dragDropHandler, QWidget* parent)
+    : Token{{}, dragDropHandler, parent} {}
 
-Token::Token(QString const& text, QWidget* parent)
+Token::Token(QString const& text, AbstractTokenDragDropHandler* dragDropHandler,
+             QWidget* parent)
     : BaseToken{text, parent},
+      _dragDropHandler{dragDropHandler},
       _button{new RemoveButton{this}},
       _removable{true},
-      _dragEnabled{false},
       _dropIndicator{DropIndicator::None} {
   setRightWidget(_button);
 
@@ -37,10 +38,6 @@ Token::Token(QString const& text, QWidget* parent)
 }
 
 Token::~Token() = default;
-
-bool Token::dragEnabled() const { return _dragEnabled; }
-
-void Token::setDragEnabled(bool enable) { _dragEnabled = enable; }
 
 bool Token::removable() const { return _removable; }
 
@@ -93,7 +90,8 @@ void Token::focusOutEvent(QFocusEvent* event) {
 void Token::mousePressEvent(QMouseEvent* event) {
   QWidget::mousePressEvent(event);
 
-  if (dragEnabled() && event->buttons().testFlag(Qt::LeftButton)) {
+  if (_dragDropHandler->canDrag(this) &&
+      event->buttons().testFlag(Qt::LeftButton)) {
     _mousePressedAt = event->pos();
   }
 }
@@ -114,7 +112,9 @@ void Token::dragEnterEvent(QDragEnterEvent* event) {
   }
 }
 
-void Token::dragLeaveEvent(QDragLeaveEvent* /* event */) { resetDropIndicator(); }
+void Token::dragLeaveEvent(QDragLeaveEvent* /* event */) {
+  resetDropIndicator();
+}
 
 void Token::dragMoveEvent(QDragMoveEvent* event) {
   if (acceptsDrag(event)) {
@@ -144,7 +144,11 @@ QPixmap Token::toPixmap() {
 }
 
 bool Token::shouldStartDrag(QPoint const& mousePos) const {
-  if (!dragEnabled()) {
+  if (!_dragDropHandler) {
+    return false;
+  }
+  
+  if (!_dragDropHandler->canDrag(this)) {
     return false;
   }
   auto const mouseMovement = mousePos - _mousePressedAt;
@@ -152,34 +156,31 @@ bool Token::shouldStartDrag(QPoint const& mousePos) const {
 }
 
 void Token::startDrag(QPoint const& mousePos) {
-  auto mimeData = new TokenMimeData{this};
-
   auto drag = new QDrag{this};
   drag->setHotSpot(mousePos);
   drag->setPixmap(toPixmap());
-  drag->setMimeData(mimeData);
+  drag->setMimeData(_dragDropHandler->mimeData(this));
 
-  drag->exec(Qt::MoveAction);
+  if (drag->exec(Qt::MoveAction) == Qt::MoveAction) {
+    auto success = _dragDropHandler->dropAccepted(this);
+    Q_ASSERT(success);
+  }
 
   _mousePressedAt = QPoint{};
 }
 
 bool Token::acceptsDrag(QDropEvent* event) const {
-  auto const token = qobject_cast<Token*>(event->source());
-
-  if (!token) {
+  if (!_dragDropHandler) {
     return false;
   }
-
-  if (token == this) {
+  
+  if (event->source() == this) {
     return false;
   }
-
-  if (token->parentWidget() != this->parentWidget()) {
-    return false;
-  }
-
-  return true;
+  
+  return _dragDropHandler->canDropMimeData(this, event->mimeData(),
+                                           event->source(),
+                                           dropHint(event->pos()));
 }
 
 void Token::acceptDrag(QDragMoveEvent* event) {
@@ -189,17 +190,13 @@ void Token::acceptDrag(QDragMoveEvent* event) {
 
 void Token::finishDrag(QDropEvent* event) {
   event->acceptProposedAction();
-
-  auto const token =
-      qobject_cast<TokenMimeData const*>(event->mimeData())->token();
-
-  emit token->dragged(this, dropHint(event->pos()));
-
+  _dragDropHandler->dropMimeData(this, event->mimeData(), event->source(),
+                                 dropHint(event->pos()));
   resetDropIndicator();
 }
 
 void Token::showDropIndicator(QPoint const& mousePos) {
-  _dropIndicator = dropHint(mousePos) == DropHint::Before
+  _dropIndicator = dropHint(mousePos) == TokenDropHint::Before
                        ? DropIndicator::Before
                        : DropIndicator::After;
 
@@ -249,6 +246,6 @@ int Token::dragStartDistance() const {
   return fontMetrics().averageCharWidth();
 }
 
-auto Token::dropHint(QPoint const& mousePos) const -> DropHint {
-  return mousePos.x() < width() / 2.0 ? DropHint::Before : DropHint::After;
+TokenDropHint Token::dropHint(QPoint const& mousePos) const {
+  return mousePos.x() < width() / 2.0 ? TokenDropHint::Before : TokenDropHint::After;
 }

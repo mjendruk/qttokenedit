@@ -1,32 +1,48 @@
 #pragma once
 
-#include <qtadvwidgets/qtadvwidgets_api.h>
 #include <qtadvwidgets/BaseToken.h>
+#include <qtadvwidgets/qtadvwidgets_api.h>
 
 #include <QString>
 #include <memory>
 
+class QMimeData;
+
 class RemoveButton;
+class Token;
+
+enum class TokenDropHint { Before, After };
+
+class AbstractTokenDragDropHandler {
+ public:
+  virtual ~AbstractTokenDragDropHandler() = default;
+  
+  virtual bool canDrag(Token const* source) const = 0;
+  virtual QMimeData* mimeData(Token const* source) const = 0;
+  virtual bool canDropMimeData(Token const* target, QMimeData const* data,
+                               QObject* source, TokenDropHint dropHint) const = 0;
+  virtual bool dropMimeData(Token const* target, QMimeData const* data,
+                            QObject* source, TokenDropHint dropHint) = 0;
+  
+  virtual bool dropAccepted(Token* token) = 0;
+};
 
 class QTADVWIDGETS_API Token : public BaseToken {
   Q_OBJECT
 
  public:
-  enum class DropHint { Before, After };
-
-  Token(QWidget* parent = nullptr);
-  Token(QString const& text, QWidget* parent = nullptr);
+  Token(AbstractTokenDragDropHandler* dragDropHandler = nullptr,
+        QWidget* parent = nullptr);
+  
+  Token(QString const& text, AbstractTokenDragDropHandler* dragDropHandler,
+        QWidget* parent = nullptr);
   ~Token();
 
-  bool dragEnabled() const;
-  void setDragEnabled(bool enable);
-  
   bool removable() const;
   void setRemovable(bool enable);
 
  signals:
   void removeClicked();
-  void dragged(Token* target, DropHint hint);
 
  protected:
   void paintEvent(QPaintEvent* event) override;
@@ -52,22 +68,22 @@ class QTADVWIDGETS_API Token : public BaseToken {
   void finishDrag(QDropEvent* event);
 
   enum class DropIndicator { None, Before, After };
-  
+
   void showDropIndicator(QPoint const& mousePos);
   void resetDropIndicator();
-  
+
   void drawDropIndicator(QPainter* painter);
-  
+
   int dragStartDistance() const;
-  DropHint dropHint(QPoint const& mousePos) const;
+  TokenDropHint dropHint(QPoint const& mousePos) const;
 
  private:
+  AbstractTokenDragDropHandler* _dragDropHandler;
   RemoveButton* _button;
-  
+
   bool _removable;
 
   // drag members
-  bool _dragEnabled;
   QPoint _mousePressedAt;
   DropIndicator _dropIndicator;
 };

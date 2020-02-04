@@ -65,7 +65,6 @@ set(headers
     ${include_path}/TokenEditFrame.h
     ${include_path}/TokenEditView.h
     ${include_path}/TokenLineEdit.h
-    ${include_path}/TokenMimeData.h
 )
 
 set(sources
@@ -78,6 +77,8 @@ set(sources
     ${source_path}/PlusButton.cpp
     ${source_path}/RemoveButton.cpp
     ${source_path}/Token.cpp
+    ${source_path}/TokenDragDropHandler.cpp
+    ${source_path}/TokenDragDropHandler.h
     ${source_path}/FocusChain.cpp
     ${source_path}/FocusChainElement.cpp
     ${source_path}/FocusChainNavigation.cpp
@@ -89,7 +90,6 @@ set(sources
     ${source_path}/TokenEditFrame.cpp
     ${source_path}/TokenEditView.cpp
     ${source_path}/TokenLineEdit.cpp
-    ${source_path}/TokenMimeData.cpp
 )
 
 # Group source files

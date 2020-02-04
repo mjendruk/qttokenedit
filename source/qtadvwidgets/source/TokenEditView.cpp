@@ -23,8 +23,9 @@ TokenEditView::TokenEditView(QWidget* parent)
 
 Token* TokenEditView::at(int index) const { return _tokens.at(index); }
 
-int TokenEditView::indexOf(Token* token) const {
-  return _tokens.indexOf(token);
+int TokenEditView::indexOf(Token const* token) const {
+  auto _token = const_cast<Token*>(token);
+  return _tokens.indexOf(_token);
 }
 
 void TokenEditView::add(Token* token) { insert(_tokens.size(), token); }

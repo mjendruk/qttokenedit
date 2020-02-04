@@ -22,7 +22,7 @@ class QTADVWIDGETS_API TokenEditView : public QWidget {
    */
 
   Token* at(int index) const;
-  int indexOf(Token* token) const;
+  int indexOf(Token const* token) const;
   void add(Token* token);
   void insert(int index, Token* token);
   void move(int from, int to);

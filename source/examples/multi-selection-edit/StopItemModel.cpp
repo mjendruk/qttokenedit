@@ -9,7 +9,7 @@ StopItemModel::StopItemModel(QStringList const& stops, QObject* parent)
     : QAbstractTableModel{parent}, _stops{stops} {}
 
 Qt::DropActions StopItemModel::supportedDropActions() const {
-  return Qt::MoveAction;
+  return Qt::MoveAction | Qt::CopyAction;
 }
 
 QStringList StopItemModel::mimeTypes() const { return {"application/json"}; }
@@ -44,10 +44,6 @@ bool StopItemModel::canDropMimeData(QMimeData const* data, Qt::DropAction action
     return false;
   }
   
-  if (!parent.isValid()) {
-    return false;
-  }
-  
   return true;
 }
 
@@ -71,7 +67,7 @@ bool StopItemModel::dropMimeData(QMimeData const* data, Qt::DropAction action, i
   
   auto jsonArray = json.array();
   
-  auto currentRow = parent.row();
+  auto currentRow = parent.isValid() ? parent.row() : _stops.size();
   
   insertRows(currentRow, jsonArray.count());
   

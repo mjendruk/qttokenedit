@@ -11,7 +11,7 @@ TokenEditEditingMode::TokenEditEditingMode(TokenEditView* view,
                                            AbstractTokenEditModeAccess* access,
                                            QObject* parent)
     : TokenEditMode{view, access, parent}, _lineEdit{new TokenLineEdit{}} {
-  auto dummyToken = QScopedPointer{new Token{"dummy"}};
+  auto dummyToken = QScopedPointer{new Token{}};
   _lineEdit->setFixedHeight(dummyToken->sizeHint().height());
 }
 
@@ -62,7 +62,7 @@ int TokenEditEditingMode::heightHint() const {
       std::min(access()->maxLineCount(), view()->lineCount());
 
   auto spacing = view()->ySpacing();
-  auto dummyToken = QScopedPointer{new Token{"dummy"}};
+  auto dummyToken = QScopedPointer{new Token{}};
   auto height =
       (dummyToken->sizeHint().height() + spacing) * actualRows + spacing;
 
