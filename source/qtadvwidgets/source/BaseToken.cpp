@@ -63,7 +63,7 @@ void BaseToken::drawBackground(QPainter* painter, QBrush brush) const {
 
   auto rect = QRectF{QPointF{0.0, 0.0}, QSizeF{size()}};
 
-  auto const rounding = contentHeight() / 8.0;
+  auto const rounding = contentHeight() / 4.0;
 
   painter->setBrush(brush);
   painter->setPen(Qt::NoPen);

@@ -21,13 +21,14 @@ QPainterPath RemoveButton::createPath(int extent) const {
   auto crossPath = QPainterPath{};
   crossPath.setFillRule(Qt::WindingFill);
 
-  auto const crossMargin = std::round(rect.height() * 0.1);
+  auto const crossMargin = std::round(rect.height() * 0.2);
   auto const crossLength = rect.height() - (2.0 * crossMargin);
   auto const crossLineWidth = std::round(rect.height() * 0.1);
-  crossPath.addRect(rect.center().x() - (crossLineWidth * 0.5), crossMargin,
-                    crossLineWidth, crossLength);
-  crossPath.addRect(crossMargin, rect.center().y() - (crossLineWidth * 0.5),
-                    crossLength, crossLineWidth);
+  auto const rounding = crossLineWidth * 0.5;
+  crossPath.addRoundedRect(rect.center().x() - (crossLineWidth * 0.5), crossMargin,
+                    crossLineWidth, crossLength, rounding, rounding);
+  crossPath.addRoundedRect(crossMargin, rect.center().y() - (crossLineWidth * 0.5),
+                    crossLength, crossLineWidth, rounding, rounding);
 
   auto const center = rect.center();
 
