@@ -141,7 +141,8 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
 
     auto tokenEdit = new TokenEdit{this};
     tokenEdit->setModelColumn(0);
-    tokenEdit->setDragDropMode(QAbstractItemView::DropOnly);
+    tokenEdit->setDragEnabled(true);
+    tokenEdit->setDragDropMode(QAbstractItemView::DragDrop);
     tokenEdit->setModel(model);
 
     m_ui->formLayout->addRow("2nd TokenEdit", tokenEdit);

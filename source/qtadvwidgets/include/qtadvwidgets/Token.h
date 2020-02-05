@@ -53,8 +53,6 @@ class QTADVWIDGETS_API Token : public BaseToken {
   void acceptDrag(QDragMoveEvent* event);
   void finishDrag(QDropEvent* event);
 
-  enum class DropIndicator { None, Before, After };
-
   void showDropIndicator(QPoint const& mousePos);
   void resetDropIndicator();
 
@@ -71,7 +69,7 @@ class QTADVWIDGETS_API Token : public BaseToken {
 
   // drag members
   QPoint _mousePressedAt;
-  DropIndicator _dropIndicator;
+  DropIndicatorPosition _dropIndicatorPosition;
 };
 
 Q_DECLARE_METATYPE(Token*);

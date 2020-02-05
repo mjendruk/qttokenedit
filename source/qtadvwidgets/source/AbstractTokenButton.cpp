@@ -43,7 +43,11 @@ void AbstractTokenButton::paintEvent(QPaintEvent* event) {
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(clippingRect);
 
-  painter.setBrush(palette().color(_colorRole));
+  auto color = palette().color(_colorRole);
+  
+  
+  
+  painter.setBrush(color.darker(130));
   painter.setPen(Qt::NoPen);
 
   painter.drawPath(_path);

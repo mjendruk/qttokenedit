@@ -9,8 +9,8 @@
 class TokenLineEdit;
 class Token;
 class FocusChain;
-class FocusChainNavigation;
 class FlexLayout;
+class FocusChainNavigation;
 
 class QTADVWIDGETS_API TokenEditView : public QWidget {
   Q_OBJECT

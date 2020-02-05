@@ -7,6 +7,7 @@
 
 class Token;
 class TokenEditView;
+class AbstractTokenDragDropHandler;
 
 class AbstractTokenEditModeAccess {
  public:
@@ -17,6 +18,8 @@ class AbstractTokenEditModeAccess {
   
   virtual Token* createToken(int index, QWidget* parent = nullptr) const = 0;
   virtual void updateToken(int index, Token* token, QVector<int> const& roles) const = 0;
+  
+  virtual AbstractTokenDragDropHandler* dragDropHandler() const = 0;
 };
 
 class QTADVWIDGETS_API TokenEditMode : public QObject {

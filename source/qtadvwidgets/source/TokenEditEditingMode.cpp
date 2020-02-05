@@ -10,7 +10,8 @@
 TokenEditEditingMode::TokenEditEditingMode(TokenEditView* view,
                                            AbstractTokenEditModeAccess* access,
                                            QObject* parent)
-    : TokenEditMode{view, access, parent}, _lineEdit{new TokenLineEdit{}} {
+    : TokenEditMode{view, access, parent},
+      _lineEdit{new TokenLineEdit{access->dragDropHandler()}} {
   auto dummyToken = QScopedPointer{new Token{}};
   _lineEdit->setFixedHeight(dummyToken->sizeHint().height());
 }

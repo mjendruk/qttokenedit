@@ -3,17 +3,18 @@
 
 #include <QDropEvent>
 #include <QKeyEvent>
+#include <QPaintEvent>
 
-TokenLineEdit::TokenLineEdit(QWidget* parent)
-    : QLineEdit{parent}, _dragDropHandler{nullptr} {
+#include "TokenDropTarget.hpp"
+
+TokenLineEdit::TokenLineEdit(AbstractTokenDragDropHandler* handler,
+                             QWidget* parent)
+    : TokenDropTarget<QLineEdit>{handler, parent} {
   setAttribute(Qt::WA_MacShowFocusRect, 0);
   setFrame(false);
+  setMinimumWidth(1);
 
   connect(this, &QLineEdit::textChanged, this, &TokenLineEdit::onTextChanged);
-}
-
-void TokenLineEdit::setDragDropHandler(AbstractTokenDragDropHandler* handler) {
-  _dragDropHandler = handler;
 }
 
 void TokenLineEdit::keyPressEvent(QKeyEvent* event) {
@@ -24,41 +25,19 @@ void TokenLineEdit::keyPressEvent(QKeyEvent* event) {
   QLineEdit::keyPressEvent(event);
 }
 
+void TokenLineEdit::paintEvent(QPaintEvent* event) {
+  QLineEdit::paintEvent(event);
+
+  auto painter = QPainter{this};
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  painter.setClipRect(QRectF{event->rect()});
+
+  this->drawIndicator(&painter);
+}
+
 QSize TokenLineEdit::sizeHint() const {
   auto height = QLineEdit::sizeHint().height();
   return QSize{_widthHint, height};
-}
-
-void TokenLineEdit::dragEnterEvent(QDragEnterEvent* event) {
-  if (acceptsDrop(event)) {
-    event->acceptProposedAction();
-  } else {
-    event->ignore();
-  }
-}
-
-void TokenLineEdit::dragMoveEvent(QDragMoveEvent* event) {
-  if (acceptsDrop(event)) {
-    event->acceptProposedAction();
-  } else {
-    event->ignore();
-  }
-}
-
-void TokenLineEdit::dropEvent(QDropEvent* event) {
-  if (acceptsDrop(event)) {
-    event->acceptProposedAction();
-    _dragDropHandler->dropMimeData(-1, event->mimeData(), event->source());
-  }
-}
-
-bool TokenLineEdit::acceptsDrop(QDropEvent* event) const {
-  if (!_dragDropHandler) {
-    return false;
-  }
-
-  return _dragDropHandler->canDropMimeData(-1, event->mimeData(),
-                                           event->source());
 }
 
 void TokenLineEdit::onTextChanged(QString const& text) {

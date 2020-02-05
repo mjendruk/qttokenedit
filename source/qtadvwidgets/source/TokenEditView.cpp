@@ -90,6 +90,7 @@ QWidget* TokenEditView::takeFinalWidget() {
 
   _focusChain->remove(widget, UpdateFocus::No);
   _layout->removeWidget(widget);
+  widget->hide();
 
   _finalWidget = nullptr;
   return widget;
@@ -109,6 +110,7 @@ void TokenEditView::setFinalWidget(QWidget* widget,
   if (widget) {
     _focusChain->add(widget, UpdateFocus::No, navigation);
     _layout->addWidget(widget);
+    widget->show();
   }
 
   _finalWidget = widget;

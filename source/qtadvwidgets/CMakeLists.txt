@@ -45,50 +45,56 @@ set(include_path "${CMAKE_CURRENT_SOURCE_DIR}/include/${target}")
 set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/source")
 
 set(headers
-    ${include_path}/baselib.h
     ${include_path}/AbstractTokenButton.h
+    ${include_path}/baselib.h
     ${include_path}/BaseToken.h
     ${include_path}/DarkStyle.h
     ${include_path}/ElidableLabel.h
     ${include_path}/FlexLayout.h
-    ${include_path}/PlusButton.h
-    ${include_path}/RemoveButton.h
-    ${include_path}/Token.h
     ${include_path}/FocusChain.h
     ${include_path}/FocusChainElement.h
     ${include_path}/FocusChainNavigation.h
     ${include_path}/Global.h
     ${include_path}/OmissionToken.h
+    ${include_path}/PlusButton.h
+    ${include_path}/RemoveButton.h
+    ${include_path}/Token.h
+    ${include_path}/TokenDropTarget.h
     ${include_path}/TokenEdit.h
     ${include_path}/TokenEditDisplayMode.h
     ${include_path}/TokenEditEditingMode.h
-    ${include_path}/TokenEditMode.h
     ${include_path}/TokenEditFrame.h
+    ${include_path}/TokenEditMode.h
     ${include_path}/TokenEditView.h
     ${include_path}/TokenLineEdit.h
 )
 
 set(sources
-    ${source_path}/baselib.cpp
     ${source_path}/AbstractTokenButton.cpp
+    ${source_path}/baselib.cpp
     ${source_path}/BaseToken.cpp
     ${source_path}/DarkStyle.cpp
+    ${source_path}/DropIndicator.cpp
+    ${source_path}/DropIndicator.h
     ${source_path}/ElidableLabel.cpp
+    ${source_path}/FinalWidgetPlaceholder.cpp
+    ${source_path}/FinalWidgetPlaceholder.h
     ${source_path}/FlexLayout.cpp
+    ${source_path}/FocusChain.cpp
+    ${source_path}/FocusChainElement.cpp
+    ${source_path}/FocusChainNavigation.cpp
+    ${source_path}/OmissionToken.cpp
     ${source_path}/PlusButton.cpp
     ${source_path}/RemoveButton.cpp
     ${source_path}/Token.cpp
     ${source_path}/TokenDragDropHandler.cpp
     ${source_path}/TokenDragDropHandler.h
-    ${source_path}/FocusChain.cpp
-    ${source_path}/FocusChainElement.cpp
-    ${source_path}/FocusChainNavigation.cpp
-    ${source_path}/OmissionToken.cpp
+    ${source_path}/TokenDropTarget.hpp
     ${source_path}/TokenEdit.cpp
     ${source_path}/TokenEditDisplayMode.cpp
     ${source_path}/TokenEditEditingMode.cpp
-    ${source_path}/TokenEditMode.cpp
     ${source_path}/TokenEditFrame.cpp
+    ${source_path}/TokenEditMode.cpp
     ${source_path}/TokenEditView.cpp
     ${source_path}/TokenLineEdit.cpp
 )

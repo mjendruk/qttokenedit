@@ -2,6 +2,7 @@
 
 #include <qtadvwidgets/TokenEdit.h>
 #include <qtadvwidgets/Token.h>
+#include <qtadvwidgets/TokenEditView.h>
 
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
@@ -78,7 +79,7 @@ bool TokenDragDropHandler::canDropMimeData(int row, QMimeData const* data,
   }
 
   if (row == -1) {
-    row = model()->rowCount();
+    row = view()->count();
   }
 
   return model()->canDropMimeData(data, Qt::MoveAction, row,
@@ -106,7 +107,7 @@ bool TokenDragDropHandler::dropMimeData(int row, QMimeData const* data,
   Q_ASSERT(canDropMimeData(row, data, source));
   
   if (row == -1) {
-    row = model()->rowCount();
+    row = view()->count();
   }
 
   auto updateFocusEnabled = _tokenEdit->enableUpdateFocus();
@@ -118,3 +119,5 @@ bool TokenDragDropHandler::dropMimeData(int row, QMimeData const* data,
 QAbstractItemModel* TokenDragDropHandler::model() const {
   return _tokenEdit->model();
 }
+
+TokenEditView* TokenDragDropHandler::view() const { return _tokenEdit->view(); }

@@ -99,8 +99,12 @@ void BaseToken::paintEvent(QPaintEvent* event) {
   auto brush = palette().brush(brushRole);
   
   if (underMouse()) {
-    auto color = brush.color().toHsv();
-    brush.setColor(color.lighter(103));
+    auto color = brush.color();
+    qreal h, s, v;
+    color.getHsvF(&h, &s, &v);
+    v = std::min(1.0, v + std::sqrt(1.0 - v) * 0.06);
+    color.setHsvF(h, s, v);
+    brush.setColor(color);
   }
 
   drawBackground(&painter, brush);

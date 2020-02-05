@@ -60,6 +60,10 @@ class TokenEditModeAccess : public AbstractTokenEditModeAccess {
       token->setToolTip(data(index, Qt::ToolTipRole).toString());
     }
   }
+  
+  AbstractTokenDragDropHandler* dragDropHandler() const override {
+    return _tokenEdit->dragDropHandler();
+  }
 
  private:
   QVariant data(int index, int role) const {
@@ -89,8 +93,6 @@ TokenEdit::TokenEdit(QWidget* parent)
       _model{nullptr},
       _rootModelIndex{QModelIndex{}},
       _modelColumn{0} {
-  _editingMode->lineEdit()->setDragDropHandler(dragDropHandler());
-        
   setWidget(_scrollArea);
 
   _view->setFocusPolicy(Qt::StrongFocus);

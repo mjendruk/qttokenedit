@@ -6,15 +6,25 @@
 #include <QBoxLayout>
 #include <QVariant>
 
+#include "FinalWidgetPlaceholder.h"
+
 TokenEditDisplayMode::TokenEditDisplayMode(TokenEditView* view,
                                            AbstractTokenEditModeAccess* access,
                                            QObject* parent)
     : TokenEditMode{view, access, parent},
-      _omissionToken{new OmissionToken{}} {}
+      _omissionToken{new OmissionToken{access->dragDropHandler(), view}},
+      _placeholder(new FinalWidgetPlaceholder{access->dragDropHandler(), view}) {
+        _omissionToken->hide();
+        _placeholder->hide();
+      }
 
 TokenEditDisplayMode::~TokenEditDisplayMode() {
   if (_omissionToken->parent() == nullptr) {
     delete _omissionToken;
+  }
+  
+  if (_placeholder->parent() == nullptr) {
+    delete _placeholder;
   }
 }
 
@@ -80,7 +90,7 @@ void TokenEditDisplayMode::changed(int first, int last,
 void TokenEditDisplayMode::invalidate() {
   view()->freezeLayout();
 
-  _omissionToken->hide();
+  view()->takeFinalWidget();
 
   auto allTokensShown = [=]() { return view()->count() == access()->count(); };
   auto lineCountConstraintMet = [=]() {
@@ -98,13 +108,15 @@ void TokenEditDisplayMode::invalidate() {
   }
 
   if (omittedTokens() > 0) {
-    _omissionToken->show();
+    view()->setFinalWidget(_omissionToken);
 
     while (!lineCountConstraintMet()) {
       view()->remove(view()->count() - 1, UpdateFocus::No);
     }
 
     _omissionToken->setCount(omittedTokens());
+  } else {
+    view()->setFinalWidget(_placeholder);
   }
 
   view()->unfreezeLayout();
@@ -115,13 +127,11 @@ int TokenEditDisplayMode::heightHint() const {
 }
 
 void TokenEditDisplayMode::activate() {
-  view()->setFinalWidget(_omissionToken);
   invalidate();
 }
 
 void TokenEditDisplayMode::deactivate() {
   view()->takeFinalWidget();
-  _omissionToken->hide();
 }
 
 QWidget* TokenEditDisplayMode::omissionToken() const { return _omissionToken; }

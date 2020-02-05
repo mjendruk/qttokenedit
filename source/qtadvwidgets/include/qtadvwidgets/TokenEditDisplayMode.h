@@ -5,6 +5,7 @@
 
 class TokenEditView;
 class OmissionToken;
+class FinalWidgetPlaceholder;
 
 class QTADVWIDGETS_API TokenEditDisplayMode : public TokenEditMode {
   Q_OBJECT
@@ -32,4 +33,5 @@ class QTADVWIDGETS_API TokenEditDisplayMode : public TokenEditMode {
 
  private:
   OmissionToken* _omissionToken;
+  FinalWidgetPlaceholder* _placeholder;
 };

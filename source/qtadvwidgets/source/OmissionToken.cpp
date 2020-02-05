@@ -1,9 +1,14 @@
 #include <qtadvwidgets/OmissionToken.h>
 #include <qtadvwidgets/PlusButton.h>
 
-OmissionToken::OmissionToken(QWidget* parent)
-    : BaseToken{parent},
-      _count{-1} {
+#include <QPaintEvent>
+#include <QPainter>
+
+#include "TokenDropTarget.hpp"
+
+OmissionToken::OmissionToken(AbstractTokenDragDropHandler* handler,
+                             QWidget* parent)
+    : TokenDropTarget<BaseToken>{handler, parent}, _count{-1} {
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   setCount(0);
   setFocusPolicy(Qt::NoFocus);
@@ -19,4 +24,14 @@ void OmissionToken::setCount(int count) {
   setText(QString{"+ %1 more"}.arg(count));
 
   _count = count;
+}
+
+void OmissionToken::paintEvent(QPaintEvent* event) {
+  BaseToken::paintEvent(event);
+
+  auto painter = QPainter{this};
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  painter.setClipRect(QRectF{event->rect()});
+
+  this->drawIndicator(&painter);
 }

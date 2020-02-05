@@ -5,6 +5,7 @@
 class QAbstractItemModel;
 
 class TokenEdit;
+class TokenEditView;
 
 class TokenDragDropHandler : public AbstractTokenDragDropHandler {
  public:
@@ -29,6 +30,7 @@ class TokenDragDropHandler : public AbstractTokenDragDropHandler {
 
  private:
   QAbstractItemModel* model() const;
+  TokenEditView* view() const;
 
  private:
   TokenEdit* _tokenEdit;
