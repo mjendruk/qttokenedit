@@ -28,6 +28,7 @@ Token::Token(QString const& text, AbstractTokenDragDropHandler* dragDropHandler,
 
   setAcceptDrops(true);
   setCursor(Qt::ArrowCursor);
+  setAutoFillBackground(false);
 
   auto sizePolicy = QSizePolicy{QSizePolicy::Preferred, QSizePolicy::Fixed};
   sizePolicy.setRetainSizeWhenHidden(true);
@@ -136,12 +137,9 @@ void Token::dropEvent(QDropEvent* event) {
 QPixmap Token::toPixmap() {
   auto pixmap = QPixmap(size() * devicePixelRatio());
   pixmap.setDevicePixelRatio(devicePixelRatio());
-  pixmap.fill(QColor{0, 0, 0, 0});
-
-  auto painter = QPainter{&pixmap};
-  painter.setRenderHint(QPainter::Antialiasing, true);
-
-  render(&painter);
+  pixmap.fill(QColor{Qt::transparent});
+  
+  render(&pixmap, QPoint{}, QRegion{}, QWidget::DrawChildren);
 
   return pixmap;
 }
