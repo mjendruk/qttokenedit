@@ -36,7 +36,7 @@ Token::Token(QString const& text, AbstractTokenDragDropHandler* dragDropHandler,
 
   setRemovable(false);
 
-  _button->setColorRole(QPalette::Button);
+  _button->setColorRole(QPalette::ButtonText);
 
   connect(_button, &RemoveButton::clicked, this, &Token::removeClicked);
 }
@@ -82,12 +82,12 @@ void Token::keyPressEvent(QKeyEvent* event) {
 }
 
 void Token::focusInEvent(QFocusEvent* event) {
-  _button->setColorRole(QPalette::Highlight);
+  _button->setColorRole(QPalette::HighlightedText);
   BaseToken::focusInEvent(event);
 }
 
 void Token::focusOutEvent(QFocusEvent* event) {
-  _button->setColorRole(QPalette::Button);
+  _button->setColorRole(QPalette::ButtonText);
   BaseToken::focusOutEvent(event);
 }
 

@@ -102,10 +102,8 @@ void BaseToken::paintEvent(QPaintEvent* event) {
   
   if (underMouse() && isEnabled()) {
     auto color = brush.color();
-    qreal h, s, v;
-    color.getHsvF(&h, &s, &v);
-    v = std::min(1.0, v + std::sqrt(1.0 - v) * 0.06);
-    color.setHsvF(h, s, v);
+    int grayValue = qGray(color.rgb());
+    color = color.lighter(100 + qMax(2, (180 - grayValue)/6));
     brush.setColor(color);
   }
 
