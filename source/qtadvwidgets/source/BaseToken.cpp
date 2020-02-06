@@ -24,6 +24,8 @@ BaseToken::BaseToken(QString const& text, QWidget* parent)
   _label->setTextColorRole(QPalette::ButtonText);
         
   setAttribute(Qt::WA_Hover);
+        
+  updateMargins();
 }
 
 BaseToken::~BaseToken() = default;
@@ -79,7 +81,7 @@ int BaseToken::margin() const { return std::lround(contentHeight() / 6.0); }
 int BaseToken::spacing() const { return std::lround(contentHeight() * 0.25); }
 
 QMargins BaseToken::margins() const {
-  auto const rightMargin = _rightWidget && _rightWidget->isVisible()
+  auto const rightMargin = _rightWidget && _rightWidget->isVisibleTo(this)
                                ? margin()
                                : horizontalTextMargin();
   return QMargins{horizontalTextMargin(), margin(), rightMargin, margin()};
