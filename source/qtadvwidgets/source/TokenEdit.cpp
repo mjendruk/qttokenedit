@@ -81,6 +81,7 @@ TokenEdit::TokenEdit(QWidget* parent)
       _access{new TokenEditModeAccess{this}},
       _dragDropHandler{new TokenDragDropHandler{this}},
       _view{new TokenEditView{this}},
+      _lineEdit{new TokenLineEdit{dragDropHandler(), _view}},
       _activeMode{nullptr},
       _editingMode{new TokenEditEditingMode{_view, _access.get(), this}},
       _displayMode{new TokenEditDisplayMode{_view, _access.get(), this}},
@@ -93,6 +94,13 @@ TokenEdit::TokenEdit(QWidget* parent)
       _model{nullptr},
       _rootModelIndex{QModelIndex{}},
       _modelColumn{0} {
+  auto dummyToken = QScopedPointer{new Token{}};
+        
+  _lineEdit->setFixedHeight(dummyToken->sizeHint().height());
+        
+  _view->setDefaultFinalWidget(_lineEdit,
+                               new LineEditFocusChainNavigation{_lineEdit});
+        
   setWidget(_scrollArea);
 
   _view->setFocusPolicy(Qt::StrongFocus);
@@ -104,8 +112,6 @@ TokenEdit::TokenEdit(QWidget* parent)
   _scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   _scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   _scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-  auto dummyToken = QScopedPointer{new Token{}};
 
   auto singleStep = dummyToken->sizeHint().height() + _view->ySpacing();
   _scrollArea->verticalScrollBar()->setSingleStep(singleStep);
@@ -124,7 +130,7 @@ TokenEdit::TokenEdit(QWidget* parent)
     updateHeight();
   });
 
-  connect(_editingMode->lineEdit(), &TokenLineEdit::backspaceAtBeginning,
+  connect(_lineEdit, &TokenLineEdit::backspaceAtBeginning,
           [=]() {
             if (_model && !_view->isEmpty() && removable()) {
               this->remove(_view->count() - 1, UpdateFocus::No);
@@ -178,7 +184,7 @@ void TokenEdit::setRemovable(bool enable) {
   updateHeight();
 }
 
-QLineEdit* TokenEdit::lineEdit() const { return _editingMode->lineEdit(); }
+QLineEdit* TokenEdit::lineEdit() const { return _lineEdit; }
 
 QAbstractItemModel* TokenEdit::model() const { return _model; }
 

@@ -10,17 +10,9 @@
 TokenEditEditingMode::TokenEditEditingMode(TokenEditView* view,
                                            AbstractTokenEditModeAccess* access,
                                            QObject* parent)
-    : TokenEditMode{view, access, parent},
-      _lineEdit{new TokenLineEdit{access->dragDropHandler()}} {
-  auto dummyToken = QScopedPointer{new Token{}};
-  _lineEdit->setFixedHeight(dummyToken->sizeHint().height());
-}
+    : TokenEditMode{view, access, parent} {}
 
-TokenEditEditingMode::~TokenEditEditingMode() {
-  if (_lineEdit->parent() == nullptr) {
-    delete _lineEdit;
-  }
-}
+TokenEditEditingMode::~TokenEditEditingMode() {}
 
 void TokenEditEditingMode::inserted(int first, int last, UpdateFocus uf) {
   for (auto index = first; index <= last; ++index) {
@@ -64,18 +56,9 @@ int TokenEditEditingMode::heightHint() const {
 }
 
 void TokenEditEditingMode::activate() {
-  view()->setFinalWidget(_lineEdit,
-                         new LineEditFocusChainNavigation{_lineEdit});
-  _lineEdit->show();
-
   if (view()->count() < access()->count()) {
     inserted(view()->count(), access()->count() - 1, UpdateFocus::No);
   }
 }
 
-void TokenEditEditingMode::deactivate() {
-  view()->takeFinalWidget();
-  _lineEdit->hide();
-}
-
-TokenLineEdit* TokenEditEditingMode::lineEdit() const { return _lineEdit; }
+void TokenEditEditingMode::deactivate() {}

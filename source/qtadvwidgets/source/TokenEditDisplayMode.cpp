@@ -12,21 +12,11 @@ TokenEditDisplayMode::TokenEditDisplayMode(TokenEditView* view,
                                            AbstractTokenEditModeAccess* access,
                                            QObject* parent)
     : TokenEditMode{view, access, parent},
-      _omissionToken{new OmissionToken{access->dragDropHandler(), view}},
-      _placeholder(new FinalWidgetPlaceholder{access->dragDropHandler(), view}) {
+      _omissionToken{new OmissionToken{access->dragDropHandler(), view}} {
         _omissionToken->hide();
-        _placeholder->hide();
       }
 
-TokenEditDisplayMode::~TokenEditDisplayMode() {
-  if (_omissionToken->parent() == nullptr) {
-    delete _omissionToken;
-  }
-  
-  if (_placeholder->parent() == nullptr) {
-    delete _placeholder;
-  }
-}
+TokenEditDisplayMode::~TokenEditDisplayMode() {}
 
 void TokenEditDisplayMode::inserted(int first, int last, UpdateFocus uf) {
   if (view()->count() < first) {
@@ -115,8 +105,6 @@ void TokenEditDisplayMode::invalidate() {
     }
 
     _omissionToken->setCount(omittedTokens());
-  } else {
-    view()->setFinalWidget(_placeholder);
   }
 
   view()->unfreezeLayout();

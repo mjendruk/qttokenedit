@@ -31,7 +31,7 @@ class QTADVWIDGETS_API TokenLineEdit : public TokenDropTarget<QLineEdit> {
 class QTADVWIDGETS_API LineEditFocusChainNavigation
     : public FocusChainNavigation {
  public:
-  LineEditFocusChainNavigation(QLineEdit* lineEdit, QObject* parent = nullptr);
+  LineEditFocusChainNavigation(QLineEdit* lineEdit);
 
   bool focusPrevious(QKeyEvent* event) const override;
   bool focusNext(QKeyEvent* event) const override;

@@ -100,6 +100,7 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditFrame {
   QScopedPointer<AbstractTokenDragDropHandler> _dragDropHandler;
   
   TokenEditView* _view;
+  TokenLineEdit* _lineEdit;
   TokenEditMode* _activeMode;
   TokenEditEditingMode* _editingMode;
   TokenEditDisplayMode* _displayMode;

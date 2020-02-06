@@ -46,9 +46,8 @@ void TokenLineEdit::onTextChanged(QString const& text) {
   updateGeometry();
 }
 
-LineEditFocusChainNavigation::LineEditFocusChainNavigation(QLineEdit* lineEdit,
-                                                           QObject* parent)
-    : FocusChainNavigation{parent}, _lineEdit{lineEdit} {}
+LineEditFocusChainNavigation::LineEditFocusChainNavigation(QLineEdit* lineEdit)
+    : FocusChainNavigation{lineEdit}, _lineEdit{lineEdit} {}
 
 bool LineEditFocusChainNavigation::focusPrevious(QKeyEvent* event) const {
   return _lineEdit->cursorPosition() == 0 && event->key() == Qt::Key_Left;

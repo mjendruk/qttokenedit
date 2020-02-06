@@ -11,7 +11,9 @@ TokenEditView::TokenEditView(QWidget* parent)
     : QWidget{parent},
       _focusChain{new FocusChain{this}},
       _layout{new FlexLayout{margin(), xSpacing(), ySpacing(), this}},
-      _finalWidget{nullptr} {
+      _finalWidget{nullptr},
+      _defaultFinalWidget{nullptr},
+      _defaultNavigation{nullptr} {
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setBackgroundRole(QPalette::Base);
   setFocusPolicy(Qt::NoFocus);
@@ -81,20 +83,7 @@ int TokenEditView::isEmpty() const { return count() == 0; }
 
 QVector<Token*> const& TokenEditView::tokens() const { return _tokens; }
 
-QWidget* TokenEditView::takeFinalWidget() {
-  if (!_finalWidget) {
-    return nullptr;
-  }
-
-  auto widget = _finalWidget;
-
-  _focusChain->remove(widget, UpdateFocus::No);
-  _layout->removeWidget(widget);
-  widget->hide();
-
-  _finalWidget = nullptr;
-  return widget;
-}
+QWidget* TokenEditView::takeFinalWidget() { return takeFinalWidget(true); }
 
 void TokenEditView::setFinalWidget(QWidget* widget,
                                    FocusChainNavigation* navigation) {
@@ -103,8 +92,12 @@ void TokenEditView::setFinalWidget(QWidget* widget,
   }
 
   if (_finalWidget) {
-    auto widget = takeFinalWidget();
-    delete widget;
+    auto setDefault = (widget == nullptr);
+    auto widget = takeFinalWidget(setDefault);
+    
+    if (widget && widget != _defaultFinalWidget) {
+      delete widget;
+    }
   }
 
   if (widget) {
@@ -114,6 +107,42 @@ void TokenEditView::setFinalWidget(QWidget* widget,
   }
 
   _finalWidget = widget;
+}
+
+QWidget* TokenEditView::takeDefaultFinalWidget() {
+  if (!_defaultFinalWidget) {
+    return nullptr;
+  }
+
+  if (_defaultFinalWidget == _finalWidget) {
+    takeFinalWidget(true);
+  }
+
+  auto widget = _defaultFinalWidget;
+
+  _defaultFinalWidget = nullptr;
+  _defaultNavigation = nullptr;
+
+  return widget;
+}
+
+void TokenEditView::setDefaultFinalWidget(QWidget* widget,
+                                          FocusChainNavigation* navigation) {
+  if (_defaultFinalWidget == widget) {
+    return;
+  }
+
+  if (_defaultFinalWidget) {
+    auto widget = takeDefaultFinalWidget();
+    delete widget;
+  }
+
+  if (!_finalWidget) {
+    setFinalWidget(widget, navigation);
+  }
+
+  _defaultFinalWidget = widget;
+  _defaultNavigation = navigation;
 }
 
 int TokenEditView::xSpacing() const {
@@ -142,4 +171,27 @@ void TokenEditView::resizeEvent(QResizeEvent* event) {
   QWidget::resizeEvent(event);
 
   emit sizeChanged(event->size());
+}
+
+QWidget* TokenEditView::takeFinalWidget(bool setDefault) {
+  if (!_finalWidget) {
+    return nullptr;
+  }
+  
+  if (setDefault && _finalWidget == _defaultFinalWidget) {
+    return nullptr;
+  }
+
+  auto widget = _finalWidget;
+
+  _focusChain->remove(widget, UpdateFocus::No);
+  _layout->removeWidget(widget);
+  widget->hide();
+  _finalWidget = nullptr;
+
+  if (setDefault) {
+    setFinalWidget(_defaultFinalWidget, _defaultNavigation);
+  }
+
+  return widget;
 }

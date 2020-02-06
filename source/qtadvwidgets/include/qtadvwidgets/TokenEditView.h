@@ -38,7 +38,11 @@ class QTADVWIDGETS_API TokenEditView : public QWidget {
   QWidget* takeFinalWidget();
   void setFinalWidget(QWidget* widget,
                       FocusChainNavigation* navigation = nullptr);
-
+  
+  QWidget* takeDefaultFinalWidget();
+  void setDefaultFinalWidget(QWidget* widget,
+                             FocusChainNavigation* navigation = nullptr);
+  
   /**
    * @name layout interface
    * @{
@@ -64,10 +68,17 @@ class QTADVWIDGETS_API TokenEditView : public QWidget {
 
  protected:
   void resizeEvent(QResizeEvent* event) override;
-
+  
+ private:
+  QWidget* takeFinalWidget(bool setDefault);
+  
  private:
   QVector<Token*> _tokens;
   FocusChain* _focusChain;
   FlexLayout* _layout;
+  
   QWidget* _finalWidget;
+  
+  QWidget* _defaultFinalWidget;
+  FocusChainNavigation* _defaultNavigation;
 };

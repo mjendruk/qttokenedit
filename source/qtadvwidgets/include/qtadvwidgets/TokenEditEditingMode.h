@@ -24,9 +24,4 @@ class QTADVWIDGETS_API TokenEditEditingMode : public TokenEditMode {
 
   void activate() override;
   void deactivate() override;
-
-  TokenLineEdit* lineEdit() const;
-
- private:
-  TokenLineEdit* _lineEdit;
 };

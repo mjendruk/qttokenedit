@@ -33,5 +33,4 @@ class QTADVWIDGETS_API TokenEditDisplayMode : public TokenEditMode {
 
  private:
   OmissionToken* _omissionToken;
-  FinalWidgetPlaceholder* _placeholder;
 };
