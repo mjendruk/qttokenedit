@@ -98,7 +98,7 @@ void BaseToken::paintEvent(QPaintEvent* event) {
   
   auto brush = palette().brush(brushRole);
   
-  if (underMouse()) {
+  if (underMouse() && isEnabled()) {
     auto color = brush.color();
     qreal h, s, v;
     color.getHsvF(&h, &s, &v);
