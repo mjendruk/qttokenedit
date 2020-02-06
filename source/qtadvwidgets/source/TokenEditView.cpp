@@ -95,7 +95,7 @@ void TokenEditView::setFinalWidget(QWidget* widget,
     auto setDefault = (widget == nullptr);
     auto widget = takeFinalWidget(setDefault);
     
-    if (widget && widget != _defaultFinalWidget) {
+    if (widget != _defaultFinalWidget) {
       delete widget;
     }
   }
@@ -115,7 +115,7 @@ QWidget* TokenEditView::takeDefaultFinalWidget() {
   }
 
   if (_defaultFinalWidget == _finalWidget) {
-    takeFinalWidget(true);
+    takeFinalWidget(false);
   }
 
   auto widget = _defaultFinalWidget;
