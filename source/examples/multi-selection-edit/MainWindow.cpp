@@ -58,7 +58,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
     tokenEdit->setModel(model);
 
     listView->setModel(model);
-    listView->setSelectionBehavior(QAbstractItemView::SelectItems);
+    listView->setSelectionBehavior(QAbstractItemView::SelectRows);
     listView->setDragDropMode(QAbstractItemView::DragDrop);
     listView->setDefaultDropAction(Qt::MoveAction);
     listView->setDragDropOverwriteMode(false);

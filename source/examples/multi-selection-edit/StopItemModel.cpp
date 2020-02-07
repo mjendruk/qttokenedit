@@ -1,5 +1,7 @@
 #include "StopItemModel.h"
 
+#include <unordered_set>
+
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QMimeData>
@@ -15,10 +17,15 @@ Qt::DropActions StopItemModel::supportedDropActions() const {
 QStringList StopItemModel::mimeTypes() const { return {"application/json"}; }
 
 QMimeData* StopItemModel::mimeData(QModelIndexList const& indexes) const {
+  auto rows = std::unordered_set<int>{};
+  for (auto const& index : indexes) {
+    rows.insert(index.row());
+  }
+    
   auto stopList = QStringList{};
-  std::transform(indexes.cbegin(), indexes.cend(), std::back_inserter(stopList),
-                 [=](auto index) {
-                   return _stops.at(index.row());
+  std::transform(rows.cbegin(), rows.cend(), std::back_inserter(stopList),
+                 [=](auto rows) {
+                   return _stops.at(rows);
                  });
 
   auto jsonData =
@@ -151,8 +158,12 @@ Qt::ItemFlags StopItemModel::flags(const QModelIndex& index) const {
   auto defaultFlags = QAbstractTableModel::flags(index);
 
   if (index.isValid()) {
-    return defaultFlags | Qt::ItemIsEditable | Qt::ItemIsDragEnabled |
-           Qt::ItemIsDropEnabled;
+    if (index.column() == 0) {
+      return defaultFlags | Qt::ItemIsEditable | Qt::ItemIsDragEnabled |
+             Qt::ItemIsDropEnabled;
+    } else {
+      return defaultFlags | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+    }
   }
 
   return defaultFlags | Qt::ItemIsDropEnabled;
