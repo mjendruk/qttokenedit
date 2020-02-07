@@ -73,7 +73,6 @@ void TokenEditView::remove(int index, UpdateFocus uf) {
   auto layoutItem = _layout->takeAt(index);
   _focusChain->remove(item, uf);
   delete layoutItem;
-  item->hide();
   item->deleteLater();
 }
 
