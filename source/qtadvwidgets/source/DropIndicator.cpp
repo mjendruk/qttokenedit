@@ -1,6 +1,7 @@
 #include "DropIndicator.h"
 
 #include <QPainter>
+#include <QPaintDevice>
 
 void DropIndicator::draw(DropIndicatorPosition position, QRect const& rect,
                          QBrush const& brush, QPainter* painter) const {
@@ -15,7 +16,7 @@ void DropIndicator::draw(DropIndicatorPosition position, QRect const& rect,
 #ifdef Q_OS_MACOS
   auto scaling = 1.0;
 #else
-  auto scaling = std::round(logicalDpiX() / 96.0);
+  auto scaling = std::round(painter->device()->logicalDpiX() / 96.0);
 #endif
 
   auto const width = scaling * 1.0;
