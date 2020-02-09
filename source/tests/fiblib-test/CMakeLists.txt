@@ -66,7 +66,7 @@ target_include_directories(${target}
 target_link_libraries(${target}
     PRIVATE
     ${DEFAULT_LIBRARIES}
-    ${META_PROJECT_NAME}::qtadvwidgets
+    ${META_PROJECT_NAME}::token-edit
     gmock-dev
 )
 

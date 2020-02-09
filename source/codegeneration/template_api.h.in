@@ -2,7 +2,7 @@
 #ifndef @target_id@_TEMPLATE_API_H
 #define @target_id@_TEMPLATE_API_H
 
-#include <@target@/@target@_export.h>
+#include <@target@/@target@-export.h>
 
 #ifdef @target_id@_STATIC_DEFINE
 #  define @target_id@_TEMPLATE_API

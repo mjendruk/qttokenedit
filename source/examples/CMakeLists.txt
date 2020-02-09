@@ -5,5 +5,4 @@ if(NOT OPTION_BUILD_EXAMPLES)
 endif()
 
 # Example applications
-add_subdirectory(fibcmd)
-add_subdirectory(multi-selection-edit)
+add_subdirectory(token-edit-playground)
