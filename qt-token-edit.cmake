@@ -12,7 +12,7 @@ include(CMakeFindDependencyMacro)
 
 # List of modules
 set(MODULE_NAMES
-    qt-widgets-extensions
+    qt-token-edit
 )
 
 

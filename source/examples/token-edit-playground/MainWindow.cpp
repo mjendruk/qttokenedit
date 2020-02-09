@@ -13,7 +13,7 @@
 #include <QStringListModel>
 #include <QTableView>
 
-#include <qt-widgets-extensions/qt-widgets-extensions-version.h>
+#include <qt-token-edit/qt-token-edit-version.h>
 #include <token-edit/TokenEdit.h>
 
 #include "StopItemModel.h"

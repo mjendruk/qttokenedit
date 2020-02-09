@@ -50,10 +50,10 @@ if(NOT GIT_SHA1)
 endif()
 
 # Meta information about the project
-set(META_PROJECT_NAME        "qt-widgets-extensions")
+set(META_PROJECT_NAME        "qt-token-edit")
 set(META_PROJECT_DESCRIPTION "Additional Qt Widgets")
 set(META_AUTHOR_ORGANIZATION "mjendruk")
-set(META_AUTHOR_DOMAIN       "https://github.com/mjendruk/qt-widgets-extensions/")
+set(META_AUTHOR_DOMAIN       "https://github.com/mjendruk/qt-token-edit/")
 set(META_AUTHOR_MAINTAINER   "code@jendruk.com")
 set(META_VERSION_MAJOR       "0")
 set(META_VERSION_MINOR       "0")
