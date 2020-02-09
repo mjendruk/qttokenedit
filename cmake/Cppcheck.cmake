@@ -10,6 +10,7 @@ function(perform_cppcheck check_target target)
                 "$<$<BOOL:${includes}>:-I$<JOIN:${includes},\t-I>>"
                 --enable=all
                 --std=c++11
+                --language=c++
                 --verbose
                 --suppress=missingIncludeSystem
                 ${ARGN}
