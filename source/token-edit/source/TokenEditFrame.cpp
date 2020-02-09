@@ -61,8 +61,8 @@ QWidget* TokenEditFrame::takeWidget() {
 
 void TokenEditFrame::setWidget(QWidget* widget) {
   if (_widget) {
-    auto widget = takeWidget();
-    delete widget;
+    auto old = takeWidget();
+    delete old;
   }
 
   _layout->addWidget(widget);
