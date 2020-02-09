@@ -46,6 +46,7 @@ void TokenDropTarget<T>::dragMoveEvent(QDragMoveEvent* event) {
 
 template <typename T>
 void TokenDropTarget<T>::dragLeaveEvent(QDragLeaveEvent* event) {
+  Q_UNUSED(event);
   hideIndicator();
 }
 
