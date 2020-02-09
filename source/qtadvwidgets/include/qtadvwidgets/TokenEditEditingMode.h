@@ -3,6 +3,8 @@
 #include <qtadvwidgets/TokenEditMode.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+namespace mjendruk {
+
 class TokenEditView;
 class TokenLineEdit;
 
@@ -25,3 +27,5 @@ class QTADVWIDGETS_API TokenEditEditingMode : public TokenEditMode {
   void activate() override;
   void deactivate() override;
 };
+
+}  // namespace mjendruk

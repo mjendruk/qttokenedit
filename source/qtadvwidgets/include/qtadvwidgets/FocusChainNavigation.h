@@ -6,6 +6,8 @@
 
 class QKeyEvent;
 
+namespace mjendruk {
+
 class FocusChainNavigation : public QObject {
  public:
   using QObject::QObject;
@@ -22,3 +24,5 @@ class QTADVWIDGETS_API DefaultFocusChainNavigation
   bool focusPrevious(QKeyEvent* event) const override;
   bool focusNext(QKeyEvent* event) const override;
 };
+
+}  // namespace mjendruk

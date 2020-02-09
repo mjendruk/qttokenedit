@@ -5,6 +5,8 @@
 #include <QtGui/QPainterPath>
 #include <QtWidgets/QStyle>
 
+namespace mjendruk {
+
 AbstractTokenButton::AbstractTokenButton(QWidget* parent)
     : AbstractTokenButton{QPalette::Text, parent} {}
 
@@ -54,3 +56,5 @@ void AbstractTokenButton::paintEvent(QPaintEvent* event) {
 void AbstractTokenButton::setPath(QPainterPath const& path) { _path = path; }
 
 int AbstractTokenButton::extent() const { return fontMetrics().height(); }
+
+}  // namespace mjendruk

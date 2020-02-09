@@ -10,6 +10,8 @@
 
 class QMimeData;
 
+namespace mjendruk {
+
 class AbstractTokenDragDropHandler;
 class RemoveButton;
 class Token;
@@ -73,4 +75,4 @@ class QTADVWIDGETS_API Token : public BaseToken {
   DropIndicatorPosition _dropIndicatorPosition;
 };
 
-Q_DECLARE_METATYPE(Token*);
+}  // namespace mjendruk

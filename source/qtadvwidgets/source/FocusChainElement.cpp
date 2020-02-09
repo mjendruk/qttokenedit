@@ -5,6 +5,8 @@
 
 #include <qtadvwidgets/FocusChainNavigation.h>
 
+namespace mjendruk {
+
 FocusChainElement::FocusChainElement(QWidget* widget,
                                      FocusChainNavigation* navigation,
                                      QObject* parent)
@@ -67,3 +69,5 @@ bool FocusChainElement::eventFilter(QObject* watched, QEvent* event) {
 
   return false;
 }
+
+}  // namespace mjendruk

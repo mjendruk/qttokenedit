@@ -8,6 +8,8 @@
 #include <qtadvwidgets/TokenEdit.h>
 #include <qtadvwidgets/TokenEditView.h>
 
+namespace mjendruk {
+
 TokenDragDropHandler::TokenDragDropHandler(TokenEdit* tokenEdit)
     : _tokenEdit{tokenEdit} {}
 
@@ -121,3 +123,5 @@ QAbstractItemModel* TokenDragDropHandler::model() const {
 }
 
 TokenEditView* TokenDragDropHandler::view() const { return _tokenEdit->view(); }
+
+}  // namespace mjendruk

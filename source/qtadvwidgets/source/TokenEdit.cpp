@@ -17,6 +17,8 @@
 
 #include "TokenDragDropHandler.h"
 
+namespace mjendruk {
+
 class TokenEditModeAccess : public AbstractTokenEditModeAccess {
  public:
   TokenEditModeAccess(TokenEdit* tokenEdit) : _tokenEdit{tokenEdit} {}
@@ -403,3 +405,5 @@ void TokenEdit::ensureVisible(QWidget* widget) {
 
   _scrollArea->ensureWidgetVisible(widget, _view->xSpacing(), ySpacing);
 }
+
+}  // namespace mjendruk

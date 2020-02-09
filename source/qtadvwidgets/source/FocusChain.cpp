@@ -9,6 +9,8 @@
 #include <qtadvwidgets/FocusChainNavigation.h>
 #include <qtadvwidgets/Token.h>
 
+namespace mjendruk {
+
 FocusChain::FocusChain(QObject* parent) : QObject{parent} {}
 
 FocusChain::~FocusChain() = default;
@@ -138,3 +140,5 @@ int FocusChain::indexOf(QWidget* widget) const {
 
   return std::distance(_elements.cbegin(), it);
 }
+
+}  // namespace mjendruk

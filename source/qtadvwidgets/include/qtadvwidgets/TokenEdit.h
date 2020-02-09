@@ -19,6 +19,8 @@ class QStackedWidget;
 class QAbstractItemModel;
 class QScrollArea;
 
+namespace mjendruk {
+
 class TokenLineEdit;
 class TokenEditView;
 class TokenEditMode;
@@ -119,3 +121,5 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditFrame {
   QModelIndex _rootModelIndex;
   int _modelColumn;
 };
+
+}  // namespace mjendruk

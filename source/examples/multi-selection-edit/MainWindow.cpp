@@ -7,8 +7,8 @@
 #include <qtadvwidgets/TokenEdit.h>
 
 #include <QCheckBox>
-#include <QCompleter>
 #include <QComboBox>
+#include <QCompleter>
 #include <QFormLayout>
 #include <QHeaderView>
 #include <QLineEdit>
@@ -29,7 +29,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
   m_ui->setupUi(this);
 
   {
-    auto tokenEdit = new TokenEdit{this};
+    auto tokenEdit = new mjendruk::TokenEdit{this};
 
     tokenEdit->setModelColumn(1);
 
@@ -82,11 +82,13 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
 
     m_ui->dragDropModeComboBox->addItems(
         {"None", "Drag Only", "Drop Only", "Drag Drop", "Internal Move"});
-    
-    connect(m_ui->dragDropModeComboBox, qOverload<int>(&QComboBox::activated), [=](int index) {
-      auto dragDropMode = static_cast<QAbstractItemView::DragDropMode>(index);
-      tokenEdit->setDragDropMode(dragDropMode);
-    });
+
+    connect(m_ui->dragDropModeComboBox, qOverload<int>(&QComboBox::activated),
+            [=](int index) {
+              auto dragDropMode =
+                  static_cast<QAbstractItemView::DragDropMode>(index);
+              tokenEdit->setDragDropMode(dragDropMode);
+            });
 
     m_ui->maxLineCountSpinBox->setValue(3);
     connect(m_ui->maxLineCountSpinBox,
@@ -119,11 +121,11 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
         },
         Qt::QueuedConnection);
 
-//     auto otherTokenEdit = new TokenEdit{};
-//     otherTokenEdit->setModel(model);
-//     otherTokenEdit->setDragEnabled(true);
-//
-//     otherTokenEdit->show();
+    //     auto otherTokenEdit = new TokenEdit{};
+    //     otherTokenEdit->setModel(model);
+    //     otherTokenEdit->setDragEnabled(true);
+    //
+    //     otherTokenEdit->show();
   }
 
   connect(m_ui->widthSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
@@ -139,7 +141,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
 
     auto model = new StopItemModel{longNames, this};
 
-    auto tokenEdit = new TokenEdit{this};
+    auto tokenEdit = new mjendruk::TokenEdit{this};
     tokenEdit->setModelColumn(0);
     tokenEdit->setDragEnabled(true);
     tokenEdit->setDragDropMode(QAbstractItemView::DragDrop);

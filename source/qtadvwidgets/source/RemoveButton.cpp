@@ -6,6 +6,8 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 
+namespace mjendruk {
+
 RemoveButton::RemoveButton(QWidget* parent)
     : RemoveButton{QPalette::Text, parent} {}
 
@@ -41,3 +43,5 @@ QPainterPath RemoveButton::createPath(int extent) const {
 
   return transform.map(crossPath);
 }
+
+}  // namespace mjendruk

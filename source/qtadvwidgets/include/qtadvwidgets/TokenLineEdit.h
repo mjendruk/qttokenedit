@@ -6,6 +6,8 @@
 #include <qtadvwidgets/TokenDropTarget.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+namespace mjendruk {
+
 class QTADVWIDGETS_API TokenLineEdit : public TokenDropTarget<QLineEdit> {
   Q_OBJECT
  public:
@@ -39,3 +41,5 @@ class QTADVWIDGETS_API LineEditFocusChainNavigation
  private:
   QLineEdit const* _lineEdit;
 };
+
+}  // namespace mjendruk

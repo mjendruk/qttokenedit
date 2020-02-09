@@ -5,6 +5,8 @@
 
 #include "TokenDropTarget.hpp"
 
+namespace mjendruk {
+
 OmissionToken::OmissionToken(AbstractTokenDragDropHandler* handler,
                              QWidget* parent)
     : TokenDropTarget<BaseToken>{handler, parent}, _count{-1} {
@@ -34,3 +36,5 @@ void OmissionToken::paintEvent(QPaintEvent* event) {
 
   this->drawIndicator(&painter);
 }
+
+}  // namespace mjendruk

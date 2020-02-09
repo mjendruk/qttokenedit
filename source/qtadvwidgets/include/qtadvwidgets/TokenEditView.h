@@ -6,6 +6,8 @@
 #include <qtadvwidgets/Global.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+namespace mjendruk {
+
 class TokenLineEdit;
 class Token;
 class FocusChain;
@@ -82,3 +84,5 @@ class QTADVWIDGETS_API TokenEditView : public QWidget {
   QWidget* _defaultFinalWidget;
   FocusChainNavigation* _defaultNavigation;
 };
+
+}  // namespace mjendruk

@@ -21,12 +21,10 @@ QMimeData* StopItemModel::mimeData(QModelIndexList const& indexes) const {
   for (auto const& index : indexes) {
     rows.insert(index.row());
   }
-    
+
   auto stopList = QStringList{};
   std::transform(rows.cbegin(), rows.cend(), std::back_inserter(stopList),
-                 [=](auto rows) {
-                   return _stops.at(rows);
-                 });
+                 [=](auto rows) { return _stops.at(rows); });
 
   auto jsonData =
       QJsonDocument{QJsonArray::fromStringList(stopList)}.toBinaryData();
@@ -36,52 +34,54 @@ QMimeData* StopItemModel::mimeData(QModelIndexList const& indexes) const {
   return mimeData;
 }
 
-bool StopItemModel::canDropMimeData(QMimeData const* data, Qt::DropAction action, int row,
-                                    int column, QModelIndex const& parent) const {
+bool StopItemModel::canDropMimeData(QMimeData const* data,
+                                    Qt::DropAction action, int row, int column,
+                                    QModelIndex const& parent) const {
   Q_UNUSED(action);
   Q_UNUSED(row);
   Q_UNUSED(column);
   Q_UNUSED(parent);
-  
+
   if (!data->hasFormat("application/json")) {
     return false;
   }
-  
+
   if (parent.isValid()) {
     return false;
   }
-  
+
   if (!(0 <= row && row <= _stops.size())) {
     return false;
   }
-  
+
   return true;
 }
 
-bool StopItemModel::dropMimeData(QMimeData const* data, Qt::DropAction action, int row,
-                  int column, QModelIndex const& parent) {
+bool StopItemModel::dropMimeData(QMimeData const* data, Qt::DropAction action,
+                                 int row, int column,
+                                 QModelIndex const& parent) {
   if (!canDropMimeData(data, action, row, column, parent)) {
     return false;
   }
-  
+
   if (action == Qt::IgnoreAction) {
     return true;
   }
-  
+
   QByteArray encodedData = data->data("application/json");
-  
+
   auto json = QJsonDocument::fromBinaryData(encodedData);
-  
+
   if (!json.isArray()) {
     return false;
   }
-  
+
   auto jsonArray = json.array();
-  
+
   auto currentRow = row;
-  
+
   insertRows(currentRow, jsonArray.count());
-  
+
   for (auto jsonValue : json.array()) {
     auto index = this->index(currentRow, 0);
     if (!setData(index, jsonValue.toVariant(), Qt::EditRole)) {
@@ -89,7 +89,7 @@ bool StopItemModel::dropMimeData(QMimeData const* data, Qt::DropAction action, i
     }
     ++currentRow;
   }
-  
+
   return true;
 }
 

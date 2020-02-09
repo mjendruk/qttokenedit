@@ -5,6 +5,8 @@
 
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+namespace mjendruk {
+
 class FocusChainNavigation;
 
 class QTADVWIDGETS_API FocusChainElement : public QObject {
@@ -37,3 +39,5 @@ class QTADVWIDGETS_API FocusChainElement : public QObject {
   QWidget* _widget;
   FocusChainNavigation* _navigation;
 };
+
+}  // namespace mjendruk

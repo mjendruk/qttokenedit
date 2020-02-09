@@ -4,6 +4,8 @@
 #include <qtadvwidgets/TokenDropTarget.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+namespace mjendruk {
+
 class QTADVWIDGETS_API OmissionToken : public TokenDropTarget<BaseToken> {
   Q_OBJECT
 
@@ -20,3 +22,5 @@ class QTADVWIDGETS_API OmissionToken : public TokenDropTarget<BaseToken> {
  private:
   int _count;
 };
+
+}  // namespace mjendruk

@@ -3,6 +3,8 @@
 #include <QtGui/QPaintDevice>
 #include <QtGui/QPainter>
 
+namespace mjendruk {
+
 void DropIndicator::draw(DropIndicatorPosition position, QRect const& rect,
                          QBrush const& brush, QPainter* painter) const {
   if (position == DropIndicatorPosition::None) {
@@ -37,3 +39,5 @@ void DropIndicator::draw(DropIndicatorPosition position, QRect const& rect,
 
   painter->restore();
 }
+
+}  // namespace mjendruk

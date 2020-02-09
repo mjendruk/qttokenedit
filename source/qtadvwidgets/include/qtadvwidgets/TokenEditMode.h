@@ -5,6 +5,8 @@
 #include <qtadvwidgets/Global.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+namespace mjendruk {
+
 class Token;
 class TokenEditView;
 class AbstractTokenDragDropHandler;
@@ -50,3 +52,5 @@ class QTADVWIDGETS_API TokenEditMode : public QObject {
   TokenEditView* _view;
   AbstractTokenEditModeAccess* _access;
 };
+
+}  // namespace mjendruk

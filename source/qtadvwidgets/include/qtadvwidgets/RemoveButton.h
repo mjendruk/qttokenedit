@@ -3,6 +3,8 @@
 #include <qtadvwidgets/AbstractTokenButton.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+namespace mjendruk {
+
 class QTADVWIDGETS_API RemoveButton : public AbstractTokenButton {
   Q_OBJECT
 
@@ -13,3 +15,5 @@ class QTADVWIDGETS_API RemoveButton : public AbstractTokenButton {
  private:
   QPainterPath createPath(int extent) const;
 };
+
+}  // namespace mjendruk

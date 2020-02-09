@@ -10,6 +10,8 @@
 #include <qtadvwidgets/TokenEditMode.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+namespace mjendruk {
+
 class FocusChainNavigation;
 
 class QTADVWIDGETS_API FocusChain : public QObject {
@@ -51,3 +53,5 @@ class QTADVWIDGETS_API FocusChain : public QObject {
  private:
   QVector<FocusChainElement*> _elements;
 };
+
+}  // namespace mjendruk

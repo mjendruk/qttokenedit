@@ -3,6 +3,8 @@
 #include <qtadvwidgets/TokenEditMode.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+namespace mjendruk {
+
 class TokenEditView;
 class OmissionToken;
 class FinalWidgetPlaceholder;
@@ -34,3 +36,5 @@ class QTADVWIDGETS_API TokenEditDisplayMode : public TokenEditMode {
  private:
   OmissionToken* _omissionToken;
 };
+
+}  // namespace mjendruk

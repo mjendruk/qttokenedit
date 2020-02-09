@@ -8,6 +8,8 @@
 #include <qtadvwidgets/TokenEditView.h>
 #include <qtadvwidgets/TokenLineEdit.h>
 
+namespace mjendruk {
+
 TokenEditEditingMode::TokenEditEditingMode(TokenEditView* view,
                                            AbstractTokenEditModeAccess* access,
                                            QObject* parent)
@@ -63,3 +65,5 @@ void TokenEditEditingMode::activate() {
 }
 
 void TokenEditEditingMode::deactivate() {}
+
+}  // namespace mjendruk

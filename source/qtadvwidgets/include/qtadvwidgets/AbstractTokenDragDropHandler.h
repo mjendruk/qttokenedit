@@ -4,6 +4,9 @@
 
 class QObject;
 class QMimeData;
+
+namespace mjendruk {
+
 class Token;
 
 class AbstractTokenDragDropHandler {
@@ -29,3 +32,5 @@ class AbstractTokenDragDropHandler {
   virtual bool dropMimeData(int row, QMimeData const* data,
                             QObject* source) = 0;
 };
+
+}  // namespace mjendruk

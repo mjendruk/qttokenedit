@@ -6,6 +6,8 @@
 
 class QBoxLayout;
 
+namespace mjendruk {
+
 class TokenEditFrameOverlay;
 
 class QTADVWIDGETS_API TokenEditFrame : public QWidget {
@@ -36,3 +38,5 @@ class QTADVWIDGETS_API TokenEditFrame : public QWidget {
   TokenEditFrameOverlay* _frame;
   bool _shownAsFocused;
 };
+
+}  // namespace mjendruk

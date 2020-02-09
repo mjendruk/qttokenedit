@@ -5,6 +5,8 @@
 
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+namespace mjendruk {
+
 class QTADVWIDGETS_API FlexLayout : public QLayout {
   Q_OBJECT
  public:
@@ -98,3 +100,5 @@ class QTADVWIDGETS_API FlexLayout : public QLayout {
 
   Frozen _frozen;
 };
+
+}  // namespace mjendruk

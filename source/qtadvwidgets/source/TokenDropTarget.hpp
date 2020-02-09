@@ -13,6 +13,8 @@
 
 #include "DropIndicator.h"
 
+namespace mjendruk {
+
 template <typename T>
 TokenDropTarget<T>::TokenDropTarget(AbstractTokenDragDropHandler* handler,
                                     QWidget* parent)
@@ -83,3 +85,5 @@ void TokenDropTarget<T>::hideIndicator() {
   _drawIndicator = false;
   this->update();
 }
+
+}  // namespace mjendruk

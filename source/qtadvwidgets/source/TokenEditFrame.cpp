@@ -6,6 +6,8 @@
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QStyleOptionFocusRect>
 
+namespace mjendruk {
+
 class TokenEditFrameOverlay : public QWidget {
  public:
   TokenEditFrameOverlay(TokenEditFrame* parent = nullptr)
@@ -129,3 +131,5 @@ QMargins TokenEditFrame::contentMargins() const {
       rect.bottom() - contentRect.bottom(),
   };
 }
+
+}  // namespace mjendruk

@@ -4,6 +4,8 @@
 
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+namespace mjendruk {
+
 class QTADVWIDGETS_API ElidableLabel : public QWidget {
   Q_OBJECT
 
@@ -40,3 +42,5 @@ class QTADVWIDGETS_API ElidableLabel : public QWidget {
   QSize _textSize;
   QSize _minTextSize;
 };
+
+}  // namespace mjendruk

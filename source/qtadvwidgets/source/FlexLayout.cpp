@@ -6,6 +6,8 @@
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QWidgetItem>
 
+namespace mjendruk {
+
 FlexLayout::FlexLayout(QWidget *parent) : FlexLayout{-1, -1, -1, parent} {}
 
 FlexLayout::FlexLayout(int margin, int hSpacing, int vSpacing, QWidget *parent)
@@ -357,3 +359,5 @@ void FlexLayout::unfreeze() {
 
   _frozen = Frozen::No;
 }
+
+}  // namespace mjendruk

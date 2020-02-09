@@ -3,6 +3,8 @@
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPainter>
 
+namespace mjendruk {
+
 ElidableLabel::ElidableLabel(QWidget* parent) : ElidableLabel{{}, parent} {}
 
 ElidableLabel::ElidableLabel(QString const& text, QWidget* parent)
@@ -84,3 +86,5 @@ void ElidableLabel::updateMinimumTextSize() {
 QString ElidableLabel::elidedText() const {
   return fontMetrics().elidedText(_text, Qt::ElideRight, width());
 }
+
+}  // namespace mjendruk

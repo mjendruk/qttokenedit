@@ -9,6 +9,8 @@
 
 class QBoxLayout;
 
+namespace mjendruk {
+
 class ElidableLabel;
 
 class QTADVWIDGETS_API BaseToken : public QWidget {
@@ -48,3 +50,5 @@ class QTADVWIDGETS_API BaseToken : public QWidget {
   ElidableLabel* _label;
   QWidget* _rightWidget;
 };
+
+}  // namespace mjendruk

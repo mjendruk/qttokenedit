@@ -4,6 +4,8 @@
 
 #include <qtadvwidgets/qtadvwidgets_api.h>
 
+namespace mjendruk {
+
 class QTADVWIDGETS_API AbstractTokenButton : public QAbstractButton {
   Q_OBJECT
 
@@ -31,3 +33,5 @@ class QTADVWIDGETS_API AbstractTokenButton : public QAbstractButton {
   QSize _size;
   QPalette::ColorRole _colorRole;
 };
+
+}  // namespace mjendruk

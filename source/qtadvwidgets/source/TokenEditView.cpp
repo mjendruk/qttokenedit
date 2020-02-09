@@ -9,6 +9,8 @@
 #include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenLineEdit.h>
 
+namespace mjendruk {
+
 TokenEditView::TokenEditView(QWidget* parent)
     : QWidget{parent},
       _focusChain{new FocusChain{this}},
@@ -196,3 +198,5 @@ QWidget* TokenEditView::takeFinalWidget(bool setDefault) {
 
   return widget;
 }
+
+}  // namespace mjendruk

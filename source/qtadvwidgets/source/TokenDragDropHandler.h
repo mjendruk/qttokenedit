@@ -4,6 +4,8 @@
 
 class QAbstractItemModel;
 
+namespace mjendruk {
+
 class TokenEdit;
 class TokenEditView;
 
@@ -35,3 +37,5 @@ class TokenDragDropHandler : public AbstractTokenDragDropHandler {
  private:
   TokenEdit* _tokenEdit;
 };
+
+}  // namespace mjendruk

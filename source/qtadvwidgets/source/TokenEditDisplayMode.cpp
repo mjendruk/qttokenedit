@@ -7,6 +7,8 @@
 #include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenEditView.h>
 
+namespace mjendruk {
+
 TokenEditDisplayMode::TokenEditDisplayMode(TokenEditView* view,
                                            AbstractTokenEditModeAccess* access,
                                            QObject* parent)
@@ -122,3 +124,5 @@ QWidget* TokenEditDisplayMode::omissionToken() const { return _omissionToken; }
 int TokenEditDisplayMode::omittedTokens() const {
   return access()->count() - view()->count();
 }
+
+}  // namespace mjendruk

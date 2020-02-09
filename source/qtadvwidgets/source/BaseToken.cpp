@@ -9,6 +9,8 @@
 
 #include <qtadvwidgets/ElidableLabel.h>
 
+namespace mjendruk {
+
 BaseToken::BaseToken(QWidget* parent) : BaseToken{{}, parent} {}
 
 BaseToken::BaseToken(QString const& text, QWidget* parent)
@@ -123,3 +125,5 @@ void BaseToken::focusOutEvent(QFocusEvent* event) {
   _label->setTextColorRole(QPalette::ButtonText);
   QWidget::focusOutEvent(event);
 }
+
+}  // namespace mjendruk

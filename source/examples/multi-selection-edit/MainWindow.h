@@ -1,43 +1,36 @@
 
 #pragma once
 
-
 #include <QMainWindow>
 #include <QScopedPointer>
 
-
 namespace Ui {
-    class MainWindow;
+class MainWindow;
 }
 
-
 /**
-*  @brief
-*    Main window of the fibgui example
-*/
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
+ *  @brief
+ *    Main window of the fibgui example
+ */
+class MainWindow : public QMainWindow {
+  Q_OBJECT
 
+ public:
+  /**
+   *  @brief
+   *    Constructor
+   */
+  MainWindow();
 
-public:
-    /**
-    *  @brief
-    *    Constructor
-    */
-    MainWindow();
+  /**
+   *  @brief
+   *    Destructor
+   */
+  virtual ~MainWindow();
 
-    /**
-    *  @brief
-    *    Destructor
-    */
-    virtual ~MainWindow();
+ protected slots:
+  void on_about();
 
-
-protected slots:
-    void on_about();
-
-
-protected:
-    const QScopedPointer<Ui::MainWindow> m_ui;
+ protected:
+  const QScopedPointer<Ui::MainWindow> m_ui;
 };

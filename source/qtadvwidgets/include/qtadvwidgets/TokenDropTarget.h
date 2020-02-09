@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QWidget>
 
+namespace mjendruk {
+
 class AbstractTokenDragDropHandler;
 
 template <typename T>
@@ -31,3 +33,5 @@ class TokenDropTarget : public T {
   AbstractTokenDragDropHandler* _handler;
   bool _drawIndicator;
 };
+
+}  // namespace mjendruk

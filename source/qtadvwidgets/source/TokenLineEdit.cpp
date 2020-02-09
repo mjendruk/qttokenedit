@@ -8,6 +8,8 @@
 
 #include "TokenDropTarget.hpp"
 
+namespace mjendruk {
+
 TokenLineEdit::TokenLineEdit(AbstractTokenDragDropHandler* handler,
                              QWidget* parent)
     : TokenDropTarget<QLineEdit>{handler, parent} {
@@ -58,3 +60,5 @@ bool LineEditFocusChainNavigation::focusNext(QKeyEvent* event) const {
   return _lineEdit->cursorPosition() == _lineEdit->text().count() &&
          event->key() == Qt::Key_Right;
 }
+
+}  // namespace mjendruk

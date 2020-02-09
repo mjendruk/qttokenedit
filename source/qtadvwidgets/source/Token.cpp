@@ -16,6 +16,8 @@
 
 #include "DropIndicator.h"
 
+namespace mjendruk {
+
 Token::Token(AbstractTokenDragDropHandler* dragDropHandler, QWidget* parent)
     : Token{{}, dragDropHandler, parent} {}
 
@@ -224,3 +226,5 @@ TokenDropHint Token::dropHint(QPoint const& mousePos) const {
   return mousePos.x() < width() / 2.0 ? TokenDropHint::Before
                                       : TokenDropHint::After;
 }
+
+}  // namespace mjendruk
