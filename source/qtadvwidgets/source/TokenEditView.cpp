@@ -1,11 +1,13 @@
+#include <qtadvwidgets/TokenEditView.h>
+
+#include <cmath>
+
+#include <QtGui/QResizeEvent>
+
 #include <qtadvwidgets/FlexLayout.h>
 #include <qtadvwidgets/FocusChain.h>
 #include <qtadvwidgets/Token.h>
-#include <qtadvwidgets/TokenEditView.h>
 #include <qtadvwidgets/TokenLineEdit.h>
-
-#include <QResizeEvent>
-#include <cmath>
 
 TokenEditView::TokenEditView(QWidget* parent)
     : QWidget{parent},
@@ -93,7 +95,7 @@ void TokenEditView::setFinalWidget(QWidget* widget,
   if (_finalWidget) {
     auto setDefault = (widget == nullptr);
     auto widget = takeFinalWidget(setDefault);
-    
+
     if (widget != _defaultFinalWidget) {
       delete widget;
     }
@@ -176,7 +178,7 @@ QWidget* TokenEditView::takeFinalWidget(bool setDefault) {
   if (!_finalWidget) {
     return nullptr;
   }
-  
+
   if (setDefault && _finalWidget == _defaultFinalWidget) {
     return nullptr;
   }

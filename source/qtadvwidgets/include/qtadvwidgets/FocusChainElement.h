@@ -1,9 +1,9 @@
 #pragma once
 
-#include <qtadvwidgets/qtadvwidgets_api.h>
+#include <QtCore/QObject>
+#include <QtWidgets/QWidget>
 
-#include <QObject>
-#include <QWidget>
+#include <qtadvwidgets/qtadvwidgets_api.h>
 
 class FocusChainNavigation;
 

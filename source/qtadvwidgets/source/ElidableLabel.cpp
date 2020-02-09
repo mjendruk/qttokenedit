@@ -1,7 +1,7 @@
-#include "qtadvwidgets/ElidableLabel.h"
+#include <qtadvwidgets/ElidableLabel.h>
 
-#include <QPaintEvent>
-#include <QPainter>
+#include <QtGui/QPaintEvent>
+#include <QtGui/QPainter>
 
 ElidableLabel::ElidableLabel(QWidget* parent) : ElidableLabel{{}, parent} {}
 
@@ -62,7 +62,7 @@ void ElidableLabel::paintEvent(QPaintEvent* event) {
   auto painter = QPainter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(QRectF{event->rect()});
-  
+
   painter.save();
   painter.setPen(palette().color(_colorRole));
   painter.drawText(rect(), Qt::TextSingleLine | Qt::AlignLeft, elidedText());

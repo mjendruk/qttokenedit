@@ -13,7 +13,7 @@ class QTADVWIDGETS_API OmissionToken : public TokenDropTarget<BaseToken> {
 
   int count() const;
   void setCount(int count);
- 
+
  protected:
   void paintEvent(QPaintEvent* event) override;
 

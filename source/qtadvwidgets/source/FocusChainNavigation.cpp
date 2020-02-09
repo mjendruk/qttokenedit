@@ -1,6 +1,6 @@
 #include <qtadvwidgets/FocusChainNavigation.h>
 
-#include <QKeyEvent>
+#include <QtGui/QKeyEvent>
 
 bool DefaultFocusChainNavigation::focusPrevious(QKeyEvent* event) const {
   return event->key() == Qt::Key_Left;

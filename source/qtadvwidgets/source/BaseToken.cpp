@@ -1,11 +1,13 @@
 #include <qtadvwidgets/BaseToken.h>
-#include <qtadvwidgets/ElidableLabel.h>
 
-#include <QBoxLayout>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QPainterPath>
 #include <cmath>
+
+#include <QtGui/QPaintEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QPainterPath>
+#include <QtWidgets/QBoxLayout>
+
+#include <qtadvwidgets/ElidableLabel.h>
 
 BaseToken::BaseToken(QWidget* parent) : BaseToken{{}, parent} {}
 
@@ -18,13 +20,13 @@ BaseToken::BaseToken(QString const& text, QWidget* parent)
   _layout->setSpacing(spacing());
   _layout->setContentsMargins(horizontalTextMargin(), margin(),
                               horizontalTextMargin(), margin());
-  
+
   setFocusPolicy(Qt::ClickFocus);
 
   _label->setTextColorRole(QPalette::ButtonText);
-        
+
   setAttribute(Qt::WA_Hover);
-        
+
   updateMargins();
 }
 
@@ -97,13 +99,13 @@ void BaseToken::paintEvent(QPaintEvent* event) {
   if (hasFocus()) {
     brushRole = QPalette::Highlight;
   }
-  
+
   auto brush = palette().brush(brushRole);
-  
+
   if (underMouse() && isEnabled()) {
     auto color = brush.color();
     int grayValue = qGray(color.rgb());
-    color = color.lighter(100 + qMax(2, (180 - grayValue)/6));
+    color = color.lighter(100 + qMax(2, (180 - grayValue) / 6));
     brush.setColor(color);
   }
 

@@ -1,11 +1,12 @@
-#include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenEditEditingMode.h>
+
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QScrollArea>
+#include <QtWidgets/QScrollBar>
+
+#include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenEditView.h>
 #include <qtadvwidgets/TokenLineEdit.h>
-
-#include <QBoxLayout>
-#include <QScrollArea>
-#include <QScrollBar>
 
 TokenEditEditingMode::TokenEditEditingMode(TokenEditView* view,
                                            AbstractTokenEditModeAccess* access,
@@ -16,7 +17,7 @@ TokenEditEditingMode::~TokenEditEditingMode() {}
 
 void TokenEditEditingMode::inserted(int first, int last, UpdateFocus uf) {
   for (auto index = first; index <= last; ++index) {
-    auto token = access()->createToken(index);    
+    auto token = access()->createToken(index);
     view()->insert(index, token, uf);
   }
 }

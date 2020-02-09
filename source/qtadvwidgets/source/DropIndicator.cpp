@@ -1,7 +1,7 @@
 #include "DropIndicator.h"
 
-#include <QPainter>
-#include <QPaintDevice>
+#include <QtGui/QPaintDevice>
+#include <QtGui/QPainter>
 
 void DropIndicator::draw(DropIndicatorPosition position, QRect const& rect,
                          QBrush const& brush, QPainter* painter) const {

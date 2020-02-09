@@ -1,18 +1,19 @@
-#include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenEdit.h>
+
+#include <algorithm>
+
+#include <QtCore/QScopedValueRollback>
+#include <QtGlobal>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QScrollArea>
+#include <QtWidgets/QScrollBar>
+
+#include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenEditDisplayMode.h>
 #include <qtadvwidgets/TokenEditEditingMode.h>
 #include <qtadvwidgets/TokenEditView.h>
 #include <qtadvwidgets/TokenLineEdit.h>
-
-#include <QApplication>
-#include <QLineEdit>
-#include <QScopedValueRollback>
-#include <QScrollArea>
-#include <QScrollBar>
-#include <QtDebug>
-#include <QtGlobal>
-#include <algorithm>
 
 #include "TokenDragDropHandler.h"
 
@@ -60,7 +61,7 @@ class TokenEditModeAccess : public AbstractTokenEditModeAccess {
       token->setToolTip(data(index, Qt::ToolTipRole).toString());
     }
   }
-  
+
   AbstractTokenDragDropHandler* dragDropHandler() const override {
     return _tokenEdit->dragDropHandler();
   }
@@ -95,12 +96,12 @@ TokenEdit::TokenEdit(QWidget* parent)
       _rootModelIndex{QModelIndex{}},
       _modelColumn{0} {
   auto dummyToken = QScopedPointer{new Token{}};
-        
+
   _lineEdit->setFixedHeight(dummyToken->sizeHint().height());
-        
+
   _view->setDefaultFinalWidget(_lineEdit,
                                new LineEditFocusChainNavigation{_lineEdit});
-        
+
   setWidget(_scrollArea);
 
   _view->setFocusPolicy(Qt::StrongFocus);
@@ -130,12 +131,11 @@ TokenEdit::TokenEdit(QWidget* parent)
     updateHeight();
   });
 
-  connect(_lineEdit, &TokenLineEdit::backspaceAtBeginning,
-          [=]() {
-            if (_model && !_view->isEmpty() && removable()) {
-              this->remove(_view->count() - 1, UpdateFocus::No);
-            }
-          });
+  connect(_lineEdit, &TokenLineEdit::backspaceAtBeginning, [=]() {
+    if (_model && !_view->isEmpty() && removable()) {
+      this->remove(_view->count() - 1, UpdateFocus::No);
+    }
+  });
 
   connect(qApp, &QApplication::focusChanged, this, &TokenEdit::onFocusChanged);
 }

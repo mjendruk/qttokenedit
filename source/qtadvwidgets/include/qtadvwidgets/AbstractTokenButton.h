@@ -1,8 +1,8 @@
 #pragma once
 
-#include <qtadvwidgets/qtadvwidgets_api.h>
+#include <QtWidgets/QAbstractButton>
 
-#include <QAbstractButton>
+#include <qtadvwidgets/qtadvwidgets_api.h>
 
 class QTADVWIDGETS_API AbstractTokenButton : public QAbstractButton {
   Q_OBJECT

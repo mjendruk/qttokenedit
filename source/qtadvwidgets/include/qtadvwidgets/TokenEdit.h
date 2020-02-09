@@ -1,17 +1,18 @@
 #pragma once
 
+#include <cstdint>
+
+#include <QtCore/QModelIndex>
+#include <QtCore/QScopedValueRollback>
+#include <QtCore/QVariant>
+#include <QtCore/QVector>
+#include <QtWidgets/QAbstractItemView>
+#include <QtWidgets/QScrollArea>
+
+#include <qtadvwidgets/Global.h>
 #include <qtadvwidgets/TokenEditFrame.h>
 #include <qtadvwidgets/TokenEditMode.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
-#include <qtadvwidgets/Global.h>
-
-#include <QModelIndex>
-#include <QScrollArea>
-#include <QVariant>
-#include <QVector>
-#include <QAbstractItemView>
-#include <QScopedValueRollback>
-#include <cstdint>
 
 class QLineEdit;
 class QStackedWidget;
@@ -26,7 +27,6 @@ class TokenEditDisplayMode;
 class AbstractTokenEditModeAccess;
 class AbstractTokenDragDropHandler;
 
-
 class QTADVWIDGETS_API TokenEdit : public TokenEditFrame {
   Q_OBJECT
 
@@ -39,7 +39,7 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditFrame {
 
   bool dragEnabled() const;
   void setDragEnabled(bool enable);
-  
+
   QAbstractItemView::DragDropMode dragDropMode() const;
   void setDragDropMode(QAbstractItemView::DragDropMode behavior);
 
@@ -55,29 +55,29 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditFrame {
   void setModelColumn(int column);
 
   QModelIndex rootIndex() const;
-  void setRootIndex(QModelIndex const& index);  
+  void setRootIndex(QModelIndex const& index);
 
  signals:
   void dragStateChanged(bool enabled);
   void removableStateChanged(bool enabled);
-                                         
+
  protected:
   bool eventFilter(QObject* object, QEvent* event) override;
 
  private:
   friend class TokenEditModeAccess;
   friend class TokenDragDropHandler;
-               
+
   TokenEditView* view() const;
   AbstractTokenDragDropHandler* dragDropHandler() const;
-  
+
   int indexOf(Token const* token) const;
   QModelIndex index(int row) const;
   QModelIndex index(Token const* token) const;
-  
+
   QScopedValueRollback<UpdateFocus> enableUpdateFocus();
   bool remove(int row, UpdateFocus uf);
-  
+
   void init();
   void clear();
 
@@ -98,7 +98,7 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditFrame {
  private:
   QScopedPointer<AbstractTokenEditModeAccess> _access;
   QScopedPointer<AbstractTokenDragDropHandler> _dragDropHandler;
-  
+
   TokenEditView* _view;
   TokenLineEdit* _lineEdit;
   TokenEditMode* _activeMode;
@@ -111,7 +111,7 @@ class QTADVWIDGETS_API TokenEdit : public TokenEditFrame {
   bool _dragEnabled;
   QAbstractItemView::DragDropMode _dragDropMode;
   bool _removable;
-  
+
   UpdateFocus _updateFocus;
 
   // model members

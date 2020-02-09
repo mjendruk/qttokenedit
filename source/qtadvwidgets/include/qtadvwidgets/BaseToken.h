@@ -1,10 +1,11 @@
 #pragma once
 
-#include <qtadvwidgets/qtadvwidgets_api.h>
-
-#include <QString>
-#include <QWidget>
 #include <memory>
+
+#include <QtCore/QString>
+#include <QtWidgets/QWidget>
+
+#include <qtadvwidgets/qtadvwidgets_api.h>
 
 class QBoxLayout;
 
@@ -23,7 +24,7 @@ class QTADVWIDGETS_API BaseToken : public QWidget {
 
   QWidget* rightWidget() const;
   void setRightWidget(QWidget* widget);
- 
+
   int contentHeight() const;
 
  protected:

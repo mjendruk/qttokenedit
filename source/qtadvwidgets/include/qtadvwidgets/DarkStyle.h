@@ -1,12 +1,12 @@
 #pragma once
 
-#include <qtadvwidgets/qtadvwidgets_api.h>
+#include <QtCore/QFile>
+#include <QtGui/QFont>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QProxyStyle>
+#include <QtWidgets/QStyleFactory>
 
-#include <QApplication>
-#include <QFile>
-#include <QFont>
-#include <QProxyStyle>
-#include <QStyleFactory>
+#include <qtadvwidgets/qtadvwidgets_api.h>
 
 class QTADVWIDGETS_API DarkStyle : public QProxyStyle {
   Q_OBJECT

@@ -1,17 +1,16 @@
 #include <qtadvwidgets/AbstractTokenButton.h>
 
-#include <QPaintEvent>
-#include <QPainter>
-#include <QPainterPath>
-#include <QStyle>
+#include <QtGui/QPaintEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QPainterPath>
+#include <QtWidgets/QStyle>
 
 AbstractTokenButton::AbstractTokenButton(QWidget* parent)
     : AbstractTokenButton{QPalette::Text, parent} {}
 
 AbstractTokenButton::AbstractTokenButton(QPalette::ColorRole colorRole,
                                          QWidget* parent)
-    : QAbstractButton{parent},
-      _colorRole{colorRole} {
+    : QAbstractButton{parent}, _colorRole{colorRole} {
   setCheckable(false);
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setCursor(Qt::PointingHandCursor);
@@ -45,7 +44,7 @@ void AbstractTokenButton::paintEvent(QPaintEvent* event) {
 
   auto color = palette().color(_colorRole);
   color.setAlpha(50);
-  
+
   painter.setBrush(color);
   painter.setPen(Qt::NoPen);
 
@@ -54,6 +53,4 @@ void AbstractTokenButton::paintEvent(QPaintEvent* event) {
 
 void AbstractTokenButton::setPath(QPainterPath const& path) { _path = path; }
 
-int AbstractTokenButton::extent() const { 
-  return fontMetrics().height();
-}
+int AbstractTokenButton::extent() const { return fontMetrics().height(); }

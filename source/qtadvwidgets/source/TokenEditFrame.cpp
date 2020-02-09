@@ -1,11 +1,10 @@
-#include <qtadvwidgets/Token.h>
 #include <qtadvwidgets/TokenEditFrame.h>
 
-#include <QBoxLayout>
-#include <QChildEvent>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QStyleOptionFocusRect>
+#include <QtCore/QChildEvent>
+#include <QtGui/QPaintEvent>
+#include <QtGui/QPainter>
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QStyleOptionFocusRect>
 
 class TokenEditFrameOverlay : public QWidget {
  public:
@@ -49,11 +48,11 @@ QWidget* TokenEditFrame::takeWidget() {
   if (!_widget) {
     return nullptr;
   }
-  
+
   auto widget = _widget;
   _layout->removeWidget(widget);
   widget->setParent(nullptr);
-  
+
   _widget = nullptr;
   return widget;
 }
@@ -67,7 +66,7 @@ void TokenEditFrame::setWidget(QWidget* widget) {
   _layout->addWidget(widget);
   _frame->raise();
   _frame->update();
-  
+
   _widget = widget;
 }
 

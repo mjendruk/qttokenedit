@@ -1,13 +1,14 @@
 #pragma once
 
+#include <cstdint>
+#include <memory>
+
+#include <QtCore/QObject>
+
 #include <qtadvwidgets/FocusChainElement.h>
 #include <qtadvwidgets/Global.h>
 #include <qtadvwidgets/TokenEditMode.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
-
-#include <QObject>
-#include <cstdint>
-#include <memory>
 
 class FocusChainNavigation;
 
@@ -29,7 +30,7 @@ class QTADVWIDGETS_API FocusChain : public QObject {
   void remove(QWidget* widget, UpdateFocus updateFocus);
 
   int count() const;
-  
+
   bool isEmpty() const;
 
  signals:

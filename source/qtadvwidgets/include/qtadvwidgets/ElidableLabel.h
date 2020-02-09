@@ -1,8 +1,8 @@
 #pragma once
 
-#include <qtadvwidgets/qtadvwidgets_api.h>
+#include <QtWidgets/QWidget>
 
-#include <QWidget>
+#include <qtadvwidgets/qtadvwidgets_api.h>
 
 class QTADVWIDGETS_API ElidableLabel : public QWidget {
   Q_OBJECT

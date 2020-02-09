@@ -46,7 +46,6 @@ set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/source")
 
 set(headers
     ${include_path}/AbstractTokenButton.h
-    ${include_path}/baselib.h
     ${include_path}/BaseToken.h
     ${include_path}/DarkStyle.h
     ${include_path}/ElidableLabel.h
@@ -56,7 +55,6 @@ set(headers
     ${include_path}/FocusChainNavigation.h
     ${include_path}/Global.h
     ${include_path}/OmissionToken.h
-    ${include_path}/PlusButton.h
     ${include_path}/RemoveButton.h
     ${include_path}/Token.h
     ${include_path}/TokenDropTarget.h
@@ -71,20 +69,16 @@ set(headers
 
 set(sources
     ${source_path}/AbstractTokenButton.cpp
-    ${source_path}/baselib.cpp
     ${source_path}/BaseToken.cpp
     ${source_path}/DarkStyle.cpp
     ${source_path}/DropIndicator.cpp
     ${source_path}/DropIndicator.h
     ${source_path}/ElidableLabel.cpp
-    ${source_path}/FinalWidgetPlaceholder.cpp
-    ${source_path}/FinalWidgetPlaceholder.h
     ${source_path}/FlexLayout.cpp
     ${source_path}/FocusChain.cpp
     ${source_path}/FocusChainElement.cpp
     ${source_path}/FocusChainNavigation.cpp
     ${source_path}/OmissionToken.cpp
-    ${source_path}/PlusButton.cpp
     ${source_path}/RemoveButton.cpp
     ${source_path}/Token.cpp
     ${source_path}/TokenDragDropHandler.cpp

@@ -1,20 +1,19 @@
+#include <qtadvwidgets/TokenEditDisplayMode.h>
+
+#include <QtCore/QVariant>
+#include <QtWidgets/QBoxLayout>
+
 #include <qtadvwidgets/OmissionToken.h>
 #include <qtadvwidgets/Token.h>
-#include <qtadvwidgets/TokenEditDisplayMode.h>
 #include <qtadvwidgets/TokenEditView.h>
-
-#include <QBoxLayout>
-#include <QVariant>
-
-#include "FinalWidgetPlaceholder.h"
 
 TokenEditDisplayMode::TokenEditDisplayMode(TokenEditView* view,
                                            AbstractTokenEditModeAccess* access,
                                            QObject* parent)
     : TokenEditMode{view, access, parent},
       _omissionToken{new OmissionToken{access->dragDropHandler(), view}} {
-        _omissionToken->hide();
-      }
+  _omissionToken->hide();
+}
 
 TokenEditDisplayMode::~TokenEditDisplayMode() {}
 
@@ -114,13 +113,9 @@ int TokenEditDisplayMode::heightHint() const {
   return view()->heightForWidth(view()->width());
 }
 
-void TokenEditDisplayMode::activate() {
-  invalidate();
-}
+void TokenEditDisplayMode::activate() { invalidate(); }
 
-void TokenEditDisplayMode::deactivate() {
-  view()->takeFinalWidget();
-}
+void TokenEditDisplayMode::deactivate() { view()->takeFinalWidget(); }
 
 QWidget* TokenEditDisplayMode::omissionToken() const { return _omissionToken; }
 

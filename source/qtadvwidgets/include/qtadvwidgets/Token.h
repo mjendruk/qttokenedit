@@ -1,11 +1,12 @@
 #pragma once
 
+#include <memory>
+
+#include <QtCore/QString>
+
 #include <qtadvwidgets/BaseToken.h>
 #include <qtadvwidgets/Global.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
-
-#include <QString>
-#include <memory>
 
 class QMimeData;
 

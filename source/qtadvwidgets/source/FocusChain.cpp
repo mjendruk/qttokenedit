@@ -1,11 +1,13 @@
 #include <qtadvwidgets/FocusChain.h>
+
+#include <algorithm>
+
+#include <QtGlobal>
+#include <QtWidgets/QWidget>
+
 #include <qtadvwidgets/FocusChainElement.h>
 #include <qtadvwidgets/FocusChainNavigation.h>
 #include <qtadvwidgets/Token.h>
-
-#include <QWidget>
-#include <QtGlobal>
-#include <algorithm>
 
 FocusChain::FocusChain(QObject* parent) : QObject{parent} {}
 
@@ -27,7 +29,7 @@ void FocusChain::insert(int index, QWidget* widget, UpdateFocus updateFocus,
   if (updateFocus == UpdateFocus::Yes) {
     widget->setFocus();
   }
-  
+
   auto element = new FocusChainElement{widget, navigation, this};
   insert(index, element, UpdateSignalConnection::Yes);
 }

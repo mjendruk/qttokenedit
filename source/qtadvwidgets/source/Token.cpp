@@ -1,16 +1,18 @@
+#include <qtadvwidgets/Token.h>
+
+#include <cmath>
+
+#include <QtCore/QMimeData>
+#include <QtGui/QDrag>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPaintEvent>
+#include <QtGui/QPainter>
+
 #include <qtadvwidgets/AbstractTokenDragDropHandler.h>
 #include <qtadvwidgets/ElidableLabel.h>
 #include <qtadvwidgets/FocusChainElement.h>
 #include <qtadvwidgets/RemoveButton.h>
-#include <qtadvwidgets/Token.h>
-
-#include <QDrag>
-#include <QKeyEvent>
-#include <QMimeData>
-#include <QMouseEvent>
-#include <QPaintEvent>
-#include <QPainter>
-#include <cmath>
 
 #include "DropIndicator.h"
 
@@ -138,7 +140,7 @@ QPixmap Token::toPixmap() {
   auto pixmap = QPixmap(size() * devicePixelRatio());
   pixmap.setDevicePixelRatio(devicePixelRatio());
   pixmap.fill(QColor{Qt::transparent});
-  
+
   render(&pixmap, QPoint{}, QRegion{}, QWidget::DrawChildren);
 
   return pixmap;

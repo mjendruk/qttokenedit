@@ -1,9 +1,10 @@
-#include <qtadvwidgets/AbstractTokenDragDropHandler.h>
 #include <qtadvwidgets/TokenLineEdit.h>
 
-#include <QDropEvent>
-#include <QKeyEvent>
-#include <QPaintEvent>
+#include <QtGui/QDropEvent>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QPaintEvent>
+
+#include <qtadvwidgets/AbstractTokenDragDropHandler.h>
 
 #include "TokenDropTarget.hpp"
 

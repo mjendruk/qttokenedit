@@ -1,9 +1,9 @@
 #pragma once
 
-#include <qtadvwidgets/qtadvwidgets_api.h>
+#include <QtWidgets/QLayout>
+#include <QtWidgets/QStyle>
 
-#include <QLayout>
-#include <QStyle>
+#include <qtadvwidgets/qtadvwidgets_api.h>
 
 class QTADVWIDGETS_API FlexLayout : public QLayout {
   Q_OBJECT

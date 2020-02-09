@@ -1,9 +1,9 @@
 #include <qtadvwidgets/FocusChainElement.h>
 
-#include <qtadvwidgets/FocusChainNavigation.h>
+#include <QtCore/QEvent>
+#include <QtGui/QKeyEvent>
 
-#include <QEvent>
-#include <QKeyEvent>
+#include <qtadvwidgets/FocusChainNavigation.h>
 
 FocusChainElement::FocusChainElement(QWidget* widget,
                                      FocusChainNavigation* navigation,
@@ -15,7 +15,7 @@ FocusChainElement::FocusChainElement(QWidget* widget,
       _navigation{navigation} {
   Q_ASSERT(widget);
   Q_ASSERT(navigation);
-        
+
   if (navigation->parent() == nullptr) {
     navigation->setParent(this);
   }

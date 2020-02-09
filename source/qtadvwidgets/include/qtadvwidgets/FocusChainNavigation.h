@@ -1,8 +1,8 @@
 #pragma once
 
-#include <qtadvwidgets/qtadvwidgets_api.h>
+#include <QtCore/QObject>
 
-#include <QObject>
+#include <qtadvwidgets/qtadvwidgets_api.h>
 
 class QKeyEvent;
 

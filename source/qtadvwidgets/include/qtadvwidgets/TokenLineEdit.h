@@ -1,10 +1,10 @@
 #pragma once
 
+#include <QtWidgets/QLineEdit>
+
 #include <qtadvwidgets/FocusChainNavigation.h>
 #include <qtadvwidgets/TokenDropTarget.h>
 #include <qtadvwidgets/qtadvwidgets_api.h>
-
-#include <QLineEdit>
 
 class QTADVWIDGETS_API TokenLineEdit : public TokenDropTarget<QLineEdit> {
   Q_OBJECT

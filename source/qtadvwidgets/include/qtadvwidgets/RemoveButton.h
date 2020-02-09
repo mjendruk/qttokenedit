@@ -8,8 +8,7 @@ class QTADVWIDGETS_API RemoveButton : public AbstractTokenButton {
 
  public:
   RemoveButton(QWidget* parent = nullptr);
-  RemoveButton(QPalette::ColorRole colorRole,
-               QWidget* parent = nullptr);
+  RemoveButton(QPalette::ColorRole colorRole, QWidget* parent = nullptr);
 
  private:
   QPainterPath createPath(int extent) const;

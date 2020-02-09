@@ -1,14 +1,15 @@
 #pragma once
 
-#include <qtadvwidgets/AbstractTokenDragDropHandler.h>
 #include <qtadvwidgets/TokenDropTarget.h>
 
-#include <QDragEnterEvent>
-#include <QDragMoveEvent>
-#include <QDropEvent>
-#include <QEvent>
-#include <QPaintEvent>
-#include <QPainter>
+#include <QtCore/QEvent>
+#include <QtGui/QDragEnterEvent>
+#include <QtGui/QDragMoveEvent>
+#include <QtGui/QDropEvent>
+#include <QtGui/QPaintEvent>
+#include <QtGui/QPainter>
+
+#include <qtadvwidgets/AbstractTokenDragDropHandler.h>
 
 #include "DropIndicator.h"
 

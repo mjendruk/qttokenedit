@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 class AbstractTokenDragDropHandler;
 
@@ -23,7 +23,7 @@ class TokenDropTarget : public T {
 
  private:
   bool acceptsDrop(QDropEvent* event) const;
-  
+
   void showIndicator();
   void hideIndicator();
 

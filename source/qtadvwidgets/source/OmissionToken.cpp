@@ -1,8 +1,7 @@
 #include <qtadvwidgets/OmissionToken.h>
-#include <qtadvwidgets/PlusButton.h>
 
-#include <QPaintEvent>
-#include <QPainter>
+#include <QtGui/QPaintEvent>
+#include <QtGui/QPainter>
 
 #include "TokenDropTarget.hpp"
 

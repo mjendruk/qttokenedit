@@ -1,10 +1,10 @@
 #include <qtadvwidgets/FlexLayout.h>
 
-#include <QLayoutItem>
-#include <QWidget>
-#include <QWidgetItem>
 #include <cmath>
-#include <limits>
+
+#include <QtWidgets/QLayoutItem>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QWidgetItem>
 
 FlexLayout::FlexLayout(QWidget *parent) : FlexLayout{-1, -1, -1, parent} {}
 

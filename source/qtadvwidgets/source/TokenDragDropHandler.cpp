@@ -1,12 +1,12 @@
 #include "TokenDragDropHandler.h"
 
-#include <qtadvwidgets/TokenEdit.h>
-#include <qtadvwidgets/Token.h>
-#include <qtadvwidgets/TokenEditView.h>
+#include <QtCore/QAbstractItemModel>
+#include <QtCore/QScopedValueRollback>
+#include <QtWidgets/QAbstractItemView>
 
-#include <QAbstractItemModel>
-#include <QAbstractItemView>
-#include <QScopedValueRollback>
+#include <qtadvwidgets/Token.h>
+#include <qtadvwidgets/TokenEdit.h>
+#include <qtadvwidgets/TokenEditView.h>
 
 TokenDragDropHandler::TokenDragDropHandler(TokenEdit* tokenEdit)
     : _tokenEdit{tokenEdit} {}
@@ -105,7 +105,7 @@ bool TokenDragDropHandler::dropMimeData(int row, QMimeData const* data,
                                         QObject* source) {
   Q_UNUSED(source);
   Q_ASSERT(canDropMimeData(row, data, source));
-  
+
   if (row == -1) {
     row = view()->count();
   }
