@@ -21,7 +21,7 @@ namespace mjendruk {
 
 class TokenEditModeAccess : public AbstractTokenEditModeAccess {
  public:
-  TokenEditModeAccess(TokenEdit* tokenEdit) : _tokenEdit{tokenEdit} {}
+  explicit TokenEditModeAccess(TokenEdit* tokenEdit) : _tokenEdit{tokenEdit} {}
 
   int maxLineCount() const override { return _tokenEdit->maxLineCount(); }
 

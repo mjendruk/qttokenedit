@@ -11,7 +11,7 @@ class TokenEditView;
 
 class TokenDragDropHandler : public AbstractTokenDragDropHandler {
  public:
-  TokenDragDropHandler(TokenEdit* tokenEdit);
+  explicit TokenDragDropHandler(TokenEdit* tokenEdit);
 
   bool canDrag(Token const* source) const override;
 

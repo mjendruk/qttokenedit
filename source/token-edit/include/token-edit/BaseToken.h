@@ -17,8 +17,8 @@ class TOKEN_EDIT_API BaseToken : public QWidget {
   Q_OBJECT
 
  public:
-  BaseToken(QWidget* parent = nullptr);
-  BaseToken(QString const& text, QWidget* parent = nullptr);
+  explicit BaseToken(QWidget* parent = nullptr);
+  explicit BaseToken(QString const& text, QWidget* parent = nullptr);
   ~BaseToken();
 
   QString const& text() const;

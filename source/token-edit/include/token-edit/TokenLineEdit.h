@@ -11,7 +11,7 @@ namespace mjendruk {
 class TOKEN_EDIT_API TokenLineEdit : public TokenDropTarget<QLineEdit> {
   Q_OBJECT
  public:
-  TokenLineEdit(AbstractTokenDragDropHandler* handler,
+  explicit TokenLineEdit(AbstractTokenDragDropHandler* handler,
                 QWidget* parent = nullptr);
 
  signals:
@@ -33,7 +33,7 @@ class TOKEN_EDIT_API TokenLineEdit : public TokenDropTarget<QLineEdit> {
 class TOKEN_EDIT_API LineEditFocusChainNavigation
     : public FocusChainNavigation {
  public:
-  LineEditFocusChainNavigation(QLineEdit* lineEdit);
+  explicit LineEditFocusChainNavigation(QLineEdit* lineEdit);
 
   bool focusPrevious(QKeyEvent* event) const override;
   bool focusNext(QKeyEvent* event) const override;

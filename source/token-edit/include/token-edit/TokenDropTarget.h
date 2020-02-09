@@ -13,7 +13,7 @@ class TokenDropTarget : public T {
   static_assert(std::is_base_of_v<QWidget, T>);
 
  public:
-  TokenDropTarget(AbstractTokenDragDropHandler* handler,
+  explicit TokenDropTarget(AbstractTokenDragDropHandler* handler,
                   QWidget* parent = nullptr);
 
  protected:

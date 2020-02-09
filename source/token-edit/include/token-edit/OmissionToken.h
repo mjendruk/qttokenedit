@@ -10,7 +10,7 @@ class TOKEN_EDIT_API OmissionToken : public TokenDropTarget<BaseToken> {
   Q_OBJECT
 
  public:
-  OmissionToken(AbstractTokenDragDropHandler* handler,
+  explicit OmissionToken(AbstractTokenDragDropHandler* handler,
                 QWidget* parent = nullptr);
 
   int count() const;

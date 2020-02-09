@@ -10,8 +10,8 @@ class TOKEN_EDIT_API ElidableLabel : public QWidget {
   Q_OBJECT
 
  public:
-  ElidableLabel(QWidget* parent = nullptr);
-  ElidableLabel(QString const& text, QWidget* parent = nullptr);
+  explicit ElidableLabel(QWidget* parent = nullptr);
+  explicit ElidableLabel(QString const& text, QWidget* parent = nullptr);
 
   QString const& text() const;
   void setText(QString const& text);

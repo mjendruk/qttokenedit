@@ -9,8 +9,8 @@ class TOKEN_EDIT_API RemoveButton : public AbstractTokenButton {
   Q_OBJECT
 
  public:
-  RemoveButton(QWidget* parent = nullptr);
-  RemoveButton(QPalette::ColorRole colorRole, QWidget* parent = nullptr);
+  explicit RemoveButton(QWidget* parent = nullptr);
+  explicit RemoveButton(QPalette::ColorRole colorRole, QWidget* parent = nullptr);
 
  private:
   QPainterPath createPath(int extent) const;
