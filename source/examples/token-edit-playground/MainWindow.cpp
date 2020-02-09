@@ -152,7 +152,7 @@ MainWindow::~MainWindow() {}
 
 void MainWindow::on_about() {
   QString about =
-      QString() + "Version:   " + QT_WIDGETS_EXTENSIONS_VERSION + "\n";
+      QString() + "Version:   " + QT_TOKEN_EDIT_VERSION + "\n";
 
   QMessageBox::about(this, "template project", about);
 }
