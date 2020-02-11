@@ -6,3 +6,4 @@ endif()
 
 # Example applications
 add_subdirectory(token-edit-playground)
+add_subdirectory(sorted-table)
