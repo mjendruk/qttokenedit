@@ -51,7 +51,7 @@ endif()
 
 # Meta information about the project
 set(META_PROJECT_NAME        "qt-token-edit")
-set(META_PROJECT_DESCRIPTION "Additional Qt Widgets")
+set(META_PROJECT_DESCRIPTION "Qt Token Edit")
 set(META_AUTHOR_ORGANIZATION "mjendruk")
 set(META_AUTHOR_DOMAIN       "https://github.com/mjendruk/qt-token-edit/")
 set(META_AUTHOR_MAINTAINER   "code@jendruk.com")
