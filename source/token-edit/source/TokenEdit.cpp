@@ -3,7 +3,8 @@
 #include <algorithm>
 
 #include <QtCore/QScopedValueRollback>
-#include <QtGlobal>
+#include <QtCore/QTimer>
+#include <QtCore/QtGlobal>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QScrollArea>
@@ -363,12 +364,12 @@ void TokenEdit::onFocusChanged(QWidget* prev, QWidget* now) {
   auto prevIsChild = isChild(prev);
   auto nowIsChild = isChild(now);
 
+  setShownAsFocused(nowIsChild);
+
   if (prevIsChild && !nowIsChild) {
-    setActiveMode(_displayMode);
-    setShownAsFocused(false);
+    QTimer::singleShot(0, [=]() { setActiveMode(_displayMode); });
   } else if (!prevIsChild && nowIsChild) {
-    setActiveMode(_editingMode);
-    setShownAsFocused(true);
+    QTimer::singleShot(0, [=]() { setActiveMode(_editingMode); });
   }
 }
 
