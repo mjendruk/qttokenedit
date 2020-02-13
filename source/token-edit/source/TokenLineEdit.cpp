@@ -12,12 +12,14 @@ namespace mjendruk {
 
 TokenLineEdit::TokenLineEdit(AbstractTokenDragDropHandler* handler,
                              QWidget* parent)
-    : TokenDropTarget<QLineEdit>{handler, parent} {
+    : TokenDropTarget<QLineEdit>{handler, parent}, 
+      _widthHint{0} {
   setAttribute(Qt::WA_MacShowFocusRect, 0);
   setFrame(false);
   setMinimumWidth(1);
 
   connect(this, &QLineEdit::textChanged, this, &TokenLineEdit::onTextChanged);
+  updateGeometry();
 }
 
 void TokenLineEdit::keyPressEvent(QKeyEvent* event) {
@@ -40,12 +42,11 @@ void TokenLineEdit::paintEvent(QPaintEvent* event) {
 
 QSize TokenLineEdit::sizeHint() const {
   auto height = QLineEdit::sizeHint().height();
-  return QSize{_widthHint, height};
+  return QSize{_widthHint + fontMetrics().averageCharWidth(), height};
 }
 
 void TokenLineEdit::onTextChanged(QString const& text) {
-  auto textWidth = fontMetrics().boundingRect(text).width();
-  _widthHint = textWidth + fontMetrics().averageCharWidth();
+  _widthHint = fontMetrics().boundingRect(text).width();
   updateGeometry();
 }
 
