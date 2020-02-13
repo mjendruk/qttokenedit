@@ -65,6 +65,16 @@ void Token::setRemovable(bool enable) {
   updateMargins();
 }
 
+QPixmap Token::toPixmap() {
+  auto pixmap = QPixmap(size() * devicePixelRatio());
+  pixmap.setDevicePixelRatio(devicePixelRatio());
+  pixmap.fill(QColor{Qt::transparent});
+
+  render(&pixmap, QPoint{}, QRegion{}, QWidget::DrawChildren);
+
+  return pixmap;
+}
+
 void Token::paintEvent(QPaintEvent* event) {
   BaseToken::paintEvent(event);
 
@@ -138,16 +148,6 @@ void Token::dropEvent(QDropEvent* event) {
   }
 }
 
-QPixmap Token::toPixmap() {
-  auto pixmap = QPixmap(size() * devicePixelRatio());
-  pixmap.setDevicePixelRatio(devicePixelRatio());
-  pixmap.fill(QColor{Qt::transparent});
-
-  render(&pixmap, QPoint{}, QRegion{}, QWidget::DrawChildren);
-
-  return pixmap;
-}
-
 bool Token::shouldStartDrag(QPoint const& mousePos) const {
   if (!_dragDropHandler) {
     return false;
@@ -161,16 +161,7 @@ bool Token::shouldStartDrag(QPoint const& mousePos) const {
 }
 
 void Token::startDrag(QPoint const& mousePos) {
-  auto drag = new QDrag{this};
-  drag->setHotSpot(mousePos);
-  drag->setPixmap(toPixmap());
-  drag->setMimeData(_dragDropHandler->mimeData(this));
-
-  if (drag->exec(Qt::MoveAction) == Qt::MoveAction) {
-    auto success = _dragDropHandler->dropAccepted(this);
-    Q_ASSERT(success);
-  }
-
+  _dragDropHandler->execDrag(this, mousePos);
   _mousePressedAt = QPoint{};
 }
 

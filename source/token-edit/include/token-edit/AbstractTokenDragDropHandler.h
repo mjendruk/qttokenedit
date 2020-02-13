@@ -4,6 +4,7 @@
 
 class QObject;
 class QMimeData;
+class QPoint;
 
 namespace mjendruk {
 
@@ -14,10 +15,8 @@ class AbstractTokenDragDropHandler {
   virtual ~AbstractTokenDragDropHandler() = default;
 
   virtual bool canDrag(Token const* source) const = 0;
-
-  virtual QMimeData* mimeData(Token const* source) const = 0;
-
-  virtual bool dropAccepted(Token* source) = 0;
+  
+  virtual bool execDrag(Token* source, QPoint const& mousePos) = 0;
 
   virtual bool canDropMimeData(Token const* target, QMimeData const* data,
                                QObject* source,

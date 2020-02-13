@@ -92,7 +92,11 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
   void onModelReset();
 
   void onFocusChanged(QWidget* prev, QWidget* now);
-
+  
+  void blockModeChange();
+  void unblockModeChange();
+  void setNextActiveMode(TokenEditMode* mode);
+  void updateActiveMode();
   void setActiveMode(TokenEditMode* mode);
   void updateHeight();
   void ensureVisible(QWidget* widget);
@@ -104,6 +108,8 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
   TokenEditView* _view;
   TokenLineEdit* _lineEdit;
   TokenEditMode* _activeMode;
+  TokenEditMode* _nextActiveMode;
+  bool _modeChangedBlocked;
   TokenEditEditingMode* _editingMode;
   TokenEditDisplayMode* _displayMode;
 

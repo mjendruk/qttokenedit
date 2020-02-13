@@ -3,6 +3,7 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QAbstractItemView>
+#include <QtGui/QDrag>
 
 #include <token-edit/Token.h>
 #include <token-edit/TokenEdit.h>
@@ -37,13 +38,25 @@ bool TokenDragDropHandler::canDrag(Token const* source) const {
   return true;
 }
 
-QMimeData* TokenDragDropHandler::mimeData(const Token* source) const {
-  auto index = _tokenEdit->index(source);
-  return model()->mimeData({index});
-}
+bool TokenDragDropHandler::execDrag(Token* source,
+                                    QPoint const& mousePos) {
+  Q_ASSERT(canDrag(source));
+  
+  auto const index = _tokenEdit->index(source);
+  
+  auto drag = new QDrag{source};
+  drag->setHotSpot(mousePos);
+  drag->setPixmap(source->toPixmap());
+  drag->setMimeData(model()->mimeData({index}));
 
-bool TokenDragDropHandler::dropAccepted(Token* token) {
-  return _tokenEdit->remove(_tokenEdit->indexOf(token), UpdateFocus::No);
+  _tokenEdit->blockModeChange();
+  
+  if (drag->exec(Qt::MoveAction) == Qt::MoveAction) {
+   auto success = _tokenEdit->remove(index.row(), UpdateFocus::No);
+   Q_ASSERT(success);
+  }
+  
+  _tokenEdit->unblockModeChange();
 }
 
 bool TokenDragDropHandler::canDropMimeData(const Token* target,

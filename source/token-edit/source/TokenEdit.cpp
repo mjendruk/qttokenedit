@@ -87,6 +87,8 @@ TokenEdit::TokenEdit(QWidget* parent)
       _view{new TokenEditView{this}},
       _lineEdit{new TokenLineEdit{dragDropHandler(), _view}},
       _activeMode{nullptr},
+      _nextActiveMode{nullptr},
+      _modeChangedBlocked{false},
       _editingMode{new TokenEditEditingMode{_view, _access.get(), this}},
       _displayMode{new TokenEditDisplayMode{_view, _access.get(), this}},
       _scrollArea{new QScrollArea{this}},
@@ -252,7 +254,7 @@ bool TokenEdit::eventFilter(QObject* object, QEvent* event) {
   Q_ASSERT(_view == object);
 
   if (event->type() == QEvent::FocusIn) {
-    setActiveMode(_editingMode);
+    setNextActiveMode(_editingMode);
     lineEdit()->setFocus();
     return true;
   }
@@ -367,9 +369,30 @@ void TokenEdit::onFocusChanged(QWidget* prev, QWidget* now) {
   setShownAsFocused(nowIsChild);
 
   if (prevIsChild && !nowIsChild) {
-    QTimer::singleShot(0, [=]() { setActiveMode(_displayMode); });
+    setNextActiveMode(_displayMode);
   } else if (!prevIsChild && nowIsChild) {
-    QTimer::singleShot(0, [=]() { setActiveMode(_editingMode); });
+    setNextActiveMode(_editingMode);
+  }
+}
+
+void TokenEdit::blockModeChange() {
+  _modeChangedBlocked = true;
+}
+
+void TokenEdit::unblockModeChange() {
+  _modeChangedBlocked = false;
+  updateActiveMode();
+}
+
+void TokenEdit::setNextActiveMode(TokenEditMode* mode) {
+  _nextActiveMode = mode;
+  updateActiveMode();
+}
+
+void TokenEdit::updateActiveMode() {
+  if (_nextActiveMode && !_modeChangedBlocked) {
+    setActiveMode(_nextActiveMode);
+    _nextActiveMode = nullptr;
   }
 }
 
