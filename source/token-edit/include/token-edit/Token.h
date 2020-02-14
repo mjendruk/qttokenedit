@@ -29,7 +29,7 @@ class TOKEN_EDIT_API Token : public BaseToken {
 
   bool removable() const;
   void setRemovable(bool enable);
-  
+
   QPixmap toPixmap();
 
  signals:

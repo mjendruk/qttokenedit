@@ -11,7 +11,7 @@ class TOKEN_EDIT_API OmissionToken : public TokenDropTarget<BaseToken> {
 
  public:
   explicit OmissionToken(AbstractTokenDragDropHandler* handler,
-                QWidget* parent = nullptr);
+                         QWidget* parent = nullptr);
 
   int count() const;
   void setCount(int count);

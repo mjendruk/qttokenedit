@@ -5,16 +5,16 @@
 
 #include <QtCore/QObject>
 
-#include <token-edit/FocusChainElement.h>
 #include <token-edit/Global.h>
-#include <token-edit/TokenEditMode.h>
-#include <token-edit/token-edit-api.h>
+
+#include "FocusChainElement.h"
+#include "TokenEditMode.h"
 
 namespace mjendruk {
 
 class FocusChainNavigation;
 
-class TOKEN_EDIT_API FocusChain : public QObject {
+class FocusChain : public QObject {
   Q_OBJECT
 
  public:

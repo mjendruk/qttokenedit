@@ -1,13 +1,14 @@
-#include <token-edit/FocusChain.h>
+#include "FocusChain.h"
 
 #include <algorithm>
 
 #include <QtGlobal>
 #include <QtWidgets/QWidget>
 
-#include <token-edit/FocusChainElement.h>
 #include <token-edit/FocusChainNavigation.h>
 #include <token-edit/Token.h>
+
+#include "FocusChainElement.h"
 
 namespace mjendruk {
 

@@ -11,7 +11,6 @@
 
 #include <token-edit/Global.h>
 #include <token-edit/TokenEditFrame.h>
-#include <token-edit/TokenEditMode.h>
 #include <token-edit/token-edit-api.h>
 
 class QLineEdit;
@@ -21,13 +20,14 @@ class QScrollArea;
 
 namespace mjendruk {
 
-class TokenLineEdit;
-class TokenEditView;
-class TokenEditMode;
-class TokenEditEditingMode;
-class TokenEditDisplayMode;
-class AbstractTokenEditModeAccess;
 class AbstractTokenDragDropHandler;
+class AbstractTokenEditModeAccess;
+class Token;
+class TokenEditDisplayMode;
+class TokenEditEditingMode;
+class TokenEditMode;
+class TokenEditView;
+class TokenLineEdit;
 
 class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
   Q_OBJECT
@@ -92,7 +92,7 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
   void onModelReset();
 
   void onFocusChanged(QWidget* prev, QWidget* now);
-  
+
   void blockModeChange();
   void unblockModeChange();
   void setNextActiveMode(TokenEditMode* mode);

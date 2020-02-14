@@ -1,4 +1,4 @@
-#include <token-edit/TokenEditEditingMode.h>
+#include "TokenEditEditingMode.h"
 
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QScrollArea>

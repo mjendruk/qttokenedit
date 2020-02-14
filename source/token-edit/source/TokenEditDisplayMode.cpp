@@ -1,4 +1,4 @@
-#include <token-edit/TokenEditDisplayMode.h>
+#include "TokenEditDisplayMode.h"
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QBoxLayout>

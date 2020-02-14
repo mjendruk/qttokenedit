@@ -11,12 +11,12 @@
 #include <QtWidgets/QScrollBar>
 
 #include <token-edit/Token.h>
-#include <token-edit/TokenEditDisplayMode.h>
-#include <token-edit/TokenEditEditingMode.h>
 #include <token-edit/TokenEditView.h>
 #include <token-edit/TokenLineEdit.h>
 
 #include "TokenDragDropHandler.h"
+#include "TokenEditDisplayMode.h"
+#include "TokenEditEditingMode.h"
 
 namespace mjendruk {
 
@@ -375,9 +375,7 @@ void TokenEdit::onFocusChanged(QWidget* prev, QWidget* now) {
   }
 }
 
-void TokenEdit::blockModeChange() {
-  _modeChangedBlocked = true;
-}
+void TokenEdit::blockModeChange() { _modeChangedBlocked = true; }
 
 void TokenEdit::unblockModeChange() {
   _modeChangedBlocked = false;

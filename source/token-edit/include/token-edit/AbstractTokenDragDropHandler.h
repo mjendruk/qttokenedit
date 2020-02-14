@@ -15,7 +15,7 @@ class AbstractTokenDragDropHandler {
   virtual ~AbstractTokenDragDropHandler() = default;
 
   virtual bool canDrag(Token const* source) const = 0;
-  
+
   virtual void execDrag(Token* source, QPoint const& mousePos) = 0;
 
   virtual bool canDropMimeData(Token const* target, QMimeData const* data,

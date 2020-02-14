@@ -5,9 +5,10 @@
 #include <QtGui/QResizeEvent>
 
 #include <token-edit/FlexLayout.h>
-#include <token-edit/FocusChain.h>
 #include <token-edit/Token.h>
 #include <token-edit/TokenLineEdit.h>
+
+#include "FocusChain.h"
 
 namespace mjendruk {
 

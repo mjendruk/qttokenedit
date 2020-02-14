@@ -1,4 +1,4 @@
-#include <token-edit/FocusChainElement.h>
+#include "FocusChainElement.h"
 
 #include <QtCore/QEvent>
 #include <QtGui/QKeyEvent>

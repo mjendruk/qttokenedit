@@ -12,8 +12,7 @@ namespace mjendruk {
 
 TokenLineEdit::TokenLineEdit(AbstractTokenDragDropHandler* handler,
                              QWidget* parent)
-    : TokenDropTarget<QLineEdit>{handler, parent}, 
-      _widthHint{0} {
+    : TokenDropTarget<QLineEdit>{handler, parent}, _widthHint{0} {
   setAttribute(Qt::WA_MacShowFocusRect, 0);
   setFrame(false);
   setMinimumWidth(1);

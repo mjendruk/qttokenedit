@@ -3,13 +3,11 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QWidget>
 
-#include <token-edit/token-edit-api.h>
-
 namespace mjendruk {
 
 class FocusChainNavigation;
 
-class TOKEN_EDIT_API FocusChainElement : public QObject {
+class FocusChainElement : public QObject {
   Q_OBJECT
  public:
   /**

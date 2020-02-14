@@ -1,4 +1,4 @@
-#include <token-edit/RemoveButton.h>
+#include "RemoveButton.h"
 
 #include <cmath>
 

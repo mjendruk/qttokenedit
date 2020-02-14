@@ -14,7 +14,7 @@ class TokenDropTarget : public T {
 
  public:
   explicit TokenDropTarget(AbstractTokenDragDropHandler* handler,
-                  QWidget* parent = nullptr);
+                           QWidget* parent = nullptr);
 
  protected:
   void dragEnterEvent(QDragEnterEvent* event) override;

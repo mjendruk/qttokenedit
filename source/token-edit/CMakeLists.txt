@@ -50,19 +50,13 @@ set(headers
     ${include_path}/DarkStyle.h
     ${include_path}/ElidableLabel.h
     ${include_path}/FlexLayout.h
-    ${include_path}/FocusChain.h
-    ${include_path}/FocusChainElement.h
     ${include_path}/FocusChainNavigation.h
     ${include_path}/Global.h
     ${include_path}/OmissionToken.h
-    ${include_path}/RemoveButton.h
     ${include_path}/Token.h
     ${include_path}/TokenDropTarget.h
     ${include_path}/TokenEdit.h
-    ${include_path}/TokenEditDisplayMode.h
-    ${include_path}/TokenEditEditingMode.h
     ${include_path}/TokenEditFrame.h
-    ${include_path}/TokenEditMode.h
     ${include_path}/TokenEditView.h
     ${include_path}/TokenLineEdit.h
 )
@@ -76,19 +70,25 @@ set(sources
     ${source_path}/ElidableLabel.cpp
     ${source_path}/FlexLayout.cpp
     ${source_path}/FocusChain.cpp
+    ${source_path}/FocusChain.h
     ${source_path}/FocusChainElement.cpp
+    ${source_path}/FocusChainElement.h
     ${source_path}/FocusChainNavigation.cpp
     ${source_path}/OmissionToken.cpp
     ${source_path}/RemoveButton.cpp
+    ${source_path}/RemoveButton.h
     ${source_path}/Token.cpp
     ${source_path}/TokenDragDropHandler.cpp
     ${source_path}/TokenDragDropHandler.h
     ${source_path}/TokenDropTarget.hpp
     ${source_path}/TokenEdit.cpp
     ${source_path}/TokenEditDisplayMode.cpp
+    ${source_path}/TokenEditDisplayMode.h
     ${source_path}/TokenEditEditingMode.cpp
+    ${source_path}/TokenEditEditingMode.h
     ${source_path}/TokenEditFrame.cpp
     ${source_path}/TokenEditMode.cpp
+    ${source_path}/TokenEditMode.h
     ${source_path}/TokenEditView.cpp
     ${source_path}/TokenLineEdit.cpp
 )

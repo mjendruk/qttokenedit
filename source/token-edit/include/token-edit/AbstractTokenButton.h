@@ -11,7 +11,8 @@ class TOKEN_EDIT_API AbstractTokenButton : public QAbstractButton {
 
  public:
   explicit AbstractTokenButton(QWidget* parent = nullptr);
-  explicit AbstractTokenButton(QPalette::ColorRole colorRole, QWidget* parent = nullptr);
+  explicit AbstractTokenButton(QPalette::ColorRole colorRole,
+                               QWidget* parent = nullptr);
 
   QSize sizeHint() const override;
 

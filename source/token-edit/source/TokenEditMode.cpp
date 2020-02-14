@@ -1,4 +1,4 @@
-#include <token-edit/TokenEditMode.h>
+#include "TokenEditMode.h"
 
 namespace mjendruk {
 

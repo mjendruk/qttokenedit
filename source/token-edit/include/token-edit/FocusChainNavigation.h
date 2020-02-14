@@ -16,8 +16,7 @@ class FocusChainNavigation : public QObject {
   virtual bool focusNext(QKeyEvent* event) const = 0;
 };
 
-class TOKEN_EDIT_API DefaultFocusChainNavigation
-    : public FocusChainNavigation {
+class TOKEN_EDIT_API DefaultFocusChainNavigation : public FocusChainNavigation {
  public:
   using FocusChainNavigation::FocusChainNavigation;
 

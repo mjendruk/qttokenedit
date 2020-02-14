@@ -12,7 +12,7 @@ class TOKEN_EDIT_API TokenLineEdit : public TokenDropTarget<QLineEdit> {
   Q_OBJECT
  public:
   explicit TokenLineEdit(AbstractTokenDragDropHandler* handler,
-                QWidget* parent = nullptr);
+                         QWidget* parent = nullptr);
 
  signals:
   void backspaceAtBeginning();

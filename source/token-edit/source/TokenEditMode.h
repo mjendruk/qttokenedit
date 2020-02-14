@@ -3,7 +3,6 @@
 #include <QtCore/QObject>
 
 #include <token-edit/Global.h>
-#include <token-edit/token-edit-api.h>
 
 namespace mjendruk {
 
@@ -25,7 +24,7 @@ class AbstractTokenEditModeAccess {
   virtual AbstractTokenDragDropHandler* dragDropHandler() const = 0;
 };
 
-class TOKEN_EDIT_API TokenEditMode : public QObject {
+class TokenEditMode : public QObject {
   Q_OBJECT
  public:
   TokenEditMode(TokenEditView* view, AbstractTokenEditModeAccess* access,

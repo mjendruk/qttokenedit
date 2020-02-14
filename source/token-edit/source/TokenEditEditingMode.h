@@ -1,14 +1,13 @@
 #pragma once
 
-#include <token-edit/TokenEditMode.h>
-#include <token-edit/token-edit-api.h>
+#include "TokenEditMode.h"
 
 namespace mjendruk {
 
 class TokenEditView;
 class TokenLineEdit;
 
-class TOKEN_EDIT_API TokenEditEditingMode : public TokenEditMode {
+class TokenEditEditingMode : public TokenEditMode {
   Q_OBJECT
  public:
   TokenEditEditingMode(TokenEditView* view, AbstractTokenEditModeAccess* access,

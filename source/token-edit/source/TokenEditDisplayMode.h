@@ -1,7 +1,6 @@
 #pragma once
 
-#include <token-edit/TokenEditMode.h>
-#include <token-edit/token-edit-api.h>
+#include "TokenEditMode.h"
 
 namespace mjendruk {
 
@@ -9,7 +8,7 @@ class TokenEditView;
 class OmissionToken;
 class FinalWidgetPlaceholder;
 
-class TOKEN_EDIT_API TokenEditDisplayMode : public TokenEditMode {
+class TokenEditDisplayMode : public TokenEditMode {
   Q_OBJECT
  public:
   TokenEditDisplayMode(TokenEditView* view, AbstractTokenEditModeAccess* access,

@@ -11,10 +11,10 @@
 
 #include <token-edit/AbstractTokenDragDropHandler.h>
 #include <token-edit/ElidableLabel.h>
-#include <token-edit/FocusChainElement.h>
-#include <token-edit/RemoveButton.h>
 
 #include "DropIndicator.h"
+#include "FocusChainElement.h"
+#include "RemoveButton.h"
 
 namespace mjendruk {
 
