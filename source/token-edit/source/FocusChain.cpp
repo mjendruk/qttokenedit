@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include <QtGlobal>
+#include <QtCore/QtGlobal>
 #include <QtWidgets/QWidget>
 
 #include <token-edit/FocusChainNavigation.h>
