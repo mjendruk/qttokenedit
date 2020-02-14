@@ -38,7 +38,7 @@ bool TokenDragDropHandler::canDrag(Token const* source) const {
   return true;
 }
 
-bool TokenDragDropHandler::execDrag(Token* source,
+void TokenDragDropHandler::execDrag(Token* source,
                                     QPoint const& mousePos) {
   Q_ASSERT(canDrag(source));
   

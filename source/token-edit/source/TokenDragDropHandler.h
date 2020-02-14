@@ -15,7 +15,7 @@ class TokenDragDropHandler : public AbstractTokenDragDropHandler {
 
   bool canDrag(Token const* source) const override;
   
-  bool execDrag(Token* source, QPoint const& mousePos) override;
+  void execDrag(Token* source, QPoint const& mousePos) override;
 
   bool canDropMimeData(const Token* target, const QMimeData* data,
                        QObject* source, TokenDropHint dropHint) const override;
