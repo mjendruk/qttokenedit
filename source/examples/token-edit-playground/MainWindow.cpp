@@ -146,6 +146,9 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
 
     m_ui->formLayout->addRow("2nd TokenEdit", tokenEdit);
   }
+
+  auto tokenEdit = new mjendruk::TokenEdit{this};
+  m_ui->formLayout->addRow("Empty TokenEdit", tokenEdit);
 }
 
 MainWindow::~MainWindow() {}

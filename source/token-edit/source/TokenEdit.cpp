@@ -128,11 +128,10 @@ TokenEdit::TokenEdit(QWidget* parent)
           [=](auto widget) { ensureVisible(widget); });
 
   connect(_view, &TokenEditView::sizeChanged, [=]() {
-    if (!_model && !_activeMode) {
-      return;
+    if (_model) {
+      _activeMode->invalidate();
+      ensureVisible(focusWidget());
     }
-    _activeMode->invalidate();
-    ensureVisible(focusWidget());
     updateHeight();
   });
 
@@ -300,6 +299,7 @@ void TokenEdit::init() {
 }
 
 void TokenEdit::clear() {
+  setNextActiveMode(nullptr);
   while (!_view->isEmpty()) {
     _view->remove(0, UpdateFocus::No);
   }
@@ -368,6 +368,10 @@ void TokenEdit::onFocusChanged(QWidget* prev, QWidget* now) {
 
   setShownAsFocused(nowIsChild);
 
+  if (!_model) {
+    return;
+  }
+
   if (prevIsChild && !nowIsChild) {
     setNextActiveMode(_displayMode);
   } else if (!prevIsChild && nowIsChild) {
@@ -395,8 +399,6 @@ void TokenEdit::updateActiveMode() {
 }
 
 void TokenEdit::setActiveMode(TokenEditMode* mode) {
-  Q_ASSERT(mode);
-
   if (_activeMode == mode) {
     return;
   }
@@ -405,12 +407,16 @@ void TokenEdit::setActiveMode(TokenEditMode* mode) {
     _activeMode->deactivate();
   }
 
-  mode->activate();
+  if (mode) {
+    mode->activate();
+  }
+
   _activeMode = mode;
 }
 
 void TokenEdit::updateHeight() {
-  auto height = _activeMode->heightHint();
+  auto height = _activeMode ? _activeMode->heightHint()
+                            : view()->heightForWidth(view()->width());
 
   if (_scrollArea->height() != height) {
     _scrollArea->setFixedHeight(height);
@@ -420,7 +426,7 @@ void TokenEdit::updateHeight() {
 void TokenEdit::ensureVisible(QWidget* widget) {
   auto ySpacing = _view->ySpacing();
 
-  // y-margin is not properly resprected for line edit
+  // y-margin is not properly respected for line edit
   if (widget == lineEdit()) {
     ySpacing *= 2;
   }
