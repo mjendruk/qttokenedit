@@ -55,6 +55,7 @@ set(headers
     ${include_path}/OmissionToken.h
     ${include_path}/Token.h
     ${include_path}/TokenDropTarget.h
+    ${include_path}/TokenDropTarget.hpp
     ${include_path}/TokenEdit.h
     ${include_path}/TokenEditFrame.h
     ${include_path}/TokenEditView.h
@@ -80,7 +81,6 @@ set(sources
     ${source_path}/Token.cpp
     ${source_path}/TokenDragDropHandler.cpp
     ${source_path}/TokenDragDropHandler.h
-    ${source_path}/TokenDropTarget.hpp
     ${source_path}/TokenEdit.cpp
     ${source_path}/TokenEditDisplayMode.cpp
     ${source_path}/TokenEditDisplayMode.h

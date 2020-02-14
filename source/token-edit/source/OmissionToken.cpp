@@ -3,7 +3,7 @@
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPainter>
 
-#include "TokenDropTarget.hpp"
+#include <token-edit/TokenDropTarget.hpp>
 
 namespace mjendruk {
 

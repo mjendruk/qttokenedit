@@ -6,7 +6,7 @@
 
 #include <token-edit/AbstractTokenDragDropHandler.h>
 
-#include "TokenDropTarget.hpp"
+#include <token-edit/TokenDropTarget.hpp>
 
 namespace mjendruk {
 
