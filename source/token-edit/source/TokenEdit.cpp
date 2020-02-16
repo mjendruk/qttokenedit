@@ -15,6 +15,7 @@
 #include <token-edit/TokenEditView.h>
 #include <token-edit/TokenLineEdit.h>
 
+#include "FinalWidgetPlaceholder.h"
 #include "TokenDragDropHandler.h"
 #include "TokenEditDisplayMode.h"
 #include "TokenEditEditingMode.h"
@@ -90,6 +91,7 @@ TokenEdit::TokenEdit(QWidget* parent)
       _dragDropHandler{new TokenDragDropHandler{this}},
       _view{new TokenEditView{this}},
       _lineEdit{new TokenLineEdit{dragDropHandler(), _view}},
+      _placeholder{new FinalWidgetPlaceholder{dragDropHandler(), _view}},
       _activeMode{nullptr},
       _nextActiveMode{nullptr},
       _modeChangedBlocked{false},
@@ -97,6 +99,7 @@ TokenEdit::TokenEdit(QWidget* parent)
       _displayMode{new TokenEditDisplayMode{_view, _access.get(), this}},
       _scrollArea{new QScrollArea{this}},
       _maxLineCount{3},
+      _showLineEdit{ShowLineEdit::Always},
       _dragEnabled{false},
       _dragDropMode{QAbstractItemView::NoDragDrop},
       _removable{false},
@@ -108,6 +111,7 @@ TokenEdit::TokenEdit(QWidget* parent)
   auto dummyToken = QScopedPointer{new Token{}};
 
   _lineEdit->setFixedHeight(dummyToken->sizeHint().height());
+  _placeholder->setFixedHeight(dummyToken->sizeHint().height());
 
   _view->setDefaultFinalWidget(_lineEdit);
 
@@ -158,6 +162,24 @@ void TokenEdit::setMaxLineCount(int count) {
   _maxLineCount = count;
   _activeMode->invalidate();
   updateHeight();
+}
+
+ShowLineEdit TokenEdit::showLineEdit() const { return _showLineEdit; }
+  
+void TokenEdit::setShowLineEdit(ShowLineEdit state) {
+  if (_showLineEdit == state) {
+    return;
+  }
+
+  if (state == ShowLineEdit::Never) {
+    _view->takeDefaultFinalWidget();
+    _view->setDefaultFinalWidget(_placeholder);
+  } else if (state == ShowLineEdit::Always) {
+    _view->takeDefaultFinalWidget();
+    _view->setDefaultFinalWidget(_lineEdit);
+  }
+  
+  _showLineEdit = state;
 }
 
 bool TokenEdit::dragEnabled() const { return _dragEnabled; }

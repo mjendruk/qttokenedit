@@ -18,18 +18,19 @@ class QStackedWidget;
 class QAbstractItemModel;
 class QScrollArea;
 
-namespace mjendruk {
 
-class AbstractTokenSelectionHandler;
+namespace mjendruk {
 class AbstractTokenDragDropHandler;
 class AbstractTokenEditModeAccess;
-class TokenSelectionHandler;
+class AbstractTokenSelectionHandler;
+class FinalWidgetPlaceholder;
 class Token;
 class TokenEditDisplayMode;
 class TokenEditEditingMode;
 class TokenEditMode;
 class TokenEditView;
 class TokenLineEdit;
+class TokenSelectionHandler;
 
 class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
   Q_OBJECT
@@ -40,6 +41,9 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
 
   int maxLineCount() const;
   void setMaxLineCount(int count);
+
+  ShowLineEdit showLineEdit() const;
+  void setShowLineEdit(ShowLineEdit state);
 
   bool dragEnabled() const;
   void setDragEnabled(bool enable);
@@ -120,7 +124,10 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
   QScopedPointer<AbstractTokenDragDropHandler> _dragDropHandler;
 
   TokenEditView* _view;
+  
   TokenLineEdit* _lineEdit;
+  FinalWidgetPlaceholder *_placeholder;
+
   TokenEditMode* _activeMode;
   TokenEditMode* _nextActiveMode;
   bool _modeChangedBlocked;
@@ -130,6 +137,7 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
   QScrollArea* _scrollArea;
 
   int _maxLineCount;
+  ShowLineEdit _showLineEdit;
   bool _dragEnabled;
   QAbstractItemView::DragDropMode _dragDropMode;
   bool _removable;

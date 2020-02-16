@@ -29,6 +29,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
   selectedColumnEdit->setMaxLineCount(2);
   selectedColumnEdit->setDragEnabled(true);
   selectedColumnEdit->setDragDropMode(QAbstractItemView::DragDrop);
+  selectedColumnEdit->setShowLineEdit(mjendruk::ShowLineEdit::Never);
   
   connect(selectedColumns, &QAbstractItemModel::rowsInserted, [=]() {
     model->sortByColumns(selectedColumns->validSelectedColumn());
@@ -52,6 +53,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
   availableColumnEdit->setMaxLineCount(2);
   availableColumnEdit->setDragEnabled(true);
   availableColumnEdit->setDragDropMode(QAbstractItemView::DragDrop);
+  availableColumnEdit->setShowLineEdit(mjendruk::ShowLineEdit::Never);
   
   m_ui->formLayout_2->addRow("Available", availableColumnEdit);
   

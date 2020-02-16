@@ -70,6 +70,8 @@ set(sources
     ${source_path}/DarkStyle.cpp
     ${source_path}/DropIndicator.cpp
     ${source_path}/ElidableLabel.cpp
+    ${source_path}/FinalWidgetPlaceholder.cpp
+    ${source_path}/FinalWidgetPlaceholder.h
     ${source_path}/FlexLayout.cpp
     ${source_path}/OmissionToken.cpp
     ${source_path}/RemoveButton.cpp
