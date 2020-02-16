@@ -308,6 +308,8 @@ int TokenEdit::visibleCount() const { return _view->count(); }
 
 Token* TokenEdit::at(int row) const { return _view->at(row); }
 
+Token* TokenEdit::find(int row) const { return _view->find(row); }
+
 int TokenEdit::indexOf(Token const* token) const {
   return _view->indexOf(token);
 }

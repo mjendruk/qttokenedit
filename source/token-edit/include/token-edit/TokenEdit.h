@@ -82,6 +82,7 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
 
   int visibleCount() const;
   Token* at(int row) const;
+  Token* find(int row) const;
   int indexOf(Token const* token) const;
   QModelIndex index(int row) const;
   QModelIndex index(Token const* token) const;

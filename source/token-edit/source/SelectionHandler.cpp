@@ -36,39 +36,15 @@ void SelectionHandler::updateModel() {
 
 void SelectionHandler::select(Token const* token, Qt::MouseButtons buttons,
                               Qt::KeyboardModifiers modifiers) {
-  if (!buttons.testFlag(Qt::LeftButton)) {
-    return;
+  auto index = _tokenEdit->index(token);
+
+  if (shouldExtendSelection(buttons, modifiers)) {
+    return extendSelectionTo(index);
   }
 
-  auto flags = QItemSelectionModel::Select | QItemSelectionModel::Rows;
-
-  auto tokenIndex = _tokenEdit->index(token);
-  
-  if (_selectionModel->selection().contains(tokenIndex)) {
-    _selectionModel->setCurrentIndex(tokenIndex, QItemSelectionModel::Current);
-    return;
+  if (shouldSelectSingle(buttons, modifiers)) {
+    return selectSingle(index, modifiers);
   }
-  
-  auto itemSelection = QItemSelection{};
-  
-  if (auto latest = _selectionModel->currentIndex();
-      latest.isValid() && modifiers.testFlag(Qt::ShiftModifier)) {
-    
-    if (latest.row() < tokenIndex.row()) {
-      itemSelection.select(latest, tokenIndex);
-    } else {
-      itemSelection.select(tokenIndex, latest);
-    }
-  } else {
-    itemSelection.select(tokenIndex, tokenIndex);
-    
-    if (!modifiers.testFlag(Qt::ControlModifier)) {
-       flags.setFlag(QItemSelectionModel::Clear);
-    }
-  }
-
-  _selectionModel->select(itemSelection, flags);
-  _selectionModel->setCurrentIndex(tokenIndex, QItemSelectionModel::Current);
 }
 
 QItemSelectionModel* SelectionHandler::selectionModel() const {
@@ -78,62 +54,19 @@ QItemSelectionModel* SelectionHandler::selectionModel() const {
 bool SelectionHandler::eventFilter(QObject* watched, QEvent* event) {
   Q_ASSERT(_tokenEdit == watched);
 
-  if (event->type() == QEvent::KeyPress) {
-    auto keyEvent = static_cast<QKeyEvent*>(event);
-
-    if (keyEvent->key() == Qt::Key_Left || keyEvent->key() == Qt::Key_Right) {
-      auto latestSelectedIndex = _selectionModel->currentIndex();
-        
-      auto row = 0;
-      
-      if (latestSelectedIndex.isValid()) {
-        auto siblingShift = (keyEvent->key() == Qt::Key_Left) ? -1 : +1;
-        row = latestSelectedIndex.row() + siblingShift;
-      } else {
-        row = (keyEvent->key() == Qt::Key_Right) ? 0 : view()->count() - 1;
-      }
-      
-      auto newCurrentIndex = _tokenEdit->index(row);
-
-      auto flags = QItemSelectionModel::Select | QItemSelectionModel::Rows;
-
-      if (!keyEvent->modifiers().testFlag(Qt::ShiftModifier)) {
-        flags.setFlag(QItemSelectionModel::Clear);
-      }
-
-      if (newCurrentIndex.isValid()) {
-        _selectionModel->select(newCurrentIndex, flags);
-        _selectionModel->setCurrentIndex(newCurrentIndex, QItemSelectionModel::Current);
-      }
-      return true;
-    }
-    
-    if (keyEvent->key() == Qt::Key_A &&
-        keyEvent->modifiers().testFlag(Qt::ControlModifier)) {
-      auto itemSelection = QItemSelection{
-          _tokenEdit->index(0), _tokenEdit->index(model()->rowCount() - 1)};
-      _selectionModel->select(itemSelection, QItemSelectionModel::Select);
-      return true;
-    }
+  if (shouldSelectPreviousNext(event)) {
+    return selectPreviousNext(event);
   }
-  
-  if (event->type() == QEvent::MouseButtonPress) {
-    auto mouseEvent = static_cast<QMouseEvent*>(event);
-    
-    if (mouseEvent->buttons().testFlag(Qt::LeftButton)) {
-      _selectionModel->clear();
-      return true;
-    }
+
+  if (shouldSelectFirst(event)) {
+    return selectFirst();
   }
-  
-  if (event->type() == QEvent::FocusIn) {
-    auto index = _tokenEdit->index(0);
-    _selectionModel->select(index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
-    _selectionModel->setCurrentIndex(index, QItemSelectionModel::Current);
-    return false;
+
+  if (shouldSelectAll(event)) {
+    return selectAll();
   }
-  
-  if (event->type() == QEvent::FocusOut) {
+
+  if (shouldClear(event)) {
     _selectionModel->clear();
     return false;
   }
@@ -144,8 +77,6 @@ bool SelectionHandler::eventFilter(QObject* watched, QEvent* event) {
 QAbstractItemModel* SelectionHandler::model() const {
   return _tokenEdit->model();
 }
-
-TokenEditView* SelectionHandler::view() const { return _tokenEdit->view(); }
 
 void SelectionHandler::onSelectionChanged(QItemSelection const& selected,
                                           QItemSelection const& deselected) {
@@ -160,10 +91,151 @@ void SelectionHandler::updateSelection(QModelIndexList const& indexes,
       continue;
     }
 
-    if (auto token = view()->find(index.row())) {
+    if (auto token = _tokenEdit->find(index.row())) {
       token->setSelected(selected);
     }
   }
+}
+
+QItemSelectionModel::SelectionFlags SelectionHandler::defaultFlags() const {
+  return QItemSelectionModel::Select | QItemSelectionModel::Rows;
+}
+
+bool SelectionHandler::shouldExtendSelection(
+    Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers) const {
+  return buttons.testFlag(Qt::LeftButton) &&
+         modifiers.testFlag(Qt::ShiftModifier) &&
+         _selectionModel->currentIndex().isValid();
+}
+
+void SelectionHandler::extendSelectionTo(QModelIndex const& index) {
+  auto current = _selectionModel->currentIndex();
+
+  auto itemSelection = QItemSelection{};
+  if (current.row() < index.row()) {
+    itemSelection.select(current, index);
+  } else {
+    itemSelection.select(index, current);
+  }
+
+  _selectionModel->select(itemSelection, defaultFlags());
+  _selectionModel->setCurrentIndex(index, {});
+}
+
+bool SelectionHandler::shouldSelectSingle(
+    Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers) const {
+  Q_UNUSED(modifiers);
+  return buttons.testFlag(Qt::LeftButton);
+}
+
+void SelectionHandler::selectSingle(QModelIndex const& index,
+                                    Qt::KeyboardModifiers modifiers) {
+  if (_selectionModel->selection().contains(index)) {
+    _selectionModel->setCurrentIndex(index, {});
+    return;
+  }
+
+  auto flags = defaultFlags();
+
+  if (!modifiers.testFlag(Qt::ControlModifier)) {
+    flags.setFlag(QItemSelectionModel::Clear);
+  }
+
+  _selectionModel->select(index, flags);
+  _selectionModel->setCurrentIndex(index, {});
+}
+
+bool SelectionHandler::shouldSelectPreviousNext(QEvent* event) const {
+  if (event->type() == QEvent::KeyPress) {
+    auto keyEvent = static_cast<QKeyEvent*>(event);
+
+    if (keyEvent->key() == Qt::Key_Left || keyEvent->key() == Qt::Key_Right)
+      return true;
+  }
+
+  return false;
+}
+
+bool SelectionHandler::selectPreviousNext(QEvent* event) {
+  auto keyEvent = static_cast<QKeyEvent*>(event);
+  bool isLeft = keyEvent->key() == Qt::Key_Left;
+
+  auto currentIndex = _selectionModel->currentIndex();
+
+  auto row = 0;
+
+  if (currentIndex.isValid()) {
+    auto adjacentShift = isLeft ? -1 : 1;
+    row = currentIndex.row() + adjacentShift;
+  } else {
+    row = isLeft ? _tokenEdit->visibleCount() - 1 : 0;
+  }
+
+  auto newCurrentIndex = _tokenEdit->index(row);
+
+  auto flags = defaultFlags();
+
+  if (!keyEvent->modifiers().testFlag(Qt::ShiftModifier)) {
+    flags.setFlag(QItemSelectionModel::Clear);
+  }
+
+  if (newCurrentIndex.isValid()) {
+    _selectionModel->select(newCurrentIndex, flags);
+    _selectionModel->setCurrentIndex(newCurrentIndex,
+                                     QItemSelectionModel::Current);
+  }
+
+  return true;
+}
+
+bool SelectionHandler::shouldSelectFirst(QEvent* event) const {
+  return event->type() == QEvent::FocusIn;
+}
+
+bool SelectionHandler::selectFirst() {
+  auto index = _tokenEdit->index(0);
+  _selectionModel->select(index, defaultFlags());
+  _selectionModel->setCurrentIndex(index, {});
+
+  return true;
+}
+
+bool SelectionHandler::shouldSelectAll(QEvent* event) const {
+  if (event->type() != QEvent::KeyPress) return false;
+
+  auto keyEvent = static_cast<QKeyEvent*>(event);
+  return keyEvent->key() == Qt::Key_A &&
+         keyEvent->modifiers().testFlag(Qt::ControlModifier);
+}
+
+bool SelectionHandler::selectAll() {
+  if (model()->rowCount() == 0) {
+    return false;
+  }
+
+  auto firstIndex = _tokenEdit->index(0);
+  auto lastIndex = _tokenEdit->index(model()->rowCount() - 1);
+  auto itemSelection = QItemSelection{firstIndex, lastIndex};
+  _selectionModel->select(itemSelection, defaultFlags());
+  _selectionModel->setCurrentIndex(lastIndex, {});
+
+  return true;
+}
+
+bool SelectionHandler::shouldClear(QEvent* event) const {
+  if (event->type() == QEvent::MouseButtonPress) {
+    auto mouseEvent = static_cast<QMouseEvent*>(event);
+
+    if (mouseEvent->buttons().testFlag(Qt::LeftButton)) {
+      return true;
+    }
+  }
+
+  if (event->type() == QEvent::FocusOut) {
+    return true;
+  }
+
+  return false;
 }
 
 }  // namespace mjendruk
