@@ -60,7 +60,7 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
 
   QModelIndex rootIndex() const;
   void setRootIndex(QModelIndex const& index);
-  
+
   QItemSelectionModel* selectionModel() const;
 
  signals:
@@ -103,7 +103,7 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
   void onModelReset();
 
   void onFocusChanged(QWidget* prev, QWidget* now);
-  
+
   void onCurrentChanged(QModelIndex const& current, QModelIndex const& prev);
 
   void blockModeChange();

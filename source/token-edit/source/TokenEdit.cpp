@@ -15,10 +15,10 @@
 #include <token-edit/TokenEditView.h>
 #include <token-edit/TokenLineEdit.h>
 
-#include "TokenSelectionHandler.h"
 #include "TokenDragDropHandler.h"
 #include "TokenEditDisplayMode.h"
 #include "TokenEditEditingMode.h"
+#include "TokenSelectionHandler.h"
 
 namespace mjendruk {
 
@@ -104,8 +104,6 @@ TokenEdit::TokenEdit(QWidget* parent)
       _model{nullptr},
       _rootModelIndex{QModelIndex{}},
       _modelColumn{0} {
-      
-    
   setFocusPolicy(Qt::StrongFocus);
   auto dummyToken = QScopedPointer{new Token{}};
 
@@ -115,8 +113,8 @@ TokenEdit::TokenEdit(QWidget* parent)
 
   setWidget(_scrollArea);
 
-//  _view->setFocusPolicy(Qt::NoFocus);
-//  _view->installEventFilter(this);
+  //  _view->setFocusPolicy(Qt::NoFocus);
+  //  _view->installEventFilter(this);
 
   _scrollArea->setFrameShape(QFrame::NoFrame);
   _scrollArea->setWidgetResizable(true);
@@ -134,10 +132,10 @@ TokenEdit::TokenEdit(QWidget* parent)
   connect(_view, &TokenEditView::sizeChanged, [=]() {
     if (_model) {
       _activeMode->invalidate();
-          
+
       if (auto selection = selectionModel()->currentIndex();
           selection.isValid()) {
-          ensureVisible(view()->at(selection.row()));
+        ensureVisible(view()->at(selection.row()));
       }
     }
     updateHeight();
@@ -228,11 +226,11 @@ void TokenEdit::setModel(QAbstractItemModel* model) {
             &TokenEdit::onDataChanged);
     connect(_model, &QAbstractItemModel::modelReset, this,
             &TokenEdit::onModelReset);
-    
+
     _selectionHandler->updateModel();
     connect(selectionModel(), &QItemSelectionModel::currentChanged, this,
             &TokenEdit::onCurrentChanged);
-    
+
     init();
   }
 }
@@ -279,15 +277,15 @@ bool TokenEdit::eventFilter(QObject* object, QEvent* event) {
 
 void TokenEdit::keyPressEvent(QKeyEvent* event) {
   TokenEditFrame::keyPressEvent(event);
-  
+
   if (removable() && event->key() == Qt::Key_Backspace) {
     auto indexes = selectionModel()->selectedRows(modelColumn());
     auto rows = std::vector<int>(indexes.size());
     std::transform(indexes.cbegin(), indexes.cend(), rows.begin(),
                    [](auto const& i) { return i.row(); });
-   
+
     std::sort(rows.rbegin(), rows.rend());
-    
+
     for (auto row : rows) {
       remove(row, UpdateFocus::Yes);
     }
@@ -336,18 +334,18 @@ bool TokenEdit::remove(int row, UpdateFocus uf) {
 bool TokenEdit::remove(QModelIndexList const& _indexes, UpdateFocus uf) {
   Q_ASSERT(_model);
   QScopedValueRollback svr{_updateFocus, uf};
-  
+
   auto indexes = _indexes;
-   auto rows = std::vector<int>(indexes.size());
-   std::transform(indexes.cbegin(), indexes.cend(), rows.begin(),
-                  [](auto const& i) { return i.row(); });
-  
-   std::sort(rows.rbegin(), rows.rend());
-   
+  auto rows = std::vector<int>(indexes.size());
+  std::transform(indexes.cbegin(), indexes.cend(), rows.begin(),
+                 [](auto const& i) { return i.row(); });
+
+  std::sort(rows.rbegin(), rows.rend());
+
   auto success = true;
-   for (auto row : rows) {
-     success &= _model->removeRow(row);
-   }
+  for (auto row : rows) {
+    success &= _model->removeRow(row);
+  }
   return success;
 }
 
