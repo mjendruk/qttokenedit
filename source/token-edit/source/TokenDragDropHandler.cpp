@@ -2,6 +2,7 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QScopedPointer>
 #include <QtGui/QDrag>
 #include <QtWidgets/QAbstractItemView>
 
@@ -40,15 +41,23 @@ bool TokenDragDropHandler::canDrag(Token const* source) const {
 
 void TokenDragDropHandler::execDrag(Token* source, QPoint const& mousePos) {
   Q_ASSERT(canDrag(source));
-
-//  auto const index = _tokenEdit->index(source);
   
-  auto indexes = _tokenEdit->selectionModel()->selectedRows(_tokenEdit->modelColumn());
+  auto tokens = selectedTokens();
+  Q_ASSERT((std::any_of(tokens.cbegin(), tokens.cend(),
+                        [=](auto token) { return token == source; })));
+  
+  auto rect = enclosingRect(tokens);
+  auto pixmap = renderPixmap(rect, tokens);
+  
+  auto hotSpot = source->mapToParent(mousePos) - rect.topLeft();
 
-  auto drag = new QDrag{source};
-  drag->setHotSpot(mousePos);
-  drag->setPixmap(source->toPixmap());
-  drag->setMimeData(model()->mimeData(indexes));
+  auto indexes = selectedIndexes();
+  auto mimeData = model()->mimeData(indexes);
+  
+  auto drag = QScopedPointer<QDrag>{new QDrag{source}};
+  drag->setPixmap(pixmap);
+  drag->setHotSpot(hotSpot);
+  drag->setMimeData(mimeData);
 
   _tokenEdit->blockModeChange();
 
@@ -95,7 +104,7 @@ bool TokenDragDropHandler::canDropMimeData(int row, QMimeData const* data,
   }
 
   if (row == -1) {
-    row = view()->count();
+    row = _tokenEdit->visibleCount();
   }
 
   return model()->canDropMimeData(data, Qt::MoveAction, row,
@@ -123,7 +132,7 @@ bool TokenDragDropHandler::dropMimeData(int row, QMimeData const* data,
   Q_ASSERT(canDropMimeData(row, data, source));
 
   if (row == -1) {
-    row = view()->count();
+    row = _tokenEdit->visibleCount();
   }
 
   auto updateFocusEnabled = _tokenEdit->enableUpdateFocus();
@@ -132,10 +141,43 @@ bool TokenDragDropHandler::dropMimeData(int row, QMimeData const* data,
                                _tokenEdit->rootIndex());
 }
 
+QModelIndexList TokenDragDropHandler::selectedIndexes() const {
+  return _tokenEdit->selectionModel()->selectedRows(_tokenEdit->modelColumn());
+}
+
+QVector<Token*> TokenDragDropHandler::selectedTokens() const {
+  auto indexes = selectedIndexes();
+  auto result = QVector<Token*>(indexes.size());
+  std::transform(indexes.cbegin(), indexes.cend(), result.begin(),
+                 [=](auto const& i) { return _tokenEdit->at(i.row()); });
+  return result;
+}
+
+QRect TokenDragDropHandler::enclosingRect(QVector<Token*> const& tokens) const {
+  return std::accumulate(tokens.cbegin(), tokens.cend(), QRect{},
+                         [](QRect const& rect, Token* token) {
+    return rect.united(token->geometry());
+  });
+}
+
+QPixmap TokenDragDropHandler::renderPixmap(QRect const& enclosingRect,
+                                           QVector<Token*> tokens) const {
+  auto dpr = _tokenEdit->devicePixelRatio();
+  
+  auto pixmap = QPixmap{dpr * enclosingRect.size()};
+  pixmap.setDevicePixelRatio(dpr);
+  pixmap.fill(Qt::transparent);
+  
+  for (auto token : tokens) {
+    auto offset = token->geometry().topLeft() - enclosingRect.topLeft();
+    token->render(&pixmap, offset, QRegion{}, QWidget::DrawChildren);
+  }
+  
+  return pixmap;
+}
+
 QAbstractItemModel* TokenDragDropHandler::model() const {
   return _tokenEdit->model();
 }
-
-TokenEditView* TokenDragDropHandler::view() const { return _tokenEdit->view(); }
 
 }  // namespace mjendruk

@@ -304,6 +304,10 @@ AbstractTokenDragDropHandler* TokenEdit::dragDropHandler() const {
   return _dragDropHandler.get();
 }
 
+int TokenEdit::visibleCount() const { return _view->count(); }
+
+Token* TokenEdit::at(int row) const { return _view->at(row); }
+
 int TokenEdit::indexOf(Token const* token) const {
   return _view->indexOf(token);
 }

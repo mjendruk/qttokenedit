@@ -80,6 +80,8 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
   AbstractSelectionHandler* selectionHandler() const;
   AbstractTokenDragDropHandler* dragDropHandler() const;
 
+  int visibleCount() const;
+  Token* at(int row) const;
   int indexOf(Token const* token) const;
   QModelIndex index(int row) const;
   QModelIndex index(Token const* token) const;

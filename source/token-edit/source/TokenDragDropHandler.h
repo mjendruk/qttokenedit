@@ -1,8 +1,9 @@
 #pragma once
 
-#include <token-edit/AbstractTokenDragDropHandler.h>
+#include <QtCore/QVector>
+#include <QtCore/QAbstractItemModel>
 
-class QAbstractItemModel;
+#include <token-edit/AbstractTokenDragDropHandler.h>
 
 namespace mjendruk {
 
@@ -29,9 +30,15 @@ class TokenDragDropHandler : public AbstractTokenDragDropHandler {
   bool dropMimeData(int row, QMimeData const* data, QObject* source) override;
 
  private:
+  QModelIndexList selectedIndexes() const;
+  QVector<Token*> selectedTokens() const;
+  QRect enclosingRect(QVector<Token*> const& tokens) const;
+  QPixmap renderPixmap(QRect const& enclosingRect,
+                       QVector<Token*> tokens) const;
+  
+ private:
   QAbstractItemModel* model() const;
-  TokenEditView* view() const;
-
+  
  private:
   TokenEdit* const _tokenEdit;
 };
