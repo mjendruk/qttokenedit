@@ -14,7 +14,6 @@
 #include <token-edit/DropIndicator.h>
 #include <token-edit/ElidableLabel.h>
 
-#include "FocusChainElement.h"
 #include "RemoveButton.h"
 
 namespace mjendruk {

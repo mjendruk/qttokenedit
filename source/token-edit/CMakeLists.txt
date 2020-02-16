@@ -53,7 +53,6 @@ set(headers
     ${include_path}/DropIndicator.h
     ${include_path}/ElidableLabel.h
     ${include_path}/FlexLayout.h
-    ${include_path}/FocusChainNavigation.h
     ${include_path}/Global.h
     ${include_path}/OmissionToken.h
     ${include_path}/Token.h
@@ -72,11 +71,6 @@ set(sources
     ${source_path}/DropIndicator.cpp
     ${source_path}/ElidableLabel.cpp
     ${source_path}/FlexLayout.cpp
-    ${source_path}/FocusChain.cpp
-    ${source_path}/FocusChain.h
-    ${source_path}/FocusChainElement.cpp
-    ${source_path}/FocusChainElement.h
-    ${source_path}/FocusChainNavigation.cpp
     ${source_path}/OmissionToken.cpp
     ${source_path}/RemoveButton.cpp
     ${source_path}/RemoveButton.h

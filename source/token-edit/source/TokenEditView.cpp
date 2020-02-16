@@ -8,8 +8,6 @@
 #include <token-edit/Token.h>
 #include <token-edit/TokenLineEdit.h>
 
-#include "FocusChain.h"
-
 namespace mjendruk {
 
 TokenEditView::TokenEditView(QWidget* parent)

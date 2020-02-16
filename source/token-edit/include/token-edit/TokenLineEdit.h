@@ -2,7 +2,6 @@
 
 #include <QtWidgets/QLineEdit>
 
-#include <token-edit/FocusChainNavigation.h>
 #include <token-edit/TokenDropTarget.h>
 #include <token-edit/token-edit-api.h>
 
@@ -28,18 +27,6 @@ class TOKEN_EDIT_API TokenLineEdit : public TokenDropTarget<QLineEdit> {
 
  private:
   int _widthHint;
-};
-
-class TOKEN_EDIT_API LineEditFocusChainNavigation
-    : public FocusChainNavigation {
- public:
-  explicit LineEditFocusChainNavigation(QLineEdit* lineEdit);
-
-  bool focusPrevious(QKeyEvent* event) const override;
-  bool focusNext(QKeyEvent* event) const override;
-
- private:
-  QLineEdit const* _lineEdit;
 };
 
 }  // namespace mjendruk

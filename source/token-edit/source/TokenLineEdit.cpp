@@ -49,16 +49,4 @@ void TokenLineEdit::onTextChanged(QString const& text) {
   updateGeometry();
 }
 
-LineEditFocusChainNavigation::LineEditFocusChainNavigation(QLineEdit* lineEdit)
-    : FocusChainNavigation{lineEdit}, _lineEdit{lineEdit} {}
-
-bool LineEditFocusChainNavigation::focusPrevious(QKeyEvent* event) const {
-  return _lineEdit->cursorPosition() == 0 && event->key() == Qt::Key_Left;
-}
-
-bool LineEditFocusChainNavigation::focusNext(QKeyEvent* event) const {
-  return _lineEdit->cursorPosition() == _lineEdit->text().count() &&
-         event->key() == Qt::Key_Right;
-}
-
 }  // namespace mjendruk
