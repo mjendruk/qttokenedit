@@ -6,9 +6,9 @@ namespace mjendruk {
 
 class Token;
 
-class AbstractSelectionHandler : public QObject {
+class AbstractTokenSelectionHandler : public QObject {
   Q_OBJECT
-  
+
  public:
   using QObject::QObject;
 

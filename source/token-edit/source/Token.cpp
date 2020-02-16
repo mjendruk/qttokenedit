@@ -9,7 +9,7 @@
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPainter>
 
-#include <token-edit/AbstractSelectionHandler.h>
+#include <token-edit/AbstractTokenSelectionHandler.h>
 #include <token-edit/AbstractTokenDragDropHandler.h>
 #include <token-edit/DropIndicator.h>
 #include <token-edit/ElidableLabel.h>
@@ -22,11 +22,11 @@ namespace mjendruk {
 Token::Token(QWidget* parent) : Token{{}, nullptr, nullptr, parent} {}
 
 Token::Token(AbstractTokenDragDropHandler* dragDropHandler,
-             AbstractSelectionHandler* selectionHandler, QWidget* parent)
+             AbstractTokenSelectionHandler* selectionHandler, QWidget* parent)
     : Token{{}, dragDropHandler, selectionHandler, parent} {}
 
 Token::Token(QString const& text, AbstractTokenDragDropHandler* dragDropHandler,
-             AbstractSelectionHandler* selectionHandler, QWidget* parent)
+             AbstractTokenSelectionHandler* selectionHandler, QWidget* parent)
     : BaseToken{text, parent},
       _dragDropHandler{dragDropHandler},
       _selectionHandler{selectionHandler},

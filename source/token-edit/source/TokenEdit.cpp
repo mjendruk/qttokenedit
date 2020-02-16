@@ -15,7 +15,7 @@
 #include <token-edit/TokenEditView.h>
 #include <token-edit/TokenLineEdit.h>
 
-#include "SelectionHandler.h"
+#include "TokenSelectionHandler.h"
 #include "TokenDragDropHandler.h"
 #include "TokenEditDisplayMode.h"
 #include "TokenEditEditingMode.h"
@@ -86,7 +86,7 @@ class TokenEditModeAccess : public AbstractTokenEditModeAccess {
 TokenEdit::TokenEdit(QWidget* parent)
     : TokenEditFrame{parent},
       _access{new TokenEditModeAccess{this}},
-      _selectionHandler{new SelectionHandler{this}},
+      _selectionHandler{new TokenSelectionHandler{this}},
       _dragDropHandler{new TokenDragDropHandler{this}},
       _view{new TokenEditView{this}},
       _lineEdit{new TokenLineEdit{dragDropHandler(), _view}},
@@ -296,7 +296,7 @@ void TokenEdit::keyPressEvent(QKeyEvent* event) {
 
 TokenEditView* TokenEdit::view() const { return _view; }
 
-AbstractSelectionHandler* TokenEdit::selectionHandler() const {
+AbstractTokenSelectionHandler* TokenEdit::selectionHandler() const {
   return _selectionHandler;
 }
 

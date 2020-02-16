@@ -20,10 +20,10 @@ class QScrollArea;
 
 namespace mjendruk {
 
-class AbstractSelectionHandler;
+class AbstractTokenSelectionHandler;
 class AbstractTokenDragDropHandler;
 class AbstractTokenEditModeAccess;
-class SelectionHandler;
+class TokenSelectionHandler;
 class Token;
 class TokenEditDisplayMode;
 class TokenEditEditingMode;
@@ -73,11 +73,11 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
 
  private:
   friend class TokenEditModeAccess;
-  friend class SelectionHandler;
+  friend class TokenSelectionHandler;
   friend class TokenDragDropHandler;
 
   TokenEditView* view() const;
-  AbstractSelectionHandler* selectionHandler() const;
+  AbstractTokenSelectionHandler* selectionHandler() const;
   AbstractTokenDragDropHandler* dragDropHandler() const;
 
   int visibleCount() const;
@@ -116,7 +116,7 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
 
  private:
   QScopedPointer<AbstractTokenEditModeAccess> _access;
-  SelectionHandler* _selectionHandler;
+  TokenSelectionHandler* _selectionHandler;
   QScopedPointer<AbstractTokenDragDropHandler> _dragDropHandler;
 
   TokenEditView* _view;

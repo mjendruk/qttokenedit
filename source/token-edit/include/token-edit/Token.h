@@ -13,7 +13,7 @@ class QMimeData;
 namespace mjendruk {
 
 class AbstractTokenDragDropHandler;
-class AbstractSelectionHandler;
+class AbstractTokenSelectionHandler;
 class RemoveButton;
 class Token;
 
@@ -24,10 +24,10 @@ class TOKEN_EDIT_API Token : public BaseToken {
   Token(QWidget* parent = nullptr);
 
   Token(AbstractTokenDragDropHandler* dragDropHandler,
-        AbstractSelectionHandler* selectionHandler, QWidget* parent = nullptr);
+        AbstractTokenSelectionHandler* selectionHandler, QWidget* parent = nullptr);
 
   Token(QString const& text, AbstractTokenDragDropHandler* dragDropHandler,
-        AbstractSelectionHandler* selectionHandler, QWidget* parent = nullptr);
+        AbstractTokenSelectionHandler* selectionHandler, QWidget* parent = nullptr);
   ~Token();
 
   bool removable() const;
@@ -71,7 +71,7 @@ class TOKEN_EDIT_API Token : public BaseToken {
 
  private:
   AbstractTokenDragDropHandler* _dragDropHandler;
-  AbstractSelectionHandler* _selectionHandler;
+  AbstractTokenSelectionHandler* _selectionHandler;
   RemoveButton* _button;
 
   bool _removable;

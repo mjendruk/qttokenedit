@@ -1,4 +1,4 @@
-#include "SelectionHandler.h"
+#include "TokenSelectionHandler.h"
 
 #include <QtCore/QEvent>
 #include <QtGui/QKeyEvent>
@@ -10,14 +10,14 @@
 
 namespace mjendruk {
 
-SelectionHandler::SelectionHandler(TokenEdit* tokenEdit)
-    : AbstractSelectionHandler{tokenEdit},
+TokenSelectionHandler::TokenSelectionHandler(TokenEdit* tokenEdit)
+    : AbstractTokenSelectionHandler{tokenEdit},
       _tokenEdit{tokenEdit},
       _selectionModel{nullptr} {
   tokenEdit->installEventFilter(this);
 }
 
-void SelectionHandler::updateModel() {
+void TokenSelectionHandler::updateModel() {
   if (!model()) {
     delete _selectionModel;
     _selectionModel = nullptr;
@@ -28,13 +28,13 @@ void SelectionHandler::updateModel() {
     _selectionModel = new QItemSelectionModel{model()};
 
     connect(_selectionModel, &QItemSelectionModel::selectionChanged, this,
-            &SelectionHandler::onSelectionChanged);
+            &TokenSelectionHandler::onSelectionChanged);
   } else {
     _selectionModel->setModel(model());
   }
 }
 
-void SelectionHandler::select(Token const* token, Qt::MouseButtons buttons,
+void TokenSelectionHandler::select(Token const* token, Qt::MouseButtons buttons,
                               Qt::KeyboardModifiers modifiers) {
   auto index = _tokenEdit->index(token);
 
@@ -47,11 +47,11 @@ void SelectionHandler::select(Token const* token, Qt::MouseButtons buttons,
   }
 }
 
-QItemSelectionModel* SelectionHandler::selectionModel() const {
+QItemSelectionModel* TokenSelectionHandler::selectionModel() const {
   return _selectionModel;
 }
 
-bool SelectionHandler::eventFilter(QObject* watched, QEvent* event) {
+bool TokenSelectionHandler::eventFilter(QObject* watched, QEvent* event) {
   Q_ASSERT(_tokenEdit == watched);
 
   if (shouldSelectPreviousNext(event)) {
@@ -74,17 +74,17 @@ bool SelectionHandler::eventFilter(QObject* watched, QEvent* event) {
   return false;
 }
 
-QAbstractItemModel* SelectionHandler::model() const {
+QAbstractItemModel* TokenSelectionHandler::model() const {
   return _tokenEdit->model();
 }
 
-void SelectionHandler::onSelectionChanged(QItemSelection const& selected,
+void TokenSelectionHandler::onSelectionChanged(QItemSelection const& selected,
                                           QItemSelection const& deselected) {
   updateSelection(deselected.indexes(), false);
   updateSelection(selected.indexes(), true);
 }
 
-void SelectionHandler::updateSelection(QModelIndexList const& indexes,
+void TokenSelectionHandler::updateSelection(QModelIndexList const& indexes,
                                        bool selected) {
   for (auto const& index : indexes) {
     if (index.column() != _tokenEdit->modelColumn()) {
@@ -97,18 +97,18 @@ void SelectionHandler::updateSelection(QModelIndexList const& indexes,
   }
 }
 
-QItemSelectionModel::SelectionFlags SelectionHandler::defaultFlags() const {
+QItemSelectionModel::SelectionFlags TokenSelectionHandler::defaultFlags() const {
   return QItemSelectionModel::Select | QItemSelectionModel::Rows;
 }
 
-bool SelectionHandler::shouldExtendSelection(
+bool TokenSelectionHandler::shouldExtendSelection(
     Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers) const {
   return buttons.testFlag(Qt::LeftButton) &&
          modifiers.testFlag(Qt::ShiftModifier) &&
          _selectionModel->currentIndex().isValid();
 }
 
-void SelectionHandler::extendSelectionTo(QModelIndex const& index) {
+void TokenSelectionHandler::extendSelectionTo(QModelIndex const& index) {
   auto current = _selectionModel->currentIndex();
 
   auto itemSelection = QItemSelection{};
@@ -122,13 +122,13 @@ void SelectionHandler::extendSelectionTo(QModelIndex const& index) {
   _selectionModel->setCurrentIndex(index, {});
 }
 
-bool SelectionHandler::shouldSelectSingle(
+bool TokenSelectionHandler::shouldSelectSingle(
     Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers) const {
   Q_UNUSED(modifiers);
   return buttons.testFlag(Qt::LeftButton);
 }
 
-void SelectionHandler::selectSingle(QModelIndex const& index,
+void TokenSelectionHandler::selectSingle(QModelIndex const& index,
                                     Qt::KeyboardModifiers modifiers) {
   if (_selectionModel->selection().contains(index)) {
     _selectionModel->setCurrentIndex(index, {});
@@ -145,7 +145,7 @@ void SelectionHandler::selectSingle(QModelIndex const& index,
   _selectionModel->setCurrentIndex(index, {});
 }
 
-bool SelectionHandler::shouldSelectPreviousNext(QEvent* event) const {
+bool TokenSelectionHandler::shouldSelectPreviousNext(QEvent* event) const {
   if (event->type() == QEvent::KeyPress) {
     auto keyEvent = static_cast<QKeyEvent*>(event);
 
@@ -156,7 +156,7 @@ bool SelectionHandler::shouldSelectPreviousNext(QEvent* event) const {
   return false;
 }
 
-bool SelectionHandler::selectPreviousNext(QEvent* event) {
+bool TokenSelectionHandler::selectPreviousNext(QEvent* event) {
   auto keyEvent = static_cast<QKeyEvent*>(event);
   bool isLeft = keyEvent->key() == Qt::Key_Left;
 
@@ -188,11 +188,11 @@ bool SelectionHandler::selectPreviousNext(QEvent* event) {
   return true;
 }
 
-bool SelectionHandler::shouldSelectFirst(QEvent* event) const {
+bool TokenSelectionHandler::shouldSelectFirst(QEvent* event) const {
   return event->type() == QEvent::FocusIn;
 }
 
-bool SelectionHandler::selectFirst() {
+bool TokenSelectionHandler::selectFirst() {
   auto index = _tokenEdit->index(0);
   _selectionModel->select(index, defaultFlags());
   _selectionModel->setCurrentIndex(index, {});
@@ -200,7 +200,7 @@ bool SelectionHandler::selectFirst() {
   return true;
 }
 
-bool SelectionHandler::shouldSelectAll(QEvent* event) const {
+bool TokenSelectionHandler::shouldSelectAll(QEvent* event) const {
   if (event->type() != QEvent::KeyPress) return false;
 
   auto keyEvent = static_cast<QKeyEvent*>(event);
@@ -208,7 +208,7 @@ bool SelectionHandler::shouldSelectAll(QEvent* event) const {
          keyEvent->modifiers().testFlag(Qt::ControlModifier);
 }
 
-bool SelectionHandler::selectAll() {
+bool TokenSelectionHandler::selectAll() {
   if (model()->rowCount() == 0) {
     return false;
   }
@@ -222,7 +222,7 @@ bool SelectionHandler::selectAll() {
   return true;
 }
 
-bool SelectionHandler::shouldClear(QEvent* event) const {
+bool TokenSelectionHandler::shouldClear(QEvent* event) const {
   if (event->type() == QEvent::MouseButtonPress) {
     auto mouseEvent = static_cast<QMouseEvent*>(event);
 

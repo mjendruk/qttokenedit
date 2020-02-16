@@ -3,7 +3,7 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QItemSelectionModel>
 
-#include <token-edit/AbstractSelectionHandler.h>
+#include <token-edit/AbstractTokenSelectionHandler.h>
 
 namespace mjendruk {
 
@@ -11,11 +11,11 @@ class Token;
 class TokenEdit;
 class TokenEditView;
 
-class SelectionHandler : public AbstractSelectionHandler {
+class TokenSelectionHandler : public AbstractTokenSelectionHandler {
   Q_OBJECT
 
  public:
-  SelectionHandler(TokenEdit* tokenEdit);
+  TokenSelectionHandler(TokenEdit* tokenEdit);
 
   void select(Token const* token, Qt::MouseButtons buttons,
               Qt::KeyboardModifiers modifiers) override;
