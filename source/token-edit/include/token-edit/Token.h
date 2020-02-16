@@ -19,24 +19,24 @@ class Token;
 
 class TOKEN_EDIT_API Token : public BaseToken {
   Q_OBJECT
-  
+
  public:
   Token(QWidget* parent = nullptr);
 
   Token(AbstractTokenDragDropHandler* dragDropHandler,
-        AbstractTokenSelectionHandler* selectionHandler, QWidget* parent = nullptr);
+        AbstractTokenSelectionHandler* selectionHandler,
+        QWidget* parent = nullptr);
 
   Token(QString const& text, AbstractTokenDragDropHandler* dragDropHandler,
-        AbstractTokenSelectionHandler* selectionHandler, QWidget* parent = nullptr);
+        AbstractTokenSelectionHandler* selectionHandler,
+        QWidget* parent = nullptr);
   ~Token();
 
   bool removable() const;
   void setRemovable(bool enable);
-  
+
   bool selected() const;
   void setSelected(bool enable);
-
-  QPixmap toPixmap();
 
  signals:
   void pressed();

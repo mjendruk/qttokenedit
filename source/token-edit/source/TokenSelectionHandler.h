@@ -32,6 +32,8 @@ class TokenSelectionHandler : public AbstractTokenSelectionHandler {
 
   void onSelectionChanged(QItemSelection const& selected,
                           QItemSelection const& deselected);
+  
+  void onCurrentChanged(QModelIndex const& index);
 
   void updateSelection(QModelIndexList const& indexes, bool selected);
 

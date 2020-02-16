@@ -9,8 +9,8 @@
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPainter>
 
-#include <token-edit/AbstractTokenSelectionHandler.h>
 #include <token-edit/AbstractTokenDragDropHandler.h>
+#include <token-edit/AbstractTokenSelectionHandler.h>
 #include <token-edit/DropIndicator.h>
 #include <token-edit/ElidableLabel.h>
 
@@ -83,16 +83,6 @@ void Token::setSelected(bool enable) {
   }
 }
 
-QPixmap Token::toPixmap() {
-  auto pixmap = QPixmap(size() * devicePixelRatio());
-  pixmap.setDevicePixelRatio(devicePixelRatio());
-  pixmap.fill(QColor{Qt::transparent});
-
-  render(&pixmap, QPoint{}, QRegion{}, QWidget::DrawChildren);
-
-  return pixmap;
-}
-
 void Token::paintEvent(QPaintEvent* event) {
   BaseToken::paintEvent(event);
 
@@ -117,12 +107,12 @@ void Token::mousePressEvent(QMouseEvent* event) {
   QWidget::mousePressEvent(event);
 
   _selectionHandler->select(this, event->buttons(), event->modifiers());
-  
+
   if (_dragDropHandler->canDrag(this) &&
       event->buttons().testFlag(Qt::LeftButton)) {
     _mousePressedAt = event->pos();
   }
-  
+
   event->accept();
 }
 

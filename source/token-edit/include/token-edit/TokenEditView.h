@@ -63,9 +63,6 @@ class TOKEN_EDIT_API TokenEditView : public QWidget {
   /** @} */
 
  signals:
-  void gotFocus(QWidget* widget);
-  void lostFocus(QWidget* widget);
-
   void sizeChanged(QSize size);
 
  protected:

@@ -29,6 +29,8 @@ void TokenSelectionHandler::updateModel() {
 
     connect(_selectionModel, &QItemSelectionModel::selectionChanged, this,
             &TokenSelectionHandler::onSelectionChanged);
+    connect(_selectionModel, &QItemSelectionModel::currentChanged, this,
+            &TokenSelectionHandler::onCurrentChanged);
   } else {
     _selectionModel->setModel(model());
   }
@@ -82,6 +84,12 @@ void TokenSelectionHandler::onSelectionChanged(QItemSelection const& selected,
                                           QItemSelection const& deselected) {
   updateSelection(deselected.indexes(), false);
   updateSelection(selected.indexes(), true);
+}
+
+void TokenSelectionHandler::onCurrentChanged(QModelIndex const& index) {
+  if (!_selectionModel->selection().contains(index)) {
+    _selectionModel->select(index, defaultFlags());
+  }
 }
 
 void TokenSelectionHandler::updateSelection(QModelIndexList const& indexes,
