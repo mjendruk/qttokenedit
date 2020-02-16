@@ -9,6 +9,7 @@
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPainter>
 
+#include <token-edit/AbstractSelectionHandler.h>
 #include <token-edit/AbstractTokenDragDropHandler.h>
 #include <token-edit/DropIndicator.h>
 #include <token-edit/ElidableLabel.h>
@@ -18,15 +19,20 @@
 
 namespace mjendruk {
 
-Token::Token(AbstractTokenDragDropHandler* dragDropHandler, QWidget* parent)
-    : Token{{}, dragDropHandler, parent} {}
+Token::Token(QWidget* parent) : Token{{}, nullptr, nullptr, parent} {}
+
+Token::Token(AbstractTokenDragDropHandler* dragDropHandler,
+             AbstractSelectionHandler* selectionHandler, QWidget* parent)
+    : Token{{}, dragDropHandler, selectionHandler, parent} {}
 
 Token::Token(QString const& text, AbstractTokenDragDropHandler* dragDropHandler,
-             QWidget* parent)
+             AbstractSelectionHandler* selectionHandler, QWidget* parent)
     : BaseToken{text, parent},
       _dragDropHandler{dragDropHandler},
+      _selectionHandler{selectionHandler},
       _button{new RemoveButton{this}},
       _removable{true},
+      _selected{false},
       _dropIndicatorPosition{DropIndicatorPosition::None} {
   setRightWidget(_button);
 
@@ -39,8 +45,6 @@ Token::Token(QString const& text, AbstractTokenDragDropHandler* dragDropHandler,
   setSizePolicy(sizePolicy);
 
   setRemovable(false);
-
-  _button->setColorRole(QPalette::ButtonText);
 
   connect(_button, &RemoveButton::clicked, this, &Token::removeClicked);
 }
@@ -63,6 +67,20 @@ void Token::setRemovable(bool enable) {
   }
 
   updateMargins();
+}
+
+bool Token::selected() const { return _selected; }
+
+void Token::setSelected(bool enable) {
+  _selected = enable;
+
+  if (_selected) {
+    setBackgroundRole(QPalette::Highlight);
+    setForegroundRole(QPalette::HighlightedText);
+  } else {
+    setBackgroundRole(QPalette::Button);
+    setForegroundRole(QPalette::ButtonText);
+  }
 }
 
 QPixmap Token::toPixmap() {
@@ -95,23 +113,17 @@ void Token::keyPressEvent(QKeyEvent* event) {
   QWidget::keyPressEvent(event);
 }
 
-void Token::focusInEvent(QFocusEvent* event) {
-  _button->setColorRole(QPalette::HighlightedText);
-  BaseToken::focusInEvent(event);
-}
-
-void Token::focusOutEvent(QFocusEvent* event) {
-  _button->setColorRole(QPalette::ButtonText);
-  BaseToken::focusOutEvent(event);
-}
-
 void Token::mousePressEvent(QMouseEvent* event) {
   QWidget::mousePressEvent(event);
 
+  _selectionHandler->select(this, event->buttons(), event->modifiers());
+  
   if (_dragDropHandler->canDrag(this) &&
       event->buttons().testFlag(Qt::LeftButton)) {
     _mousePressedAt = event->pos();
   }
+  
+  event->accept();
 }
 
 void Token::mouseMoveEvent(QMouseEvent* event) {

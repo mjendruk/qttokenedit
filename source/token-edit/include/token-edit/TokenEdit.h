@@ -20,8 +20,10 @@ class QScrollArea;
 
 namespace mjendruk {
 
+class AbstractSelectionHandler;
 class AbstractTokenDragDropHandler;
 class AbstractTokenEditModeAccess;
+class SelectionHandler;
 class Token;
 class TokenEditDisplayMode;
 class TokenEditEditingMode;
@@ -58,6 +60,8 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
 
   QModelIndex rootIndex() const;
   void setRootIndex(QModelIndex const& index);
+  
+  QItemSelectionModel* selectionModel() const;
 
  signals:
   void dragStateChanged(bool enabled);
@@ -65,12 +69,15 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
 
  protected:
   bool eventFilter(QObject* object, QEvent* event) override;
+  void keyPressEvent(QKeyEvent* event) override;
 
  private:
   friend class TokenEditModeAccess;
+  friend class SelectionHandler;
   friend class TokenDragDropHandler;
 
   TokenEditView* view() const;
+  AbstractSelectionHandler* selectionHandler() const;
   AbstractTokenDragDropHandler* dragDropHandler() const;
 
   int indexOf(Token const* token) const;
@@ -79,6 +86,7 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
 
   QScopedValueRollback<UpdateFocus> enableUpdateFocus();
   bool remove(int row, UpdateFocus uf);
+  bool remove(QModelIndexList const& indexes, UpdateFocus uf);
 
   void init();
   void clear();
@@ -92,6 +100,8 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
   void onModelReset();
 
   void onFocusChanged(QWidget* prev, QWidget* now);
+  
+  void onCurrentChanged(QModelIndex const& current, QModelIndex const& prev);
 
   void blockModeChange();
   void unblockModeChange();
@@ -103,6 +113,7 @@ class TOKEN_EDIT_API TokenEdit : public TokenEditFrame {
 
  private:
   QScopedPointer<AbstractTokenEditModeAccess> _access;
+  SelectionHandler* _selectionHandler;
   QScopedPointer<AbstractTokenDragDropHandler> _dragDropHandler;
 
   TokenEditView* _view;

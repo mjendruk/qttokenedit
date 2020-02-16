@@ -9,7 +9,7 @@
 int main(int argc, char *argv[]) {
   QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   auto application = QApplication{argc, argv};
-//  application.setStyle(new DarkStyle{});
+  application.setStyle(new DarkStyle{});
 
 //  application.setStyle(QStyleFactory::create("Fusion"));
 #ifdef Q_OS_WIN

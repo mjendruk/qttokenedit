@@ -11,13 +11,8 @@ class TOKEN_EDIT_API AbstractTokenButton : public QAbstractButton {
 
  public:
   explicit AbstractTokenButton(QWidget* parent = nullptr);
-  explicit AbstractTokenButton(QPalette::ColorRole colorRole,
-                               QWidget* parent = nullptr);
 
   QSize sizeHint() const override;
-
-  QPalette::ColorRole colorRole() const;
-  void setColorRole(QPalette::ColorRole role);
 
  protected:
   void paintEvent(QPaintEvent* event) override;
@@ -32,7 +27,6 @@ class TOKEN_EDIT_API AbstractTokenButton : public QAbstractButton {
  private:
   QPainterPath _path;
   QSize _size;
-  QPalette::ColorRole _colorRole;
 };
 
 }  // namespace mjendruk

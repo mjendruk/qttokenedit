@@ -14,21 +14,24 @@ namespace mjendruk {
 
 TokenEditView::TokenEditView(QWidget* parent)
     : QWidget{parent},
-      _focusChain{new FocusChain{this}},
+      // _focusChain{new FocusChain{this}},
       _layout{new FlexLayout{margin(), xSpacing(), ySpacing(), this}},
       _finalWidget{nullptr},
-      _defaultFinalWidget{nullptr},
-      _defaultNavigation{nullptr} {
+      _defaultFinalWidget{nullptr} {
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setBackgroundRole(QPalette::Base);
   setFocusPolicy(Qt::NoFocus);
-  connect(_focusChain, &FocusChain::gotFocus, this,
-          qOverload<QWidget*>(&TokenEditView::gotFocus));
-  connect(_focusChain, &FocusChain::lostFocus, this,
-          qOverload<QWidget*>(&TokenEditView::lostFocus));
 }
 
 Token* TokenEditView::at(int index) const { return _tokens.at(index); }
+
+Token* TokenEditView::find(int index) const {
+  if (!(0 <= index && index < count())) {
+    return nullptr;
+  }
+
+  return at(index);
+}
 
 int TokenEditView::indexOf(Token const* token) const {
   auto _token = const_cast<Token*>(token);
@@ -44,7 +47,6 @@ void TokenEditView::insert(int index, Token* token, UpdateFocus uf) {
 
   _tokens.insert(index, token);
   _layout->insertWidget(index, token);
-  _focusChain->insert(index, token, uf);
 
   updateGeometry();
 }
@@ -67,8 +69,6 @@ void TokenEditView::move(int from, int to) {
 
   auto layoutItem = _layout->takeAt(from);
   _layout->insertItem(insertAt, layoutItem);
-
-  _focusChain->move(from, insertAt);
 }
 
 void TokenEditView::remove(int index, UpdateFocus uf) {
@@ -76,7 +76,7 @@ void TokenEditView::remove(int index, UpdateFocus uf) {
 
   auto item = _tokens.takeAt(index);
   auto layoutItem = _layout->takeAt(index);
-  _focusChain->remove(item, uf);
+  // _focusChain->remove(item, uf);
   delete layoutItem;
   item->deleteLater();
 }
@@ -89,8 +89,7 @@ QVector<Token*> const& TokenEditView::tokens() const { return _tokens; }
 
 QWidget* TokenEditView::takeFinalWidget() { return takeFinalWidget(true); }
 
-void TokenEditView::setFinalWidget(QWidget* widget,
-                                   FocusChainNavigation* navigation) {
+void TokenEditView::setFinalWidget(QWidget* widget) {
   if (_finalWidget == widget) {
     return;
   }
@@ -105,7 +104,6 @@ void TokenEditView::setFinalWidget(QWidget* widget,
   }
 
   if (widget) {
-    _focusChain->add(widget, UpdateFocus::No, navigation);
     _layout->addWidget(widget);
     widget->show();
   }
@@ -125,13 +123,11 @@ QWidget* TokenEditView::takeDefaultFinalWidget() {
   auto widget = _defaultFinalWidget;
 
   _defaultFinalWidget = nullptr;
-  _defaultNavigation = nullptr;
 
   return widget;
 }
 
-void TokenEditView::setDefaultFinalWidget(QWidget* widget,
-                                          FocusChainNavigation* navigation) {
+void TokenEditView::setDefaultFinalWidget(QWidget* widget) {
   if (_defaultFinalWidget == widget) {
     return;
   }
@@ -142,11 +138,10 @@ void TokenEditView::setDefaultFinalWidget(QWidget* widget,
   }
 
   if (!_finalWidget) {
-    setFinalWidget(widget, navigation);
+    setFinalWidget(widget);
   }
 
   _defaultFinalWidget = widget;
-  _defaultNavigation = navigation;
 }
 
 int TokenEditView::xSpacing() const {
@@ -188,13 +183,12 @@ QWidget* TokenEditView::takeFinalWidget(bool setDefault) {
 
   auto widget = _finalWidget;
 
-  _focusChain->remove(widget, UpdateFocus::No);
   _layout->removeWidget(widget);
   widget->hide();
   _finalWidget = nullptr;
 
   if (setDefault) {
-    setFinalWidget(_defaultFinalWidget, _defaultNavigation);
+    setFinalWidget(_defaultFinalWidget);
   }
 
   return widget;

@@ -8,11 +8,7 @@
 namespace mjendruk {
 
 AbstractTokenButton::AbstractTokenButton(QWidget* parent)
-    : AbstractTokenButton{QPalette::Text, parent} {}
-
-AbstractTokenButton::AbstractTokenButton(QPalette::ColorRole colorRole,
-                                         QWidget* parent)
-    : QAbstractButton{parent}, _colorRole{colorRole} {
+    : QAbstractButton{parent} {
   setCheckable(false);
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setCursor(Qt::PointingHandCursor);
@@ -24,19 +20,6 @@ QSize AbstractTokenButton::sizeHint() const {
   return QSize{extent, extent};
 }
 
-QPalette::ColorRole AbstractTokenButton::colorRole() const {
-  return _colorRole;
-}
-
-void AbstractTokenButton::setColorRole(QPalette::ColorRole role) {
-  if (_colorRole == role) {
-    return;
-  }
-
-  _colorRole = role;
-  update();
-}
-
 void AbstractTokenButton::paintEvent(QPaintEvent* event) {
   auto const clippingRect = QRectF{event->rect()};
 
@@ -44,7 +27,7 @@ void AbstractTokenButton::paintEvent(QPaintEvent* event) {
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(clippingRect);
 
-  auto color = palette().color(_colorRole);
+  auto color = palette().color(foregroundRole());
   color.setAlpha(50);
 
   painter.setBrush(color);

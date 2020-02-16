@@ -13,33 +13,38 @@ class QMimeData;
 namespace mjendruk {
 
 class AbstractTokenDragDropHandler;
+class AbstractSelectionHandler;
 class RemoveButton;
 class Token;
 
 class TOKEN_EDIT_API Token : public BaseToken {
   Q_OBJECT
-
+  
  public:
-  Token(AbstractTokenDragDropHandler* dragDropHandler = nullptr,
-        QWidget* parent = nullptr);
+  Token(QWidget* parent = nullptr);
+
+  Token(AbstractTokenDragDropHandler* dragDropHandler,
+        AbstractSelectionHandler* selectionHandler, QWidget* parent = nullptr);
 
   Token(QString const& text, AbstractTokenDragDropHandler* dragDropHandler,
-        QWidget* parent = nullptr);
+        AbstractSelectionHandler* selectionHandler, QWidget* parent = nullptr);
   ~Token();
 
   bool removable() const;
   void setRemovable(bool enable);
+  
+  bool selected() const;
+  void setSelected(bool enable);
 
   QPixmap toPixmap();
 
  signals:
+  void pressed();
   void removeClicked();
 
  protected:
   void paintEvent(QPaintEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
-  void focusInEvent(QFocusEvent* event) override;
-  void focusOutEvent(QFocusEvent* event) override;
 
   void mousePressEvent(QMouseEvent* event) override;
   void mouseMoveEvent(QMouseEvent* event) override;
@@ -66,9 +71,11 @@ class TOKEN_EDIT_API Token : public BaseToken {
 
  private:
   AbstractTokenDragDropHandler* _dragDropHandler;
+  AbstractSelectionHandler* _selectionHandler;
   RemoveButton* _button;
 
   bool _removable;
+  bool _selected;
 
   // drag members
   QPoint _mousePressedAt;

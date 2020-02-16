@@ -23,9 +23,10 @@ BaseToken::BaseToken(QString const& text, QWidget* parent)
   _layout->setContentsMargins(horizontalTextMargin(), margin(),
                               horizontalTextMargin(), margin());
 
-  setFocusPolicy(Qt::ClickFocus);
+  setFocusPolicy(Qt::NoFocus);
 
-  _label->setTextColorRole(QPalette::ButtonText);
+  setBackgroundRole(QPalette::Button);
+  setForegroundRole(QPalette::ButtonText);
 
   setAttribute(Qt::WA_Hover);
 
@@ -96,11 +97,7 @@ void BaseToken::paintEvent(QPaintEvent* event) {
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(QRectF{event->rect()});
 
-  auto brushRole = QPalette::Button;
-
-  if (hasFocus()) {
-    brushRole = QPalette::Highlight;
-  }
+  auto brushRole = backgroundRole();
 
   auto brush = palette().brush(brushRole);
 
@@ -114,16 +111,6 @@ void BaseToken::paintEvent(QPaintEvent* event) {
   drawBackground(&painter, brush);
 
   QWidget::paintEvent(event);
-}
-
-void BaseToken::focusInEvent(QFocusEvent* event) {
-  _label->setTextColorRole(QPalette::HighlightedText);
-  QWidget::focusInEvent(event);
-}
-
-void BaseToken::focusOutEvent(QFocusEvent* event) {
-  _label->setTextColorRole(QPalette::ButtonText);
-  QWidget::focusOutEvent(event);
 }
 
 }  // namespace mjendruk

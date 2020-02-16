@@ -22,9 +22,6 @@ class TOKEN_EDIT_API ElidableLabel : public QWidget {
   QSize sizeHint() const override;
   QSize minimumSizeHint() const override;
 
-  QPalette::ColorRole textColorRole() const;
-  void setTextColorRole(QPalette::ColorRole role);
-
  protected:
   void paintEvent(QPaintEvent* event) override;
 
@@ -37,7 +34,6 @@ class TOKEN_EDIT_API ElidableLabel : public QWidget {
  private:
   QString _text;
   int _minVisibleCharacters;
-  QPalette::ColorRole _colorRole;
 
   QSize _textSize;
   QSize _minTextSize;

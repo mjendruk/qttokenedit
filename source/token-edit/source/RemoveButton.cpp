@@ -9,10 +9,7 @@
 namespace mjendruk {
 
 RemoveButton::RemoveButton(QWidget* parent)
-    : RemoveButton{QPalette::Text, parent} {}
-
-RemoveButton::RemoveButton(QPalette::ColorRole colorRole, QWidget* parent)
-    : AbstractTokenButton{colorRole, parent} {
+    : AbstractTokenButton{parent} {
   setFocusPolicy(Qt::NoFocus);
   setPath(createPath(this->extent()));
 }

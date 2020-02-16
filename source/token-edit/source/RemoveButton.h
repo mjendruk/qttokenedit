@@ -9,8 +9,6 @@ class RemoveButton : public AbstractTokenButton {
 
  public:
   explicit RemoveButton(QWidget* parent = nullptr);
-  explicit RemoveButton(QPalette::ColorRole colorRole,
-                        QWidget* parent = nullptr);
 
  private:
   QPainterPath createPath(int extent) const;

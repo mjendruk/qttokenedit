@@ -33,7 +33,7 @@ class TokenDragDropHandler : public AbstractTokenDragDropHandler {
   TokenEditView* view() const;
 
  private:
-  TokenEdit* _tokenEdit;
+  TokenEdit* const _tokenEdit;
 };
 
 }  // namespace mjendruk

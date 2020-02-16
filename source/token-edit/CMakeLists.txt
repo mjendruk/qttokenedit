@@ -45,7 +45,9 @@ set(include_path "${CMAKE_CURRENT_SOURCE_DIR}/include/${target}")
 set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/source")
 
 set(headers
+    ${include_path}/AbstractSelectionHandler.h
     ${include_path}/AbstractTokenButton.h
+    ${include_path}/AbstractTokenDragDropHandler.h
     ${include_path}/BaseToken.h
     ${include_path}/DarkStyle.h
     ${include_path}/DropIndicator.h
@@ -78,6 +80,8 @@ set(sources
     ${source_path}/OmissionToken.cpp
     ${source_path}/RemoveButton.cpp
     ${source_path}/RemoveButton.h
+    ${source_path}/SelectionHandler.cpp
+    ${source_path}/SelectionHandler.h
     ${source_path}/Token.cpp
     ${source_path}/TokenDragDropHandler.cpp
     ${source_path}/TokenDragDropHandler.h

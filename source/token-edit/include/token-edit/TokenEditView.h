@@ -10,9 +10,7 @@ namespace mjendruk {
 
 class TokenLineEdit;
 class Token;
-class FocusChain;
 class FlexLayout;
-class FocusChainNavigation;
 
 class TOKEN_EDIT_API TokenEditView : public QWidget {
   Q_OBJECT
@@ -25,6 +23,10 @@ class TOKEN_EDIT_API TokenEditView : public QWidget {
    */
 
   Token* at(int index) const;
+
+  //! returns nullptr if index exceeds count
+  Token* find(int index) const;
+  
   int indexOf(Token const* token) const;
   void add(Token* token, UpdateFocus uf);
   void insert(int index, Token* token, UpdateFocus uf);
@@ -38,12 +40,10 @@ class TOKEN_EDIT_API TokenEditView : public QWidget {
   /** @} */
 
   QWidget* takeFinalWidget();
-  void setFinalWidget(QWidget* widget,
-                      FocusChainNavigation* navigation = nullptr);
+  void setFinalWidget(QWidget* widget);
 
   QWidget* takeDefaultFinalWidget();
-  void setDefaultFinalWidget(QWidget* widget,
-                             FocusChainNavigation* navigation = nullptr);
+  void setDefaultFinalWidget(QWidget* widget);
 
   /**
    * @name layout interface
@@ -76,13 +76,10 @@ class TOKEN_EDIT_API TokenEditView : public QWidget {
 
  private:
   QVector<Token*> _tokens;
-  FocusChain* _focusChain;
   FlexLayout* _layout;
 
   QWidget* _finalWidget;
-
   QWidget* _defaultFinalWidget;
-  FocusChainNavigation* _defaultNavigation;
 };
 
 }  // namespace mjendruk

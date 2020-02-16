@@ -5,6 +5,7 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
 #include <QtCore/QtGlobal>
+#include <QtGui/QKeyEvent>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QScrollArea>
@@ -14,6 +15,7 @@
 #include <token-edit/TokenEditView.h>
 #include <token-edit/TokenLineEdit.h>
 
+#include "SelectionHandler.h"
 #include "TokenDragDropHandler.h"
 #include "TokenEditDisplayMode.h"
 #include "TokenEditEditingMode.h"
@@ -34,7 +36,8 @@ class TokenEditModeAccess : public AbstractTokenEditModeAccess {
   }
 
   Token* createToken(int index, QWidget* parent) const override {
-    auto token = new Token{_tokenEdit->dragDropHandler(), parent};
+    auto token = new Token{_tokenEdit->dragDropHandler(),
+                           _tokenEdit->selectionHandler(), parent};
     token->setRemovable(_tokenEdit->removable());
 
     QObject::connect(token, &Token::removeClicked, [=]() {
@@ -83,6 +86,7 @@ class TokenEditModeAccess : public AbstractTokenEditModeAccess {
 TokenEdit::TokenEdit(QWidget* parent)
     : TokenEditFrame{parent},
       _access{new TokenEditModeAccess{this}},
+      _selectionHandler{new SelectionHandler{this}},
       _dragDropHandler{new TokenDragDropHandler{this}},
       _view{new TokenEditView{this}},
       _lineEdit{new TokenLineEdit{dragDropHandler(), _view}},
@@ -100,21 +104,24 @@ TokenEdit::TokenEdit(QWidget* parent)
       _model{nullptr},
       _rootModelIndex{QModelIndex{}},
       _modelColumn{0} {
+      
+    
+  setFocusPolicy(Qt::StrongFocus);
   auto dummyToken = QScopedPointer{new Token{}};
 
   _lineEdit->setFixedHeight(dummyToken->sizeHint().height());
 
-  _view->setDefaultFinalWidget(_lineEdit,
-                               new LineEditFocusChainNavigation{_lineEdit});
+  _view->setDefaultFinalWidget(_lineEdit);
 
   setWidget(_scrollArea);
 
-  _view->setFocusPolicy(Qt::StrongFocus);
-  _view->installEventFilter(this);
+//  _view->setFocusPolicy(Qt::NoFocus);
+//  _view->installEventFilter(this);
 
   _scrollArea->setFrameShape(QFrame::NoFrame);
   _scrollArea->setWidgetResizable(true);
   _scrollArea->setFocusPolicy(Qt::ClickFocus);
+  _scrollArea->setFocusProxy(this);
   _scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   _scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   _scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -124,13 +131,14 @@ TokenEdit::TokenEdit(QWidget* parent)
 
   _scrollArea->setWidget(_view);
 
-  connect(_view, &TokenEditView::gotFocus,
-          [=](auto widget) { ensureVisible(widget); });
-
   connect(_view, &TokenEditView::sizeChanged, [=]() {
     if (_model) {
       _activeMode->invalidate();
-      ensureVisible(focusWidget());
+          
+      if (auto selection = selectionModel()->currentIndex();
+          selection.isValid()) {
+          ensureVisible(view()->at(selection.row()));
+      }
     }
     updateHeight();
   });
@@ -220,7 +228,11 @@ void TokenEdit::setModel(QAbstractItemModel* model) {
             &TokenEdit::onDataChanged);
     connect(_model, &QAbstractItemModel::modelReset, this,
             &TokenEdit::onModelReset);
-
+    
+    _selectionHandler->updateModel();
+    connect(selectionModel(), &QItemSelectionModel::currentChanged, this,
+            &TokenEdit::onCurrentChanged);
+    
     init();
   }
 }
@@ -249,6 +261,10 @@ void TokenEdit::setRootIndex(QModelIndex const& index) {
   onModelReset();
 }
 
+QItemSelectionModel* TokenEdit::selectionModel() const {
+  return _selectionHandler->selectionModel();
+}
+
 bool TokenEdit::eventFilter(QObject* object, QEvent* event) {
   Q_ASSERT(_view == object);
 
@@ -261,7 +277,28 @@ bool TokenEdit::eventFilter(QObject* object, QEvent* event) {
   return false;
 }
 
+void TokenEdit::keyPressEvent(QKeyEvent* event) {
+  TokenEditFrame::keyPressEvent(event);
+  
+  if (removable() && event->key() == Qt::Key_Backspace) {
+    auto indexes = selectionModel()->selectedRows(modelColumn());
+    auto rows = std::vector<int>(indexes.size());
+    std::transform(indexes.cbegin(), indexes.cend(), rows.begin(),
+                   [](auto const& i) { return i.row(); });
+   
+    std::sort(rows.rbegin(), rows.rend());
+    
+    for (auto row : rows) {
+      remove(row, UpdateFocus::Yes);
+    }
+  }
+}
+
 TokenEditView* TokenEdit::view() const { return _view; }
+
+AbstractSelectionHandler* TokenEdit::selectionHandler() const {
+  return _selectionHandler;
+}
 
 AbstractTokenDragDropHandler* TokenEdit::dragDropHandler() const {
   return _dragDropHandler.get();
@@ -288,6 +325,24 @@ bool TokenEdit::remove(int row, UpdateFocus uf) {
   Q_ASSERT(_model);
   QScopedValueRollback svr{_updateFocus, uf};
   return _model->removeRow(row);
+}
+
+bool TokenEdit::remove(QModelIndexList const& _indexes, UpdateFocus uf) {
+  Q_ASSERT(_model);
+  QScopedValueRollback svr{_updateFocus, uf};
+  
+  auto indexes = _indexes;
+   auto rows = std::vector<int>(indexes.size());
+   std::transform(indexes.cbegin(), indexes.cend(), rows.begin(),
+                  [](auto const& i) { return i.row(); });
+  
+   std::sort(rows.rbegin(), rows.rend());
+   
+  auto success = true;
+   for (auto row : rows) {
+     success &= _model->removeRow(row);
+   }
+  return success;
 }
 
 void TokenEdit::init() {
@@ -359,8 +414,7 @@ void TokenEdit::onModelReset() {
 
 void TokenEdit::onFocusChanged(QWidget* prev, QWidget* now) {
   auto isChild = [=](QWidget* widget) {
-    return widget && (widget->parent() == _view || widget == _scrollArea ||
-                      widget == _view);
+    return widget && (widget == this || widget == _lineEdit);
   };
 
   auto prevIsChild = isChild(prev);
@@ -376,6 +430,14 @@ void TokenEdit::onFocusChanged(QWidget* prev, QWidget* now) {
     setNextActiveMode(_displayMode);
   } else if (!prevIsChild && nowIsChild) {
     setNextActiveMode(_editingMode);
+  }
+}
+
+void TokenEdit::onCurrentChanged(QModelIndex const& current,
+                                 QModelIndex const& prev) {
+  if (current.isValid()) {
+    auto token = view()->at(current.row());
+    ensureVisible(token);
   }
 }
 

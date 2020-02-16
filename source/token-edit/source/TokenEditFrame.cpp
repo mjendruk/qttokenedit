@@ -40,8 +40,9 @@ TokenEditFrame::TokenEditFrame(QWidget* parent)
       _layout{new QBoxLayout{QBoxLayout::TopToBottom}},
       _frame{new TokenEditFrameOverlay{this}},
       _shownAsFocused{false} {
-  setFocusPolicy(Qt::NoFocus);
+  setAttribute(Qt::WA_Hover);
   setBackgroundRole(QPalette::Base);
+  setAutoFillBackground(true);
   _layout->setContentsMargins(contentMargins());
   setLayout(_layout);
 }
@@ -80,16 +81,16 @@ void TokenEditFrame::setShownAsFocused(bool value) {
 }
 
 void TokenEditFrame::paintEvent(QPaintEvent* event) {
-  auto painter = QPainter{this};
-  painter.setClipRect(event->rect());
-
-  painter.save();
-
-  painter.setBrush(palette().brush(QPalette::Base));
-  painter.setPen(Qt::NoPen);
-  painter.drawRect(contentRect());
-
-  painter.restore();
+//  auto painter = QPainter{this};
+//  painter.setClipRect(event->rect());
+//
+//  painter.save();
+//
+//  painter.setBrush(palette().brush(QPalette::Base));
+//  painter.setPen(Qt::NoPen);
+//  painter.drawRect(contentRect());
+//
+//  painter.restore();
 
   QWidget::paintEvent(event);
 }

@@ -10,8 +10,7 @@ ElidableLabel::ElidableLabel(QWidget* parent) : ElidableLabel{{}, parent} {}
 ElidableLabel::ElidableLabel(QString const& text, QWidget* parent)
     : QWidget{parent},
       _text{text},
-      _minVisibleCharacters{0},
-      _colorRole{QPalette::Text} {
+      _minVisibleCharacters{0} {
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
   updateTextSize();
@@ -45,17 +44,6 @@ void ElidableLabel::setMinVisibleCharacters(int count) {
   update();
 }
 
-QPalette::ColorRole ElidableLabel::textColorRole() const { return _colorRole; }
-
-void ElidableLabel::setTextColorRole(QPalette::ColorRole role) {
-  if (_colorRole == role) {
-    return;
-  }
-
-  _colorRole = role;
-  update();
-}
-
 QSize ElidableLabel::sizeHint() const { return _textSize; }
 
 QSize ElidableLabel::minimumSizeHint() const { return _minTextSize; }
@@ -66,7 +54,7 @@ void ElidableLabel::paintEvent(QPaintEvent* event) {
   painter.setClipRect(QRectF{event->rect()});
 
   painter.save();
-  painter.setPen(palette().color(_colorRole));
+  painter.setPen(palette().color(foregroundRole()));
   painter.drawText(rect(), Qt::TextSingleLine | Qt::AlignLeft, elidedText());
   painter.restore();
 }

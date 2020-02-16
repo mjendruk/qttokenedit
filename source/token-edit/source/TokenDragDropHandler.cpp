@@ -41,17 +41,19 @@ bool TokenDragDropHandler::canDrag(Token const* source) const {
 void TokenDragDropHandler::execDrag(Token* source, QPoint const& mousePos) {
   Q_ASSERT(canDrag(source));
 
-  auto const index = _tokenEdit->index(source);
+//  auto const index = _tokenEdit->index(source);
+  
+  auto indexes = _tokenEdit->selectionModel()->selectedRows(_tokenEdit->modelColumn());
 
   auto drag = new QDrag{source};
   drag->setHotSpot(mousePos);
   drag->setPixmap(source->toPixmap());
-  drag->setMimeData(model()->mimeData({index}));
+  drag->setMimeData(model()->mimeData(indexes));
 
   _tokenEdit->blockModeChange();
 
   if (drag->exec(Qt::MoveAction) == Qt::MoveAction) {
-    auto success = _tokenEdit->remove(index.row(), UpdateFocus::No);
+    auto success = _tokenEdit->remove(indexes, UpdateFocus::No);
     Q_ASSERT(success);
   }
 
