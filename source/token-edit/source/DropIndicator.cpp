@@ -1,4 +1,4 @@
-#include "DropIndicator.h"
+#include <token-edit/DropIndicator.h>
 
 #include <QtGui/QPaintDevice>
 #include <QtGui/QPainter>

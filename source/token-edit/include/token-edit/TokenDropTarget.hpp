@@ -10,8 +10,7 @@
 #include <QtGui/QPainter>
 
 #include <token-edit/AbstractTokenDragDropHandler.h>
-
-#include "DropIndicator.h"
+#include <token-edit/DropIndicator.h>
 
 namespace mjendruk {
 

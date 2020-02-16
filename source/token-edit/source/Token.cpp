@@ -10,9 +10,9 @@
 #include <QtGui/QPainter>
 
 #include <token-edit/AbstractTokenDragDropHandler.h>
+#include <token-edit/DropIndicator.h>
 #include <token-edit/ElidableLabel.h>
 
-#include "DropIndicator.h"
 #include "FocusChainElement.h"
 #include "RemoveButton.h"
 

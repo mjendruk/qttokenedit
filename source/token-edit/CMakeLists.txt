@@ -48,6 +48,7 @@ set(headers
     ${include_path}/AbstractTokenButton.h
     ${include_path}/BaseToken.h
     ${include_path}/DarkStyle.h
+    ${include_path}/DropIndicator.h
     ${include_path}/ElidableLabel.h
     ${include_path}/FlexLayout.h
     ${include_path}/FocusChainNavigation.h
@@ -67,7 +68,6 @@ set(sources
     ${source_path}/BaseToken.cpp
     ${source_path}/DarkStyle.cpp
     ${source_path}/DropIndicator.cpp
-    ${source_path}/DropIndicator.h
     ${source_path}/ElidableLabel.cpp
     ${source_path}/FlexLayout.cpp
     ${source_path}/FocusChain.cpp
