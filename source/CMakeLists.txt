@@ -4,7 +4,7 @@
 # 
 
 # Generate version-header
-configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${META_PROJECT_NAME}/${META_PROJECT_NAME}-version.h @ONLY)
+configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${META_PROJECT_NAME}/${META_PROJECT_NAME}_version.h @ONLY)
 
 
 # 
@@ -13,7 +13,7 @@ configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${META_PROJECT_N
 
 # Libraries
 set(IDE_FOLDER "")
-add_subdirectory(token-edit)
+add_subdirectory(qttokenedit)
 
 # Examples
 set(IDE_FOLDER "Examples")

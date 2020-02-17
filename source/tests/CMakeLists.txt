@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 # Meta information about the project
-set(META_PROJECT_NAME "qt-token-edit")
+set(META_PROJECT_NAME "qttokenedit")
 
 # Declare project
 project("${META_PROJECT_NAME}-tests" C CXX)

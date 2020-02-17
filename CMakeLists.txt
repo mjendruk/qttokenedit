@@ -37,7 +37,6 @@ include(cmake/GenerateTemplateExportHeader.cmake)
 include(cmake/GetGitRevisionDescription.cmake)
 include(cmake/HealthCheck.cmake)
 
-
 # 
 # Project description and (meta) information
 # 
@@ -50,10 +49,10 @@ if(NOT GIT_SHA1)
 endif()
 
 # Meta information about the project
-set(META_PROJECT_NAME        "qt-token-edit")
+set(META_PROJECT_NAME        "qttokenedit")
 set(META_PROJECT_DESCRIPTION "Qt Token Edit")
 set(META_AUTHOR_ORGANIZATION "mjendruk")
-set(META_AUTHOR_DOMAIN       "https://github.com/mjendruk/qt-token-edit/")
+set(META_AUTHOR_DOMAIN       "https://github.com/mjendruk/qttokenedit/")
 set(META_AUTHOR_MAINTAINER   "code@jendruk.com")
 set(META_VERSION_MAJOR       "0")
 set(META_VERSION_MINOR       "0")

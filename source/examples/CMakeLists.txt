@@ -5,5 +5,5 @@ if(NOT OPTION_BUILD_EXAMPLES)
 endif()
 
 # Example applications
-add_subdirectory(token-edit-playground)
-add_subdirectory(sorted-table)
+add_subdirectory(tokenedit_playground)
+add_subdirectory(sorted_table)
