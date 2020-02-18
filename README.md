@@ -56,5 +56,5 @@ The token edit offers an intuitive way to delete items through both mouse and ke
 
 ## References
 
-- Token fields in MacOS: https://developer.apple.com/design/human-interface-guidelines/macos/fields-and-labels/token-fields/
-- Input chips in Material Design: https://material.io/components/chips/#input-chips
+- Token fields in MacOS [[link]](https://developer.apple.com/design/human-interface-guidelines/macos/fields-and-labels/token-fields/)
+- Input chips in Material Design [[link]](https://material.io/components/chips/#input-chips)
