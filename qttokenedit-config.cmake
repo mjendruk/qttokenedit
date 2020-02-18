@@ -7,7 +7,7 @@
 
 # Find depencencies
 include(CMakeFindDependencyMacro)
-find_dependency(glm)
+# find_dependency(glm)
 
 
 # List of modules
