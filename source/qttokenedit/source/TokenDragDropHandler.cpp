@@ -1,8 +1,8 @@
 #include "TokenDragDropHandler.h"
 
 #include <QtCore/QAbstractItemModel>
-#include <QtCore/QScopedValueRollback>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QScopedValueRollback>
 #include <QtGui/QDrag>
 #include <QtWidgets/QAbstractItemView>
 
@@ -41,18 +41,20 @@ bool TokenDragDropHandler::canDrag(Token const* source) const {
 
 void TokenDragDropHandler::execDrag(Token* source, QPoint const& mousePos) {
   Q_ASSERT(canDrag(source));
-  
+
   auto tokens = selectedTokens();
   Q_ASSERT((std::any_of(tokens.cbegin(), tokens.cend(),
                         [=](auto token) { return token == source; })));
-  
+
   auto rect = enclosingRect(tokens);
   auto pixmap = renderPixmap(rect, tokens);
-  
+
   auto hotSpot = source->mapToParent(mousePos) - rect.topLeft();
 
   auto indexes = selectedIndexes();
   auto mimeData = model()->mimeData(indexes);
+
+  auto persistentIndexes = persistent(indexes);
   
   auto drag = QScopedPointer<QDrag>{new QDrag{source}};
   drag->setPixmap(pixmap);
@@ -62,7 +64,7 @@ void TokenDragDropHandler::execDrag(Token* source, QPoint const& mousePos) {
   _tokenEdit->blockModeChange();
 
   if (drag->exec(Qt::MoveAction) == Qt::MoveAction) {
-    auto success = _tokenEdit->remove(indexes, UpdateFocus::No);
+    auto success = _tokenEdit->remove(nonpersistent(persistentIndexes), UpdateFocus::No);
     Q_ASSERT(success);
   }
 
@@ -153,26 +155,44 @@ QVector<Token*> TokenDragDropHandler::selectedTokens() const {
   return result;
 }
 
+QVector<QPersistentModelIndex> TokenDragDropHandler::persistent(
+    QModelIndexList const& indexes) const {
+  auto result = QVector<QPersistentModelIndex>{};
+  for (auto const& index : indexes) {
+    result.append(index);
+  }
+  return result;
+}
+
+QModelIndexList TokenDragDropHandler::nonpersistent(QVector<QPersistentModelIndex> const& indexes) const
+{
+  auto result = QModelIndexList{};
+  for (auto const& index : indexes) {
+    result.append(index);
+  }
+  return result;
+}
+
 QRect TokenDragDropHandler::enclosingRect(QVector<Token*> const& tokens) const {
   return std::accumulate(tokens.cbegin(), tokens.cend(), QRect{},
                          [](QRect const& rect, Token* token) {
-    return rect.united(token->geometry());
-  });
+                           return rect.united(token->geometry());
+                         });
 }
 
 QPixmap TokenDragDropHandler::renderPixmap(QRect const& enclosingRect,
                                            QVector<Token*> tokens) const {
   auto dpr = _tokenEdit->devicePixelRatio();
-  
+
   auto pixmap = QPixmap{dpr * enclosingRect.size()};
   pixmap.setDevicePixelRatio(dpr);
   pixmap.fill(Qt::transparent);
-  
+
   for (auto token : tokens) {
     auto offset = token->geometry().topLeft() - enclosingRect.topLeft();
     token->render(&pixmap, offset, QRegion{}, QWidget::DrawChildren);
   }
-  
+
   return pixmap;
 }
 

@@ -2,6 +2,7 @@
 
 #include <QtCore/QVector>
 #include <QtCore/QAbstractItemModel>
+#include <QtCore/QPersistentModelIndex>
 
 #include <qttokenedit/AbstractTokenDragDropHandler.h>
 
@@ -32,6 +33,8 @@ class TokenDragDropHandler : public AbstractTokenDragDropHandler {
  private:
   QModelIndexList selectedIndexes() const;
   QVector<Token*> selectedTokens() const;
+  QVector<QPersistentModelIndex> persistent(QModelIndexList const& indexes) const;
+  QModelIndexList nonpersistent(QVector<QPersistentModelIndex> const& indexes) const;
   QRect enclosingRect(QVector<Token*> const& tokens) const;
   QPixmap renderPixmap(QRect const& enclosingRect,
                        QVector<Token*> tokens) const;
