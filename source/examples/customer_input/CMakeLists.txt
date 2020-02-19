@@ -38,12 +38,16 @@ endif()
 # 
 
 set(sources
+    CustomerCompletionModel.cpp
+    CustomerCompletionModel.h
+    LoadCsvFromFile.cpp
+    LoadCsvFromFile.h
     main.cpp
     MainWindow.cpp
     MainWindow.h
     MainWindow.ui
-    CsvItemModel.cpp
-    CsvItemModel.h
+    SelectedCustomersModel.cpp
+    SelectedCustomersModel.h
 )
 
 

@@ -6,12 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>396</width>
+    <width>447</width>
     <height>26</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string/>
+   <string>Select Customers</string>
+  </property>
+  <property name="dockNestingEnabled">
+   <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="focusPolicy">
