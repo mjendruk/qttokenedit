@@ -23,7 +23,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
 
   auto customerInput = new mjendruk::TokenEdit{this};
   customerInput->setModel(selectedCustomerModel);
-  customerInput->setMaxLineCount(2);
+  customerInput->setMaxLineCount(3);
   customerInput->setDragEnabled(true);
   customerInput->setDragDropMode(QAbstractItemView::DragDrop);
   customerInput->setRemovable(true);
@@ -34,7 +34,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
 
   auto completer = new QCompleter{customerModel, this};
   completer->setCaseSensitivity(Qt::CaseInsensitive);
-  completer->popup()->setMinimumWidth(200);
+  completer->popup()->setMinimumWidth(300);
   completer->setCompletionColumn(0);
   completer->setFilterMode(Qt::MatchContains);
 
@@ -57,7 +57,7 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
       Qt::QueuedConnection);
 
   m_ui->formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
-  m_ui->formLayout->addRow("Customers", customerInput);
+  m_ui->formLayout->addRow("Recipients", customerInput);
 }
 
 MainWindow::~MainWindow() {}
