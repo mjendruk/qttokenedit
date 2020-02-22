@@ -26,12 +26,12 @@ QVariant CustomerCompletionModel::data(QModelIndex const& index,
 
   auto const& row = _data.rows.at(index.row());
 
-  if (role == Qt::DisplayRole || role == Qt::EditRole) {
+  if (role == Qt::DisplayRole) {
     return QString{"%1 %2 <%3>"}
         .arg(row.at(_firstNameCol))
         .arg(row.at(_lastNameCol))
         .arg(row.at(_emailCol));
-  } else if (role == NameRole) {
+  } else if (role == NameRole || role == Qt::EditRole) {
     return QString{"%1 %2"}
         .arg(row.at(_firstNameCol))
         .arg(row.at(_lastNameCol));
