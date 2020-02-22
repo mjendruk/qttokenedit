@@ -125,7 +125,7 @@ TokenEdit::TokenEdit(QWidget* parent)
   _scrollArea->setFocusPolicy(Qt::ClickFocus);
   _scrollArea->setFocusProxy(this);
   _scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  _scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  _scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   _scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
   auto singleStep = dummyToken->sizeHint().height() + _view->ySpacing();
@@ -149,6 +149,10 @@ TokenEdit::TokenEdit(QWidget* parent)
     if (_model && !_view->isEmpty() && removable()) {
       this->remove(_view->count() - 1, UpdateFocus::No);
     }
+  });
+        
+  connect(_lineEdit, &QLineEdit::textChanged, [=]() {
+    updateHeight();
   });
 
   connect(qApp, &QApplication::focusChanged, this, &TokenEdit::onFocusChanged);
