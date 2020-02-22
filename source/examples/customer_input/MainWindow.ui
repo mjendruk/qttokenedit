@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Select Customers</string>
+   <string/>
   </property>
   <property name="dockNestingEnabled">
    <bool>false</bool>
