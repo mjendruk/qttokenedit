@@ -154,7 +154,10 @@ TokenEdit::TokenEdit(QWidget* parent)
   connect(qApp, &QApplication::focusChanged, this, &TokenEdit::onFocusChanged);
 }
 
-TokenEdit::~TokenEdit() = default;
+TokenEdit::~TokenEdit() {
+  disconnect(qApp, &QApplication::focusChanged, this,
+             &TokenEdit::onFocusChanged);
+}
 
 int TokenEdit::maxLineCount() const { return _maxLineCount; }
 
