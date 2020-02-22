@@ -31,7 +31,7 @@ Drag and Drop is implemented using the QAbstractItemModel interface. However onl
 
 ### High-DPI Support
 
-The widget is properly scaled at different DPI scalings.
+The widget is properly scaled at different DPI scale factors.
 
 
 
