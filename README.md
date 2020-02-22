@@ -2,6 +2,8 @@
 
 Implementation of a token edit based on the Qt model/view framework. 
 
+![Preview](images/tokenedit_preview.gif)
+
 
 ## Notable Features
 
