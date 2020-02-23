@@ -5,6 +5,14 @@ Implementation of a token edit based on the Qt model/view framework.
 ![Preview](images/tokenedit_preview.gif)
 
 
+## Requirements
+
+* C++14 compliant compiler 
+* Qt version >= 5.9 (a lower version may work but was not tested)
+
+
+
+
 ## Notable Features
 
 ### QAbstractItemModel Interface
