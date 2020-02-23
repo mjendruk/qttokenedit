@@ -95,8 +95,8 @@ TokenEdit::TokenEdit(QWidget* parent)
       _activeMode{nullptr},
       _nextActiveMode{nullptr},
       _modeChangedBlocked{false},
-      _editingMode{new TokenEditEditingMode{_view, _access.get(), this}},
-      _displayMode{new TokenEditDisplayMode{_view, _access.get(), this}},
+      _editingMode{new TokenEditEditingMode{_view, _access.data(), this}},
+      _displayMode{new TokenEditDisplayMode{_view, _access.data(), this}},
       _scrollArea{new QScrollArea{this}},
       _maxLineCount{3},
       _showLineEdit{ShowLineEdit::Always},
@@ -331,7 +331,7 @@ AbstractTokenSelectionHandler* TokenEdit::selectionHandler() const {
 }
 
 AbstractTokenDragDropHandler* TokenEdit::dragDropHandler() const {
-  return _dragDropHandler.get();
+  return _dragDropHandler.data();
 }
 
 int TokenEdit::visibleCount() const { return _view->count(); }
