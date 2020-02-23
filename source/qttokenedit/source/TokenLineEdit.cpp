@@ -15,6 +15,10 @@ TokenLineEdit::TokenLineEdit(AbstractTokenDragDropHandler* handler,
     : TokenDropTarget<QLineEdit>{handler, parent}, _widthHint{0} {
   setAttribute(Qt::WA_MacShowFocusRect, 0);
   setFrame(false);
+
+  setTextMargins(0,0,0,0);
+  setContentsMargins(0,0,0,0);
+
   setMinimumWidth(1);
 
   connect(this, &QLineEdit::textChanged, this, &TokenLineEdit::onTextChanged);
