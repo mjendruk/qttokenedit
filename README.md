@@ -29,19 +29,19 @@ The implementation utilises the application’s style wherever possible. Colors 
 
 __MacOS__
 
-<img src="images/styles/macos.png" alt="MacOS" />
+<img srcset="images/styles/macos.png 2x, images/styles/macos_1x.png 1x" src="images/styles/macos_1x.png" alt="MacOS">
 
 
 
 __Windows__
 
-<img src="images/styles/windows_10.png" alt="Windows" />
+<img srcset="images/styles/windows_10.png 2x, images/styles/windows_10_1x.png 1x" src="images/styles/windows_10_1x.png" alt="Windows">
 
 
 
 __Gnome Adwaita__
 
-<img src="images/styles/gnome_adwaita.png" alt="Gnome Adwaita" style="max-width=50%;" />
+<img srcset="images/styles/gnome_adwaita.png 2x, images/styles/gnome_adwaita_1x.png 1x" src="images/styles/gnome_adwaita_1x.png"  alt="Gnome Adwaita">
 
 ### Auto-Completion and validation
 
