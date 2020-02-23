@@ -8,8 +8,6 @@ class QBoxLayout;
 
 namespace mjendruk {
 
-class TokenEditFrameOverlay;
-
 class QTTOKENEDIT_API TokenEditFrame : public QWidget {
   Q_OBJECT
 
@@ -24,18 +22,17 @@ class QTTOKENEDIT_API TokenEditFrame : public QWidget {
 
  protected:
   void paintEvent(QPaintEvent* event) override;
-  void resizeEvent(QResizeEvent* event) override;
-  void leaveEvent(QEvent* event) override;
-  void enterEvent(QEvent* event) override;
 
  private:
+  void drawBackground(QPainter* painter);
+  void drawFrame(QPainter* painter);
+  
   QRect contentRect() const;
   QMargins contentMargins() const;
 
  private:
   QWidget* _widget;
   QBoxLayout* _layout;
-  TokenEditFrameOverlay* _frame;
   bool _shownAsFocused;
 };
 

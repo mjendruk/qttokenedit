@@ -132,6 +132,9 @@ TokenEdit::TokenEdit(QWidget* parent)
   _scrollArea->verticalScrollBar()->setSingleStep(singleStep);
 
   _scrollArea->setWidget(_view);
+        
+  _scrollArea->viewport()->setAutoFillBackground(false);
+  _view->setAutoFillBackground(false);
 
   connect(_view, &TokenEditView::sizeChanged, this, [=]() {
     if (_model) {

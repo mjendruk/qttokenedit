@@ -16,7 +16,6 @@ TokenEditView::TokenEditView(QWidget* parent)
       _finalWidget{nullptr},
       _defaultFinalWidget{nullptr} {
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  setBackgroundRole(QPalette::Base);
   setFocusPolicy(Qt::NoFocus);
 }
 
