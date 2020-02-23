@@ -29,19 +29,25 @@ The implementation utilises the application’s style wherever possible. Colors 
 
 __MacOS__
 
-<img srcset="images/styles/macos.png 2x, images/styles/macos_1x.png 1x" src="images/styles/macos_1x.png" alt="MacOS">
-
+<img src="images/styles/macos_1x.png" alt="MacOS" />
+[[full size]](images/styles/macos.png)
 
 
 __Windows__
 
-<img srcset="images/styles/windows_10.png 2x, images/styles/windows_10_1x.png 1x" src="images/styles/windows_10_1x.png" alt="Windows">
+<img  src="images/styles/windows_10_1x.png" alt="Windows" />
+[[full size]](images/styles/windows_10.png)
 
 
 
 __Gnome Adwaita__
 
-<img srcset="images/styles/gnome_adwaita.png 2x, images/styles/gnome_adwaita_1x.png 1x" src="images/styles/gnome_adwaita_1x.png"  alt="Gnome Adwaita">
+<img src="images/styles/gnome_adwaita_1x.png"  alt="Gnome Adwaita"/>
+[[full size]](images/styles/gnome_adwaita.png)
+
+<a target="_blank" rel="noopener noreferrer" href="images/styles/gnome_adwaita.png">
+  <img src="images/styles/gnome_adwaita_1x.png"  alt="Gnome Adwaita"/>
+</a>
 
 ### Auto-Completion and validation
 
