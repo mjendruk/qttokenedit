@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 #include <QtCore/QModelIndex>
 #include <QtCore/QScopedValueRollback>
@@ -90,7 +91,7 @@ class QTTOKENEDIT_API TokenEdit : public TokenEditFrame {
   QModelIndex index(int row) const;
   QModelIndex index(Token const* token) const;
 
-  QScopedValueRollback<UpdateFocus> enableUpdateFocus();
+  std::unique_ptr<QScopedValueRollback<UpdateFocus>> enableUpdateFocus();
   bool remove(int row, UpdateFocus uf);
   bool remove(QModelIndexList const& indexes, UpdateFocus uf);
 

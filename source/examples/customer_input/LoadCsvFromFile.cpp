@@ -6,13 +6,13 @@
 CsvData loadCsvFromFile(QString const& filePath) {
   auto result = CsvData{};
 
-  auto file = QFile{filePath};
+  QFile file{filePath};
 
   Q_ASSERT(file.exists());
 
   file.open(QFile::ReadOnly | QFile::Text);
 
-  auto in = QTextStream(&file);
+  QTextStream in{&file};
 
   auto headerLine = in.readLine();
   for (auto title : headerLine.split(",")) {

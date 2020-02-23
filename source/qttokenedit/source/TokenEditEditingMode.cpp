@@ -51,9 +51,9 @@ int TokenEditEditingMode::heightHint() const {
       std::min(access()->maxLineCount(), view()->lineCount());
 
   auto spacing = view()->ySpacing();
-  auto dummyToken = QScopedPointer{new Token{}};
+  Token dummyToken{};
   auto height =
-      (dummyToken->sizeHint().height() + spacing) * actualRows + spacing;
+      (dummyToken.sizeHint().height() + spacing) * actualRows + spacing;
 
   return height;
 }

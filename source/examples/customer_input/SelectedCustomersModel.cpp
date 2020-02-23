@@ -26,8 +26,8 @@ QMimeData* SelectedCustomersModel::mimeData(
     auto row = index.row();
 
     customers.append(
-        QJsonObject{QPair{QStringLiteral("name"), _names.at(row)},
-                   QPair{QStringLiteral("email"), _emails.at(row)}});
+        QJsonObject{{QStringLiteral("name"), _names.at(row)},
+                   {QStringLiteral("email"), _emails.at(row)}});
   }
 
   auto jsonData = QJsonDocument{customers}.toBinaryData();

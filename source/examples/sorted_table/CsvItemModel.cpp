@@ -75,13 +75,13 @@ void CsvItemModel::sortByColumns(QVector<int> const& columns) {
 QStringList CsvItemModel::titles() const { return _headerRow.toList(); }
 
 void CsvItemModel::loadFromFile(QString const& path) {
-  auto file = QFile{path};
+  QFile file{path};
 
   Q_ASSERT(file.exists());
 
   file.open(QFile::ReadOnly | QFile::Text);
 
-  auto in = QTextStream(&file);
+  QTextStream in{&file};
 
   auto headerLine = in.readLine();
   for (auto title : headerLine.split(",")) {

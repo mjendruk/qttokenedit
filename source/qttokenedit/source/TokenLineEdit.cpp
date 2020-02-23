@@ -36,7 +36,7 @@ void TokenLineEdit::keyPressEvent(QKeyEvent* event) {
 void TokenLineEdit::paintEvent(QPaintEvent* event) {
   QLineEdit::paintEvent(event);
 
-  auto painter = QPainter{this};
+  QPainter painter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(QRectF{event->rect()});
 

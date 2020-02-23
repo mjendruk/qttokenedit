@@ -19,9 +19,9 @@ bool TokenDragDropHandler::canDrag(Token const* source) const {
   if (!_tokenEdit->dragEnabled()) {
     return false;
   }
-
-  if (auto mode = _tokenEdit->dragDropMode();
-      mode == QAbstractItemView::NoDragDrop ||
+ 
+  auto mode = _tokenEdit->dragDropMode();
+  if (mode == QAbstractItemView::NoDragDrop ||
       mode == QAbstractItemView::DropOnly) {
     return false;
   }
@@ -56,14 +56,14 @@ void TokenDragDropHandler::execDrag(Token* source, QPoint const& mousePos) {
 
   auto persistentIndexes = persistent(indexes);
   
-  auto drag = QScopedPointer<QDrag>{new QDrag{source}};
-  drag->setPixmap(pixmap);
-  drag->setHotSpot(hotSpot);
-  drag->setMimeData(mimeData);
+  QDrag drag{source};
+  drag.setPixmap(pixmap);
+  drag.setHotSpot(hotSpot);
+  drag.setMimeData(mimeData);
 
   _tokenEdit->blockModeChange();
 
-  if (drag->exec(Qt::MoveAction) == Qt::MoveAction) {
+  if (drag.exec(Qt::MoveAction) == Qt::MoveAction) {
     auto success = _tokenEdit->remove(nonpersistent(persistentIndexes), UpdateFocus::No);
     Q_ASSERT(success);
   }
@@ -95,8 +95,8 @@ bool TokenDragDropHandler::canDropMimeData(int row, QMimeData const* data,
     return false;
   }
 
-  if (auto token = qobject_cast<Token*>(source);
-      mode == QAbstractItemView::InternalMove &&
+  auto token = qobject_cast<Token*>(source);
+  if (mode == QAbstractItemView::InternalMove &&
       !(token && _tokenEdit->indexOf(token) != -1)) {
     return false;
   }

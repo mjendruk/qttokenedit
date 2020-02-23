@@ -108,10 +108,10 @@ TokenEdit::TokenEdit(QWidget* parent)
       _rootModelIndex{QModelIndex{}},
       _modelColumn{0} {
   setFocusPolicy(Qt::StrongFocus);
-  auto dummyToken = QScopedPointer{new Token{}};
+  Token dummyToken{};
 
-  _lineEdit->setFixedHeight(dummyToken->sizeHint().height());
-  _placeholder->setFixedHeight(dummyToken->sizeHint().height());
+  _lineEdit->setFixedHeight(dummyToken.sizeHint().height());
+  _placeholder->setFixedHeight(dummyToken.sizeHint().height());
   _placeholder->setVisible(false);
 
   setWidget(_scrollArea);
@@ -127,7 +127,7 @@ TokenEdit::TokenEdit(QWidget* parent)
   _scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   _scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-  auto singleStep = dummyToken->sizeHint().height() + _view->ySpacing();
+  auto singleStep = dummyToken.sizeHint().height() + _view->ySpacing();
   _scrollArea->verticalScrollBar()->setSingleStep(singleStep);
 
   _scrollArea->setWidget(_view);
@@ -141,8 +141,8 @@ TokenEdit::TokenEdit(QWidget* parent)
     if (_model) {
       _activeMode->invalidate();
 
-      if (auto selection = selectionModel()->currentIndex();
-          selection.isValid()) {
+      auto selection = selectionModel()->currentIndex();
+      if (selection.isValid()) {
         ensureVisible(view()->at(selection.row()));
       }
     }
@@ -347,19 +347,19 @@ QModelIndex TokenEdit::index(Token const* token) const {
   return index(indexOf(token));
 }
 
-QScopedValueRollback<UpdateFocus> TokenEdit::enableUpdateFocus() {
-  return QScopedValueRollback{_updateFocus, UpdateFocus::Yes};
+std::unique_ptr<QScopedValueRollback<UpdateFocus>> TokenEdit::enableUpdateFocus() {
+  return std::make_unique<QScopedValueRollback<UpdateFocus>>(_updateFocus, UpdateFocus::Yes);
 }
 
 bool TokenEdit::remove(int row, UpdateFocus uf) {
   Q_ASSERT(_model);
-  QScopedValueRollback svr{_updateFocus, uf};
+  QScopedValueRollback<UpdateFocus> svr{_updateFocus, uf};
   return _model->removeRow(row);
 }
 
 bool TokenEdit::remove(QModelIndexList const& _indexes, UpdateFocus uf) {
   Q_ASSERT(_model);
-  QScopedValueRollback svr{_updateFocus, uf};
+  QScopedValueRollback<UpdateFocus> svr{_updateFocus, uf};
 
   auto indexes = _indexes;
   auto rows = std::vector<int>(indexes.size());

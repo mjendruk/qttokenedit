@@ -49,7 +49,7 @@ QSize ElidableLabel::sizeHint() const { return _textSize; }
 QSize ElidableLabel::minimumSizeHint() const { return _minTextSize; }
 
 void ElidableLabel::paintEvent(QPaintEvent* event) {
-  auto painter = QPainter{this};
+  QPainter painter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(QRectF{event->rect()});
 

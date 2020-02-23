@@ -30,7 +30,7 @@ void OmissionToken::setCount(int count) {
 void OmissionToken::paintEvent(QPaintEvent* event) {
   BaseToken::paintEvent(event);
 
-  auto painter = QPainter{this};
+  QPainter painter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(QRectF{event->rect()});
 

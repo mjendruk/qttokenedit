@@ -53,7 +53,7 @@ void TokenEditFrame::setShownAsFocused(bool value) {
 void TokenEditFrame::paintEvent(QPaintEvent* event) {
   QWidget::paintEvent(event);
   
-  auto painter = QPainter{this};
+  QPainter painter{this};
   painter.setClipRect(event->rect());
   
   drawBackground(&painter);

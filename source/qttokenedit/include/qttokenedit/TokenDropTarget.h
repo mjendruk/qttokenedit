@@ -10,7 +10,7 @@ class AbstractTokenDragDropHandler;
 
 template <typename T>
 class TokenDropTarget : public T {
-  static_assert(std::is_base_of_v<QWidget, T>);
+  static_assert(std::is_base_of<QWidget, T>{}, "T must inherit from QWidget");
 
  public:
   explicit TokenDropTarget(AbstractTokenDragDropHandler* handler,

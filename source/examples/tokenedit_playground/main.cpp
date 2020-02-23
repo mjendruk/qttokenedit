@@ -8,7 +8,7 @@
 
 int main(int argc, char *argv[]) {
   QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  auto application = QApplication{argc, argv};
+  QApplication application{argc, argv};
   application.setStyle(new DarkStyle{});
 
 //  application.setStyle(QStyleFactory::create("Fusion"));
@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
   application.setFont(font);
 #endif
 
-  auto mainWindow = MainWindow{};
+  MainWindow mainWindow{};
   mainWindow.show();
 
   return application.exec();

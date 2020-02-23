@@ -191,7 +191,7 @@ auto FlexLayout::findNextLine(LayoutItemConstIterator begin,
 
   remainingWidth += lastHSpacing;
 
-  return std::pair{it, remainingWidth};
+  return std::make_pair(it, remainingWidth);
 }
 
 auto FlexLayout::itemMetrics(LayoutItemConstIterator begin,
@@ -268,11 +268,14 @@ auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
                                 LayoutItemConstIterator end, int width,
                                 bool testOnly) const
     -> std::pair<std::vector<ItemMetrics>, LayoutItemConstIterator> {
-  auto const [nextLineIt, remainingWidth] = findNextLine(begin, end, width);
+  auto nextLineIt = LayoutItemConstIterator{};
+  auto remainingWidth = 0;
+  std::tie(nextLineIt, remainingWidth) = findNextLine(begin, end, width);
+      
   auto itemMetrics = this->itemMetrics(begin, nextLineIt);
 
   if (testOnly) {
-    return std::pair{std::move(itemMetrics), nextLineIt};
+    return std::make_pair(std::move(itemMetrics), nextLineIt);
   }
 
   if (remainingWidth < 0) {
@@ -281,12 +284,13 @@ auto FlexLayout::metricsForLine(LayoutItemConstIterator begin,
     auto const overflow = -remainingWidth;
     tryRemoveOverflow(overflow, *begin, itemMetrics.front().size);
   } else if (remainingWidth > 0) {
-    if (auto indices = expandingItemIndices(itemMetrics); !indices.empty()) {
+    auto indices = expandingItemIndices(itemMetrics); 
+    if (!indices.empty()) {
       distributeRemainingWidth(remainingWidth, indices, itemMetrics);
     }
   }
 
-  return std::pair{std::move(itemMetrics), nextLineIt};
+  return std::make_pair(std::move(itemMetrics), nextLineIt);
 }
 
 auto FlexLayout::doLayout(QRect const &rect, bool testOnly) const
@@ -305,7 +309,9 @@ auto FlexLayout::doLayout(QRect const &rect, bool testOnly) const
   auto lineCount = 0;
 
   while (itemIt != itemEnd) {
-    auto const [itemMetrics, nextLineItemIt] =
+    auto itemMetrics = std::vector<ItemMetrics>{};
+    auto nextLineItemIt = LayoutItemConstIterator{};
+    std::tie(itemMetrics, nextLineItemIt) =
         metricsForLine(itemIt, itemEnd, effectiveRect.width(), testOnly);
 
     auto x = effectiveRect.x();

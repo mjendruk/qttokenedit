@@ -23,7 +23,7 @@ QSize AbstractTokenButton::sizeHint() const {
 void AbstractTokenButton::paintEvent(QPaintEvent* event) {
   auto const clippingRect = QRectF{event->rect()};
 
-  auto painter = QPainter{this};
+  QPainter painter{this};
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setClipRect(clippingRect);
 
