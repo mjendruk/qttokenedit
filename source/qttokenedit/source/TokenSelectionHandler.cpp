@@ -55,6 +55,10 @@ QItemSelectionModel* TokenSelectionHandler::selectionModel() const {
 
 bool TokenSelectionHandler::eventFilter(QObject* watched, QEvent* event) {
   Q_ASSERT(_tokenEdit == watched);
+  
+  if (!model()) {
+    return false;
+  }
 
   if (shouldSelectPreviousNext(event)) {
     return selectPreviousNext(event);
