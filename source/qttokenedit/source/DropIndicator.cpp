@@ -1,5 +1,7 @@
 #include <qttokenedit/DropIndicator.h>
 
+#include <cmath>
+
 #include <QtGui/QPaintDevice>
 #include <QtGui/QPainter>
 
