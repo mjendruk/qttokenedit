@@ -112,6 +112,7 @@ TokenEdit::TokenEdit(QWidget* parent)
 
   _lineEdit->setFixedHeight(dummyToken->sizeHint().height());
   _placeholder->setFixedHeight(dummyToken->sizeHint().height());
+  _placeholder->setVisible(false);
 
   _view->setDefaultFinalWidget(_lineEdit);
 
