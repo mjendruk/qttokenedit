@@ -27,6 +27,22 @@ The implementation utilises the application’s style wherever possible. Colors 
 
 
 
+__MacOS__
+
+<img src="images/styles/macos.png" alt="MacOS" />
+
+
+
+__Windows__
+
+<img src="images/styles/windows_10.png" alt="Windows" />
+
+
+
+__Gnome Adwaita__
+
+<img src="images/styles/gnome_adwaita.png" alt="Gnome Adwaita" style="max-width=50%;" />
+
 ### Auto-Completion and validation
 
 The token edit exposes its QLineEdit so that auto-completion and validation can easily be added as normally.
