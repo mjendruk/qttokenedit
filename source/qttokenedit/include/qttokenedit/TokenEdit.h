@@ -115,6 +115,7 @@ class QTTOKENEDIT_API TokenEdit : public TokenEditFrame {
   void updateActiveMode();
   void setActiveMode(TokenEditMode* mode);
   void updateHeight();
+  void updateDefaultFinalWidget();
   void ensureVisible(QWidget* widget);
 
  private:

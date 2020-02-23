@@ -99,7 +99,7 @@ TokenEdit::TokenEdit(QWidget* parent)
       _displayMode{new TokenEditDisplayMode{_view, _access.data(), this}},
       _scrollArea{new QScrollArea{this}},
       _maxLineCount{3},
-      _showLineEdit{ShowLineEdit::Always},
+      _showLineEdit{ShowLineEdit::Never},
       _dragEnabled{false},
       _dragDropMode{QAbstractItemView::NoDragDrop},
       _removable{false},
@@ -113,8 +113,6 @@ TokenEdit::TokenEdit(QWidget* parent)
   _lineEdit->setFixedHeight(dummyToken->sizeHint().height());
   _placeholder->setFixedHeight(dummyToken->sizeHint().height());
   _placeholder->setVisible(false);
-
-  _view->setDefaultFinalWidget(_lineEdit);
 
   setWidget(_scrollArea);
 
@@ -136,6 +134,8 @@ TokenEdit::TokenEdit(QWidget* parent)
         
   _scrollArea->viewport()->setAutoFillBackground(false);
   _view->setAutoFillBackground(false);
+        
+  setShowLineEdit(ShowLineEdit::Always);
 
   connect(_view, &TokenEditView::sizeChanged, this, [=]() {
     if (_model) {
@@ -182,15 +182,8 @@ void TokenEdit::setShowLineEdit(ShowLineEdit state) {
     return;
   }
 
-  if (state == ShowLineEdit::Never) {
-    _view->takeDefaultFinalWidget();
-    _view->setDefaultFinalWidget(_placeholder);
-  } else if (state == ShowLineEdit::Always) {
-    _view->takeDefaultFinalWidget();
-    _view->setDefaultFinalWidget(_lineEdit);
-  }
-
   _showLineEdit = state;
+  updateDefaultFinalWidget();
 }
 
 bool TokenEdit::dragEnabled() const { return _dragEnabled; }
@@ -387,6 +380,7 @@ void TokenEdit::init() {
     return;
   }
   setActiveMode(_displayMode);
+  updateDefaultFinalWidget();
 }
 
 void TokenEdit::clear() {
@@ -402,6 +396,8 @@ void TokenEdit::onRowsInserted(QModelIndex const& parent, int first, int last) {
   }
 
   _activeMode->inserted(first, last, _updateFocus);
+  
+  updateDefaultFinalWidget();
   updateHeight();
 }
 
@@ -411,6 +407,7 @@ void TokenEdit::onRowsRemoved(QModelIndex const& parent, int first, int last) {
   }
 
   _activeMode->removed(first, last, _updateFocus);
+  updateDefaultFinalWidget();
   updateHeight();
 }
 
@@ -519,6 +516,24 @@ void TokenEdit::updateHeight() {
   if (_scrollArea->height() != height) {
     _scrollArea->setFixedHeight(height);
   }
+}
+
+void TokenEdit::updateDefaultFinalWidget() {
+  if (!_model) {
+    return;
+  }
+  
+  auto finalWidget = static_cast<QWidget*>(_placeholder);
+  
+  if (_showLineEdit == ShowLineEdit::Always) {
+    finalWidget = _lineEdit;
+  } else if ((_showLineEdit == ShowLineEdit::WhenEmpty) &&
+             _model->rowCount() == 0) {
+    finalWidget = _lineEdit;
+  }
+ 
+  _view->takeDefaultFinalWidget();
+  _view->setDefaultFinalWidget(finalWidget);
 }
 
 void TokenEdit::ensureVisible(QWidget* widget) {

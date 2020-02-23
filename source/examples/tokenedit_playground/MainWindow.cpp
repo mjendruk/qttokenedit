@@ -84,6 +84,16 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
                   static_cast<QAbstractItemView::DragDropMode>(index);
               tokenEdit->setDragDropMode(dragDropMode);
             });
+    
+    m_ui->showLineEditComboBox->addItems({"Never", "WhenEmpty", "Always"});
+    m_ui->showLineEditComboBox->setCurrentIndex(static_cast<int>(tokenEdit->showLineEdit()));
+    
+    connect(m_ui->showLineEditComboBox, qOverload<int>(&QComboBox::activated),
+            [=](int index) {
+              auto showLineEdit =
+                  static_cast<mjendruk::ShowLineEdit>(index);
+              tokenEdit->setShowLineEdit(showLineEdit);
+            });
 
     m_ui->maxLineCountSpinBox->setValue(3);
     connect(m_ui->maxLineCountSpinBox,
@@ -122,12 +132,6 @@ MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
     //
     //     otherTokenEdit->show();
   }
-
-  connect(m_ui->widthSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
-          [=](auto value) { resize(value, height()); });
-
-  connect(m_ui->heightSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
-          [=](auto value) { resize(width(), value); });
 
   {
     auto const longNames = QStringList{
