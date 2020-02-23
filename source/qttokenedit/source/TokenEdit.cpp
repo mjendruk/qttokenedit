@@ -133,7 +133,7 @@ TokenEdit::TokenEdit(QWidget* parent)
 
   _scrollArea->setWidget(_view);
 
-  connect(_view, &TokenEditView::sizeChanged, [=]() {
+  connect(_view, &TokenEditView::sizeChanged, this, [=]() {
     if (_model) {
       _activeMode->invalidate();
 
@@ -143,7 +143,7 @@ TokenEdit::TokenEdit(QWidget* parent)
       }
     }
     updateHeight();
-  });
+  }, Qt::QueuedConnection);
 
   connect(_lineEdit, &TokenLineEdit::backspaceAtBeginning, [=]() {
     if (_model && !_view->isEmpty() && removable()) {
@@ -383,7 +383,6 @@ void TokenEdit::init() {
     return;
   }
   setActiveMode(_displayMode);
-  _displayMode->activate();
 }
 
 void TokenEdit::clear() {

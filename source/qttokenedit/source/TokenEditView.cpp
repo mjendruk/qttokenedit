@@ -12,7 +12,6 @@ namespace mjendruk {
 
 TokenEditView::TokenEditView(QWidget* parent)
     : QWidget{parent},
-      // _focusChain{new FocusChain{this}},
       _layout{new FlexLayout{margin(), xSpacing(), ySpacing(), this}},
       _finalWidget{nullptr},
       _defaultFinalWidget{nullptr} {
@@ -74,7 +73,6 @@ void TokenEditView::remove(int index, UpdateFocus uf) {
 
   auto item = _tokens.takeAt(index);
   auto layoutItem = _layout->takeAt(index);
-  // _focusChain->remove(item, uf);
   delete layoutItem;
   item->deleteLater();
 }

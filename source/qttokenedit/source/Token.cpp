@@ -103,7 +103,7 @@ void Token::keyPressEvent(QKeyEvent* event) {
 }
 
 void Token::mousePressEvent(QMouseEvent* event) {
-  QWidget::mousePressEvent(event);
+  BaseToken::mousePressEvent(event);
 
   _selectionHandler->select(this, event->buttons(), event->modifiers());
 
