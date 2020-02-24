@@ -10,6 +10,12 @@ find_package(Qt5Gui 5.9)
 find_package(Qt5Widgets 5.9)
 find_package(Qt5Test 5.9)
 
+# Enable automoc
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(AUTOMOC_MOC_OPTIONS PROPERTIES FOLDER CMakeAutomocTargets)
+set_property(GLOBAL PROPERTY AUTOMOC_FOLDER CMakeAutomocTargets)
+
 # 
 # Executable name and options
 # 
@@ -24,7 +30,7 @@ message(STATUS "Test ${target}")
 # 
 
 set(sources
-    main.cpp
+    TokenEditTest.cpp
 )
 
 
