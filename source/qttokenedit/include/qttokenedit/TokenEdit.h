@@ -12,6 +12,7 @@
 
 #include <qttokenedit/Global.h>
 #include <qttokenedit/TokenEditFrame.h>
+#include <qttokenedit/TokenEditPasskey.h>
 #include <qttokenedit/qttokenedit_api.h>
 
 class QLineEdit;
@@ -66,6 +67,10 @@ class QTTOKENEDIT_API TokenEdit : public TokenEditFrame {
   void setRootIndex(QModelIndex const& index);
 
   QItemSelectionModel* selectionModel() const;
+  
+  ActiveTokenEditMode activeMode() const;
+  
+  TokenEditView const* view(TokenEditPasskey const&) const;
 
  signals:
   void dragStateChanged(bool enabled);

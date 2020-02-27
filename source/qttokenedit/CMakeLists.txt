@@ -60,6 +60,7 @@ set(headers
     ${include_path}/TokenDropTarget.hpp
     ${include_path}/TokenEdit.h
     ${include_path}/TokenEditFrame.h
+    ${include_path}/TokenEditPasskey.h
     ${include_path}/TokenEditView.h
     ${include_path}/TokenLineEdit.h
 )

@@ -131,33 +131,34 @@ TokenEdit::TokenEdit(QWidget* parent)
   _scrollArea->verticalScrollBar()->setSingleStep(singleStep);
 
   _scrollArea->setWidget(_view);
-        
+
   _scrollArea->viewport()->setAutoFillBackground(false);
   _view->setAutoFillBackground(false);
-        
+
   setShowLineEdit(ShowLineEdit::Always);
 
-  connect(_view, &TokenEditView::sizeChanged, this, [=]() {
-    if (_model) {
-      _activeMode->invalidate();
+  connect(
+      _view, &TokenEditView::sizeChanged, this,
+      [=]() {
+        if (_model) {
+          _activeMode->invalidate();
 
-      auto selection = selectionModel()->currentIndex();
-      if (selection.isValid()) {
-        ensureVisible(view()->at(selection.row()));
-      }
-    }
-    updateHeight();
-  }, Qt::QueuedConnection);
+          auto selection = selectionModel()->currentIndex();
+          if (selection.isValid()) {
+            ensureVisible(view()->at(selection.row()));
+          }
+        }
+        updateHeight();
+      },
+      Qt::QueuedConnection);
 
   connect(_lineEdit, &TokenLineEdit::backspaceAtBeginning, [=]() {
     if (_model && !_view->isEmpty() && removable()) {
       this->remove(_view->count() - 1, UpdateFocus::No);
     }
   });
-        
-  connect(_lineEdit, &QLineEdit::textChanged, [=]() {
-    updateHeight();
-  });
+
+  connect(_lineEdit, &QLineEdit::textChanged, [=]() { updateHeight(); });
 
   connect(qApp, &QApplication::focusChanged, this, &TokenEdit::onFocusChanged);
 }
@@ -289,6 +290,16 @@ QItemSelectionModel* TokenEdit::selectionModel() const {
   return _selectionHandler->selectionModel();
 }
 
+ActiveTokenEditMode TokenEdit::activeMode() const {
+  if (_activeMode == _displayMode) {
+    return ActiveTokenEditMode::Display;
+  } else {  // _activeMode == _editMode
+    return ActiveTokenEditMode::Edit;
+  }
+}
+
+TokenEditView const* TokenEdit::view(TokenEditPasskey const&) const { return _view; }
+
 bool TokenEdit::eventFilter(QObject* object, QEvent* event) {
   Q_ASSERT(_view == object);
 
@@ -347,8 +358,10 @@ QModelIndex TokenEdit::index(Token const* token) const {
   return index(indexOf(token));
 }
 
-std::unique_ptr<QScopedValueRollback<UpdateFocus>> TokenEdit::enableUpdateFocus() {
-  return std::make_unique<QScopedValueRollback<UpdateFocus>>(_updateFocus, UpdateFocus::Yes);
+std::unique_ptr<QScopedValueRollback<UpdateFocus>>
+TokenEdit::enableUpdateFocus() {
+  return std::make_unique<QScopedValueRollback<UpdateFocus>>(_updateFocus,
+                                                             UpdateFocus::Yes);
 }
 
 bool TokenEdit::remove(int row, UpdateFocus uf) {
@@ -396,7 +409,7 @@ void TokenEdit::onRowsInserted(QModelIndex const& parent, int first, int last) {
   }
 
   _activeMode->inserted(first, last, _updateFocus);
-  
+
   updateDefaultFinalWidget();
   updateHeight();
 }
@@ -522,16 +535,16 @@ void TokenEdit::updateDefaultFinalWidget() {
   if (!_model) {
     return;
   }
-  
+
   auto finalWidget = static_cast<QWidget*>(_placeholder);
-  
+
   if (_showLineEdit == ShowLineEdit::Always) {
     finalWidget = _lineEdit;
   } else if ((_showLineEdit == ShowLineEdit::WhenEmpty) &&
              _model->rowCount() == 0) {
     finalWidget = _lineEdit;
   }
- 
+
   _view->takeDefaultFinalWidget();
   _view->setDefaultFinalWidget(finalWidget);
 }

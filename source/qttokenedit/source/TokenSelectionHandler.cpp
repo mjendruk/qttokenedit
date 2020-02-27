@@ -17,6 +17,10 @@ TokenSelectionHandler::TokenSelectionHandler(TokenEdit* tokenEdit)
   tokenEdit->installEventFilter(this);
 }
 
+TokenSelectionHandler::~TokenSelectionHandler() {
+  _tokenEdit->removeEventFilter(this);
+}
+
 void TokenSelectionHandler::updateModel() {
   if (!model()) {
     delete _selectionModel;

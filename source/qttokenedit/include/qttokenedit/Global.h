@@ -12,4 +12,6 @@ enum class DropIndicatorPosition : std::int8_t { None, Before, After };
 
 enum class ShowLineEdit : std::int8_t { Never, WhenEmpty, Always };
 
+enum class ActiveTokenEditMode : std::int8_t { Display, Edit };
+
 }  // namespace mjendruk
