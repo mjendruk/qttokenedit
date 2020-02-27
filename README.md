@@ -1,6 +1,12 @@
+_Please note: This project and its site on Github are still under development._
+
+
+
 # Qt Token Edit
 
 Implementation of a token edit based on the Qt model/view framework. 
+
+
 
 ![Preview](images/tokenedit_preview.gif)
 
