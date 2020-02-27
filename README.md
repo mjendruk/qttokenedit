@@ -86,7 +86,7 @@ The token edit offers an intuitive way to delete items through both mouse and ke
 
 - [ ] Only move operations are supported for drag and drop.
 - [ ] The widget does not rescale when moving between windows with difference DPI scaling
-- [ ] Add unit test for the testable parts of the widget
+- [ ] Add unit tests for the testable parts of the widget
 
 
 
