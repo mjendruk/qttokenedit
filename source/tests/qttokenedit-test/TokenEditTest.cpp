@@ -1,6 +1,9 @@
 
 #include <vector>
 
+#include <gmock/gmock.h>
+#include <gtest/gtest-param-test.h>
+
 #include <QtCore/QStringList>
 #include <QtCore/QStringListModel>
 #include <QtTest/QtTest>
@@ -9,39 +12,22 @@
 #include <qttokenedit/TokenEdit.h>
 #include <qttokenedit/TokenEditView.h>
 
-class TokenEditTest : public QObject {
-  Q_OBJECT
+using Position = int;
+using Count = int;
 
- private:
-  using Position = int;
-  using Count = int;
+class TokenEditTest : public testing::Test {
+ protected:
+  void SetUp() override;
+  void TearDown() override;
 
- private slots:
-  void init();
-  void cleanup();
-
-  void SetModel_PopulatedWithOneTokenForEachRow();
-
-  void AddRowsAtPosition_TokenAdded_data();
-  void AddRowsAtPosition_TokenAdded();
-
-  void RemoveRowsAtPosition_TokenRemoved_data();
-  void RemoveRowsAtPosition_TokenRemoved();
-
-  void ChangeDataAtPosition_TokenTextUpdated_data();
-  void ChangeDataAtPosition_TokenTextUpdated();
-
-  void SetToolTipRole_ToolTipSetOnToken_data();
-  void SetToolTipRole_ToolTipSetOnToken();
-
- private:
   void show();
   void processEvents();
+  mjendruk::TokenEditView const* view() const;
   void compare(QStringList const& expectedStrings,
                QVector<mjendruk::Token*> const& actualTokens,
                Qt::ItemDataRole role) const;
 
- private:
+ protected:
   mjendruk::TokenEdit* tokenEdit;
   QStringListModel* model;
 };
@@ -58,32 +44,35 @@ void TokenEditTest::show() {
 
 void TokenEditTest::processEvents() { qApp->processEvents(); }
 
-void TokenEditTest::compare(
-    QStringList const& expectedStrings,
-    QVector<mjendruk::Token*> const& actualTokens,
-    Qt::ItemDataRole role) const {
+mjendruk::TokenEditView const* TokenEditTest::view() const {
+  return tokenEdit->view({});
+}
+
+void TokenEditTest::compare(QStringList const& expectedStrings,
+                            QVector<mjendruk::Token*> const& actualTokens,
+                            Qt::ItemDataRole role) const {
   QCOMPARE(expectedStrings.size(), actualTokens.size());
 
   auto data = [=](mjendruk::Token const* token) {
     return role == Qt::DisplayRole ? token->text() : token->toolTip();
   };
-  
+
   for (auto index = 0; index < actualTokens.size(); ++index) {
     QCOMPARE(expectedStrings.at(index), data(actualTokens.at(index)));
   }
 }
 
-void TokenEditTest::init() {
+void TokenEditTest::SetUp() {
   tokenEdit = new mjendruk::TokenEdit{};
   model = new QStringListModel{};
 }
 
-void TokenEditTest::cleanup() {
+void TokenEditTest::TearDown() {
   delete tokenEdit;
   delete model;
 }
 
-void TokenEditTest::SetModel_PopulatedWithOneTokenForEachRow() {
+TEST_F(TokenEditTest, SetModel_PopulatedWithOneTokenForEachRow) {
   auto stringList = QStringList{"Abbie", "Jeramey", "Gabriella"};
 
   model->setStringList(stringList);
@@ -91,177 +80,205 @@ void TokenEditTest::SetModel_PopulatedWithOneTokenForEachRow() {
 
   show();
 
-  auto tokens = tokenEdit->view({})->tokens();
+  auto tokens = view()->tokens();
   compare(stringList, tokens, Qt::DisplayRole);
 }
 
-void TokenEditTest::AddRowsAtPosition_TokenAdded_data() {
-  QTest::addColumn<QStringList>("initialStrings");
-  QTest::addColumn<Position>("position");
-  QTest::addColumn<QStringList>("stringsToBeInserted");
-  QTest::addColumn<QStringList>("stringsAfterInsertion");
+struct TokenEditTest_AddRowsAtPosition_Data {
+  std::string name;
+  QStringList initialStrings;
+  Position position;
+  QStringList stringsToBeInserted;
+  QStringList stringsAfterInsertion;
+};
 
-  QTest::newRow("one at the beginning")
-      << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{0}
-      << QStringList{"Robert"}
-      << QStringList{"Robert", "Abbie", "Jeramey", "Gabriella"};
+std::vector<TokenEditTest_AddRowsAtPosition_Data>
+TokenEditTest_AddRowsAtPosition_TestCases() {
+  auto result = std::vector<TokenEditTest_AddRowsAtPosition_Data>{
+      {
+          "OneAtTheBeginning",
+          QStringList{"Abbie", "Jeramey", "Gabriella"},
+          Position{0},
+          QStringList{"Robert"},
+          QStringList{"Robert", "Abbie", "Jeramey", "Gabriella"},
+      },
+      {
+          "OneInTheMiddle",
+          QStringList{"Abbie", "Jeramey", "Gabriella"},
+          Position{2},
+          QStringList{"Robert"},
+          QStringList{"Abbie", "Jeramey", "Robert", "Gabriella"},
+      },
+      {
+          "OneAtTheEnd",
+          QStringList{"Abbie", "Jeramey", "Gabriella"},
+          Position{3},
+          QStringList{"Robert"},
+          QStringList{"Abbie", "Jeramey", "Gabriella", "Robert"},
+      },
+      {
+          "TwoInTheMiddle",
+          QStringList{"Abbie", "Jeramey", "Gabriella"},
+          Position{2},
+          QStringList{"Robert", "Rachel"},
+          QStringList{"Abbie", "Jeramey", "Robert", "Rachel", "Gabriella"},
+      },
+      {
+          "TwoAtTheEnd",
+          QStringList{"Abbie", "Jeramey", "Gabriella"},
+          Position{3},
+          QStringList{"Robert", "Rachel"},
+          QStringList{"Abbie", "Jeramey", "Gabriella", "Robert", "Rachel"},
+      }};
 
-  QTest::newRow("one in the middle")
-      << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{2}
-      << QStringList{"Robert"}
-      << QStringList{"Abbie", "Jeramey", "Robert", "Gabriella"};
-
-  QTest::newRow("one at the end")
-      << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{3}
-      << QStringList{"Robert"}
-      << QStringList{"Abbie", "Jeramey", "Gabriella", "Robert"};
-
-  QTest::newRow("two in the middle")
-      << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{2}
-      << QStringList{"Robert", "Rachel"}
-      << QStringList{"Abbie", "Jeramey", "Robert", "Rachel", "Gabriella"};
-
-  QTest::newRow("two at the end")
-      << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{3}
-      << QStringList{"Robert", "Rachel"}
-      << QStringList{"Abbie", "Jeramey", "Gabriella", "Robert", "Rachel"};
+  return result;
 }
 
-void TokenEditTest::AddRowsAtPosition_TokenAdded() {
-  QFETCH(QStringList, initialStrings);
-  QFETCH(Position, position);
-  QFETCH(QStringList, stringsToBeInserted);
-  QFETCH(QStringList, stringsAfterInsertion);
+class TokenEditTest_AddRowsAtPosition
+    : public TokenEditTest,
+      public testing::WithParamInterface<TokenEditTest_AddRowsAtPosition_Data> {
+};
 
-  model->setStringList(initialStrings);
+TEST_P(TokenEditTest_AddRowsAtPosition, TokenAdded) {
+  auto data = GetParam();
+
+  model->setStringList(data.initialStrings);
   tokenEdit->setModel(model);
 
   show();
 
-  model->insertRows(position, stringsToBeInserted.size());
+  model->insertRows(data.position, data.stringsToBeInserted.size());
 
-  for (auto string : stringsToBeInserted) {
-    model->setData(model->index(position++), string);
+  for (auto string : data.stringsToBeInserted) {
+    model->setData(model->index(data.position++), string);
   }
 
-  auto tokens = tokenEdit->view({})->tokens();
-  compare(stringsAfterInsertion, tokens, Qt::DisplayRole);
+  auto tokens = view()->tokens();
+  compare(data.stringsAfterInsertion, tokens, Qt::DisplayRole);
 }
 
-void TokenEditTest::RemoveRowsAtPosition_TokenRemoved_data() {
-  QTest::addColumn<QStringList>("initialStrings");
-  QTest::addColumn<Position>("position");
-  QTest::addColumn<Count>("count");
-  QTest::addColumn<QStringList>("stringsAfterRemoval");
+INSTANTIATE_TEST_CASE_P(
+    TokenEditTest,
+    TokenEditTest_AddRowsAtPosition,
+    testing::ValuesIn(TokenEditTest_AddRowsAtPosition_TestCases()),
+    [](auto const& info) { return info.param.name; });
 
-  QTest::newRow("one at the beginning")
-      << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{0} << Count{1}
-      << QStringList{"Jeramey", "Gabriella"};
 
-  QTest::newRow("one in the middle")
-      << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{1} << Count{1}
-      << QStringList{"Abbie", "Gabriella"};
+// void TokenEditTest::RemoveRowsAtPosition_TokenRemoved_data() {
+//   QTest::addColumn<QStringList>("initialStrings");
+//   QTest::addColumn<Position>("position");
+//   QTest::addColumn<Count>("count");
+//   QTest::addColumn<QStringList>("stringsAfterRemoval");
 
-  QTest::newRow("one at the end")
-      << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{2} << Count{1}
-      << QStringList{"Abbie", "Jeramey"};
+//   QTest::newRow("one at the beginning")
+//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{0} <<
+//       Count{1}
+//       << QStringList{"Jeramey", "Gabriella"};
 
-  QTest::newRow("two at the beginning")
-      << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{0} << Count{2}
-      << QStringList{"Gabriella"};
+//   QTest::newRow("one in the middle")
+//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{1} <<
+//       Count{1}
+//       << QStringList{"Abbie", "Gabriella"};
 
-  QTest::newRow("two at the end")
-      << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{1} << Count{2}
-      << QStringList{"Abbie"};
-}
+//   QTest::newRow("one at the end")
+//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{2} <<
+//       Count{1}
+//       << QStringList{"Abbie", "Jeramey"};
 
-void TokenEditTest::RemoveRowsAtPosition_TokenRemoved() {
-  QFETCH(QStringList, initialStrings);
-  QFETCH(Position, position);
-  QFETCH(Count, count);
-  QFETCH(QStringList, stringsAfterRemoval);
+//   QTest::newRow("two at the beginning")
+//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{0} <<
+//       Count{2}
+//       << QStringList{"Gabriella"};
 
-  model->setStringList(initialStrings);
-  tokenEdit->setModel(model);
+//   QTest::newRow("two at the end")
+//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{1} <<
+//       Count{2}
+//       << QStringList{"Abbie"};
+// }
 
-  model->removeRows(position, count);
+// void TokenEditTest::RemoveRowsAtPosition_TokenRemoved() {
+//   QFETCH(QStringList, initialStrings);
+//   QFETCH(Position, position);
+//   QFETCH(Count, count);
+//   QFETCH(QStringList, stringsAfterRemoval);
 
-  show();
+//   model->setStringList(initialStrings);
+//   tokenEdit->setModel(model);
 
-  auto tokens = tokenEdit->view({})->tokens();
-  compare(stringsAfterRemoval, tokens, Qt::DisplayRole);
-}
+//   model->removeRows(position, count);
 
-void TokenEditTest::ChangeDataAtPosition_TokenTextUpdated_data() {
-  QTest::addColumn<QStringList>("initialStrings");
-  QTest::addColumn<Position>("position");
-  QTest::addColumn<QStringList>("newStrings");
-  QTest::addColumn<QStringList>("stringsAfterUpdate");
+//   show();
 
-  QTest::newRow("two at the beginning")
-      << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{0}
-      << QStringList{"Robert", "Rachel"}
-      << QStringList{"Robert", "Rachel", "Gabriella"};
+//   auto tokens = tokenEdit->view({})->tokens();
+//   compare(stringsAfterRemoval, tokens, Qt::DisplayRole);
+// }
 
-  QTest::newRow("one at the end")
-      << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{2}
-      << QStringList{"Rachel"} << QStringList{"Abbie", "Jeramey", "Rachel"};
-}
+// void TokenEditTest::ChangeDataAtPosition_TokenTextUpdated_data() {
+//   QTest::addColumn<QStringList>("initialStrings");
+//   QTest::addColumn<Position>("position");
+//   QTest::addColumn<QStringList>("newStrings");
+//   QTest::addColumn<QStringList>("stringsAfterUpdate");
 
-void TokenEditTest::ChangeDataAtPosition_TokenTextUpdated() {
-  QFETCH(QStringList, initialStrings);
-  QFETCH(Position, position);
-  QFETCH(QStringList, newStrings);
-  QFETCH(QStringList, stringsAfterUpdate);
+//   QTest::newRow("two at the beginning")
+//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{0}
+//       << QStringList{"Robert", "Rachel"}
+//       << QStringList{"Robert", "Rachel", "Gabriella"};
 
-  model->setStringList(initialStrings);
-  tokenEdit->setModel(model);
+//   QTest::newRow("one at the end")
+//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{2}
+//       << QStringList{"Rachel"} << QStringList{"Abbie", "Jeramey", "Rachel"};
+// }
 
-  for (auto string : newStrings) {
-    auto index = model->index(position++);
-    model->setData(index, string, Qt::DisplayRole);
-  }
+// void TokenEditTest::ChangeDataAtPosition_TokenTextUpdated() {
+//   QFETCH(QStringList, initialStrings);
+//   QFETCH(Position, position);
+//   QFETCH(QStringList, newStrings);
+//   QFETCH(QStringList, stringsAfterUpdate);
 
-  show();
+//   model->setStringList(initialStrings);
+//   tokenEdit->setModel(model);
 
-  auto tokens = tokenEdit->view({})->tokens();
-  compare(stringsAfterUpdate, tokens, Qt::DisplayRole);
-}
+//   for (auto string : newStrings) {
+//     auto index = model->index(position++);
+//     model->setData(index, string, Qt::DisplayRole);
+//   }
 
-void TokenEditTest::SetToolTipRole_ToolTipSetOnToken_data() {
-  QTest::addColumn<Position>("position");
-  QTest::addColumn<QStringList>("toolTipsToSet");
-  QTest::addColumn<QStringList>("toolTipsSetOnTokens");
+//   show();
 
-  QTest::newRow("on first token")
-      << Position{0} << QStringList{"Abbie@mail.com"}
-      << QStringList{"Abbie@mail.com", QString{}, QString{}};
-  
-  QSKIP("StringListModel does not support tooltips.");
-}
+//   auto tokens = tokenEdit->view({})->tokens();
+//   compare(stringsAfterUpdate, tokens, Qt::DisplayRole);
+// }
 
-void TokenEditTest::SetToolTipRole_ToolTipSetOnToken() {
-  QFETCH(Position, position);
-  QFETCH(QStringList, toolTipsToSet);
-  QFETCH(QStringList, toolTipsSetOnTokens);
+// void TokenEditTest::SetToolTipRole_ToolTipSetOnToken_data() {
+//   QTest::addColumn<Position>("position");
+//   QTest::addColumn<QStringList>("toolTipsToSet");
+//   QTest::addColumn<QStringList>("toolTipsSetOnTokens");
 
-  auto initialStrings = QStringList{"Abbie", "Jeramey", "Gabriella"};
-  
-  model->setStringList(initialStrings);
-  tokenEdit->setModel(model);
+//   QTest::newRow("on first token")
+//       << Position{0} << QStringList{"Abbie@mail.com"}
+//       << QStringList{"Abbie@mail.com", QString{}, QString{}};
 
-  for (auto string : toolTipsToSet) {
-    auto index = model->index(position++);
-    auto success = model->setData(index, string, Qt::ToolTipRole);
-    QCOMPARE(true, success);
-  }
+//   QSKIP("StringListModel does not support tooltips.");
+// }
 
-  show();
+// void TokenEditTest::SetToolTipRole_ToolTipSetOnToken() {
+//   QFETCH(Position, position);
+//   QFETCH(QStringList, toolTipsToSet);
+//   QFETCH(QStringList, toolTipsSetOnTokens);
 
-  auto tokens = tokenEdit->view({})->tokens();
-  compare(toolTipsSetOnTokens, tokens, Qt::ToolTipRole);
-}
+//   auto initialStrings = QStringList{"Abbie", "Jeramey", "Gabriella"};
 
-QTEST_MAIN(TokenEditTest)
+//   model->setStringList(initialStrings);
+//   tokenEdit->setModel(model);
 
-#include "TokenEditTest.moc"
+//   for (auto string : toolTipsToSet) {
+//     auto index = model->index(position++);
+//     auto success = model->setData(index, string, Qt::ToolTipRole);
+//     QCOMPARE(true, success);
+//   }
+
+//   show();
+
+//   auto tokens = tokenEdit->view({})->tokens();
+//   compare(toolTipsSetOnTokens, tokens, Qt::ToolTipRole);
+// }

@@ -30,6 +30,7 @@ message(STATUS "Test ${target}")
 # 
 
 set(sources
+    main.cpp
     TokenEditTest.cpp
 )
 
@@ -42,6 +43,8 @@ set(sources
 add_executable(${target}
     ${sources}
 )
+
+add_test(${target} ${target})
 
 # Create namespaced alias
 add_executable(${META_PROJECT_NAME}::${target} ALIAS ${target})
@@ -77,6 +80,7 @@ target_link_libraries(${target}
     PRIVATE
     ${DEFAULT_LIBRARIES}
     ${META_PROJECT_NAME}::qttokenedit
+    gmock-dev
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets

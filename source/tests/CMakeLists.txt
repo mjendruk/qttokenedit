@@ -6,7 +6,7 @@
 # CMake version
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
-# # Meta information about the project
+# Meta information about the project
 set(META_PROJECT_NAME "qttokenedit")
 
 # Declare project
@@ -30,7 +30,7 @@ else()
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 endif()
 
-# Function: Build tests and add command to execute it via target 'tests'
+# Function: Build test and add command to execute it via target 'test'
 function(add_test_without_ctest target)
     add_subdirectory(${target})
     
@@ -46,8 +46,33 @@ function(add_test_without_ctest target)
     generate_coverage_report(${target})
 endfunction()
 
+# Build gmock
+set(gmock_build_tests           OFF CACHE BOOL "")
+set(gtest_build_samples         OFF CACHE BOOL "")
+set(gtest_build_tests           OFF CACHE BOOL "")
+set(gtest_disable_pthreads      OFF CACHE BOOL "")
+set(gtest_force_shared_crt      ON  CACHE BOOL "")
+set(gtest_hide_internal_symbols OFF CACHE BOOL "")
+
+add_subdirectory(googletest/googlemock)
+
+# Create interface library to link against gmock
+add_library(gmock-dev INTERFACE)
+
+target_include_directories(gmock-dev
+    SYSTEM INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/googletest/googletest/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/googletest/googlemock/include
+)
+
+target_link_libraries(gmock-dev
+    INTERFACE
+    gmock
+)
+
+
 # 
-# Target 'tests'
+# Target 'test'
 # 
 
 add_custom_target(tests)
