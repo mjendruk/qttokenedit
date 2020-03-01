@@ -92,8 +92,7 @@ struct TokenEditTest_AddRowsAtPosition_Data {
   QStringList stringsAfterInsertion;
 };
 
-std::vector<TokenEditTest_AddRowsAtPosition_Data>
-TokenEditTest_AddRowsAtPosition_TestCases() {
+auto TokenEditTest_AddRowsAtPosition_TestCases() {
   auto result = std::vector<TokenEditTest_AddRowsAtPosition_Data>{
       {
           "OneAtTheBeginning",
@@ -158,60 +157,83 @@ TEST_P(TokenEditTest_AddRowsAtPosition, TokenAdded) {
 }
 
 INSTANTIATE_TEST_CASE_P(
-    TokenEditTest,
-    TokenEditTest_AddRowsAtPosition,
+    TokenEditTest, TokenEditTest_AddRowsAtPosition,
     testing::ValuesIn(TokenEditTest_AddRowsAtPosition_TestCases()),
     [](auto const& info) { return info.param.name; });
 
+struct TokenEditTest_RemoveRowsAtPosition_Data {
+  std::string name;
+  QStringList initialStrings;
+  Position position;
+  Count count;
+  QStringList stringsAfterRemoval;
+};
 
-// void TokenEditTest::RemoveRowsAtPosition_TokenRemoved_data() {
-//   QTest::addColumn<QStringList>("initialStrings");
-//   QTest::addColumn<Position>("position");
-//   QTest::addColumn<Count>("count");
-//   QTest::addColumn<QStringList>("stringsAfterRemoval");
+auto TokenEditTest_RemoveRowsAtPosition_TestCases() {
+  auto result = std::vector<TokenEditTest_RemoveRowsAtPosition_Data>{
+      {
+          "OneAtTheBeginning",
+          QStringList{"Abbie", "Jeramey", "Gabriella"},
+          Position{0},
+          Count{1},
+          QStringList{"Jeramey", "Gabriella"},
+      },
+      {
+          "OneInTheMiddle",
+          QStringList{"Abbie", "Jeramey", "Gabriella"},
+          Position{1},
+          Count{1},
+          QStringList{"Abbie", "Gabriella"},
+      },
+      {
+          "OneAtTheEnd",
+          QStringList{"Abbie", "Jeramey", "Gabriella"},
+          Position{2},
+          Count{1},
+          QStringList{"Abbie", "Jeramey"},
+      },
+      {
+          "TwoAtTheBeginning",
+          QStringList{"Abbie", "Jeramey", "Gabriella"},
+          Position{0},
+          Count{2},
+          QStringList{"Gabriella"},
+      },
+      {
+          "TwoAtTheEnd",
+          QStringList{"Abbie", "Jeramey", "Gabriella"},
+          Position{1},
+          Count{2},
+          QStringList{"Abbie"},
+      },
+  };
+  
+  return result;
+}
 
-//   QTest::newRow("one at the beginning")
-//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{0} <<
-//       Count{1}
-//       << QStringList{"Jeramey", "Gabriella"};
+class TokenEditTest_RemoveRowsAtPosition
+    : public TokenEditTest,
+      public testing::WithParamInterface<
+          TokenEditTest_RemoveRowsAtPosition_Data> {};
 
-//   QTest::newRow("one in the middle")
-//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{1} <<
-//       Count{1}
-//       << QStringList{"Abbie", "Gabriella"};
+TEST_P(TokenEditTest_RemoveRowsAtPosition, TokenRemoved) {
+  auto data = GetParam();
 
-//   QTest::newRow("one at the end")
-//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{2} <<
-//       Count{1}
-//       << QStringList{"Abbie", "Jeramey"};
+  model->setStringList(data.initialStrings);
+  tokenEdit->setModel(model);
 
-//   QTest::newRow("two at the beginning")
-//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{0} <<
-//       Count{2}
-//       << QStringList{"Gabriella"};
+  model->removeRows(data.position, data.count);
 
-//   QTest::newRow("two at the end")
-//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{1} <<
-//       Count{2}
-//       << QStringList{"Abbie"};
-// }
+  show();
 
-// void TokenEditTest::RemoveRowsAtPosition_TokenRemoved() {
-//   QFETCH(QStringList, initialStrings);
-//   QFETCH(Position, position);
-//   QFETCH(Count, count);
-//   QFETCH(QStringList, stringsAfterRemoval);
+  auto tokens = view()->tokens();
+  compare(data.stringsAfterRemoval, tokens, Qt::DisplayRole);
+}
 
-//   model->setStringList(initialStrings);
-//   tokenEdit->setModel(model);
-
-//   model->removeRows(position, count);
-
-//   show();
-
-//   auto tokens = tokenEdit->view({})->tokens();
-//   compare(stringsAfterRemoval, tokens, Qt::DisplayRole);
-// }
+INSTANTIATE_TEST_CASE_P(
+    TokenEditTest, TokenEditTest_RemoveRowsAtPosition,
+    testing::ValuesIn(TokenEditTest_RemoveRowsAtPosition_TestCases()),
+    [](auto const& info) { return info.param.name; });
 
 // void TokenEditTest::ChangeDataAtPosition_TokenTextUpdated_data() {
 //   QTest::addColumn<QStringList>("initialStrings");
