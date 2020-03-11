@@ -16,7 +16,10 @@ TokenEditFrame::TokenEditFrame(QWidget* parent)
   setAttribute(Qt::WA_Hover);
   setBackgroundRole(QPalette::Base);
   _layout->setContentsMargins(contentMargins());
+  _layout->setSizeConstraint(QLayout::SetMinimumSize);
   setLayout(_layout);
+        
+  setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 }
 
 QWidget* TokenEditFrame::takeWidget() {
