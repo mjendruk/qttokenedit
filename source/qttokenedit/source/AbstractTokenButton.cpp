@@ -28,7 +28,7 @@ void AbstractTokenButton::paintEvent(QPaintEvent* event) {
   painter.setClipRect(clippingRect);
 
   auto color = palette().color(foregroundRole());
-  color.setAlpha(50);
+  color.setAlpha(70);
 
   painter.setBrush(color);
   painter.setPen(Qt::NoPen);
