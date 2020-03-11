@@ -169,8 +169,9 @@ struct TokenEditTest_RemoveRowsAtPosition_Data {
   QStringList stringsAfterRemoval;
 };
 
-auto TokenEditTest_RemoveRowsAtPosition_TestCases() {
-  auto result = std::vector<TokenEditTest_RemoveRowsAtPosition_Data>{
+std::vector<TokenEditTest_RemoveRowsAtPosition_Data>
+TokenEditTest_RemoveRowsAtPosition_TestCases() {
+  return {
       {
           "OneAtTheBeginning",
           QStringList{"Abbie", "Jeramey", "Gabriella"},
@@ -207,8 +208,6 @@ auto TokenEditTest_RemoveRowsAtPosition_TestCases() {
           QStringList{"Abbie"},
       },
   };
-  
-  return result;
 }
 
 class TokenEditTest_RemoveRowsAtPosition
@@ -235,72 +234,106 @@ INSTANTIATE_TEST_CASE_P(
     testing::ValuesIn(TokenEditTest_RemoveRowsAtPosition_TestCases()),
     [](auto const& info) { return info.param.name; });
 
-// void TokenEditTest::ChangeDataAtPosition_TokenTextUpdated_data() {
-//   QTest::addColumn<QStringList>("initialStrings");
-//   QTest::addColumn<Position>("position");
-//   QTest::addColumn<QStringList>("newStrings");
-//   QTest::addColumn<QStringList>("stringsAfterUpdate");
+struct TokenEditTest_ChangeDataAtPosition_Data {
+  std::string name;
+  QStringList initialStrings;
+  Position position;
+  QStringList newStrings;
+  QStringList stringsAfterUpdate;
+};
 
-//   QTest::newRow("two at the beginning")
-//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{0}
-//       << QStringList{"Robert", "Rachel"}
-//       << QStringList{"Robert", "Rachel", "Gabriella"};
+std::vector<TokenEditTest_ChangeDataAtPosition_Data>
+TokenEditTest_ChangeDataAtPosition_TestCases() {
+  return {
+      {
+          "TwoAtTheBeginning",
+          QStringList{"Abbie", "Jeramey", "Gabriella"},
+          Position{0},
+          QStringList{"Robert", "Rachel"},
+          QStringList{"Robert", "Rachel", "Gabriella"},
+      },
+      {
+          "OneAtTheEnd",
+          QStringList{"Abbie", "Jeramey", "Gabriella"},
+          Position{2},
+          QStringList{"Rachel"},
+          QStringList{"Abbie", "Jeramey", "Rachel"},
+      },
+  };
+}
 
-//   QTest::newRow("one at the end")
-//       << QStringList{"Abbie", "Jeramey", "Gabriella"} << Position{2}
-//       << QStringList{"Rachel"} << QStringList{"Abbie", "Jeramey", "Rachel"};
-// }
+class TokenEditTest_ChangeDataAtPosition
+    : public TokenEditTest,
+      public testing::WithParamInterface<
+          TokenEditTest_ChangeDataAtPosition_Data> {};
 
-// void TokenEditTest::ChangeDataAtPosition_TokenTextUpdated() {
-//   QFETCH(QStringList, initialStrings);
-//   QFETCH(Position, position);
-//   QFETCH(QStringList, newStrings);
-//   QFETCH(QStringList, stringsAfterUpdate);
+TEST_P(TokenEditTest_ChangeDataAtPosition, TokenTextUpdated) {
+  auto data = GetParam();
 
-//   model->setStringList(initialStrings);
-//   tokenEdit->setModel(model);
+  model->setStringList(data.initialStrings);
+  tokenEdit->setModel(model);
 
-//   for (auto string : newStrings) {
-//     auto index = model->index(position++);
-//     model->setData(index, string, Qt::DisplayRole);
-//   }
+  for (auto string : data.newStrings) {
+    auto index = model->index(data.position++);
+    model->setData(index, string, Qt::DisplayRole);
+  }
 
-//   show();
+  show();
 
-//   auto tokens = tokenEdit->view({})->tokens();
-//   compare(stringsAfterUpdate, tokens, Qt::DisplayRole);
-// }
+  auto tokens = view()->tokens();
+  compare(data.stringsAfterUpdate, tokens, Qt::DisplayRole);
+}
 
-// void TokenEditTest::SetToolTipRole_ToolTipSetOnToken_data() {
-//   QTest::addColumn<Position>("position");
-//   QTest::addColumn<QStringList>("toolTipsToSet");
-//   QTest::addColumn<QStringList>("toolTipsSetOnTokens");
+INSTANTIATE_TEST_CASE_P(
+    TokenEditTest, TokenEditTest_ChangeDataAtPosition,
+    testing::ValuesIn(TokenEditTest_ChangeDataAtPosition_TestCases()),
+    [](auto const& info) { return info.param.name; });
 
-//   QTest::newRow("on first token")
-//       << Position{0} << QStringList{"Abbie@mail.com"}
-//       << QStringList{"Abbie@mail.com", QString{}, QString{}};
+struct TokenEditTest_SetToolTipRole_Data {
+  std::string name;
+  Position position;
+  QStringList toolTipsToSet;
+  QStringList toolTipsSetOnTokens;
+};
 
-//   QSKIP("StringListModel does not support tooltips.");
-// }
+std::vector<TokenEditTest_SetToolTipRole_Data>
+TokenEditTest_SetToolTipRole_TestCases() {
+  return {
+      {
+          "OnFirstToken",
+          Position{0},
+          QStringList{"Abbie@mail.com"},
+          QStringList{"Abbie@mail.com", QString{}, QString{}},
+      },
+  };
+}
 
-// void TokenEditTest::SetToolTipRole_ToolTipSetOnToken() {
-//   QFETCH(Position, position);
-//   QFETCH(QStringList, toolTipsToSet);
-//   QFETCH(QStringList, toolTipsSetOnTokens);
+class TokenEditTest_SetToolTipRole
+    : public TokenEditTest,
+      public testing::WithParamInterface<TokenEditTest_SetToolTipRole_Data> {};
 
-//   auto initialStrings = QStringList{"Abbie", "Jeramey", "Gabriella"};
+//! disabled: StringListModel does not support tooltips.
+TEST_P(TokenEditTest_SetToolTipRole, DISABLED_ToolTipSetOnToken) {
+  auto data = GetParam();
 
-//   model->setStringList(initialStrings);
-//   tokenEdit->setModel(model);
+  auto initialStrings = QStringList{"Abbie", "Jeramey", "Gabriella"};
 
-//   for (auto string : toolTipsToSet) {
-//     auto index = model->index(position++);
-//     auto success = model->setData(index, string, Qt::ToolTipRole);
-//     QCOMPARE(true, success);
-//   }
+  model->setStringList(initialStrings);
+  tokenEdit->setModel(model);
 
-//   show();
+  for (auto string : data.toolTipsToSet) {
+    auto index = model->index(data.position++);
+    auto success = model->setData(index, string, Qt::ToolTipRole);
+    QCOMPARE(true, success);
+  }
 
-//   auto tokens = tokenEdit->view({})->tokens();
-//   compare(toolTipsSetOnTokens, tokens, Qt::ToolTipRole);
-// }
+  show();
+
+  auto tokens = view()->tokens();
+  compare(data.toolTipsSetOnTokens, tokens, Qt::ToolTipRole);
+}
+
+INSTANTIATE_TEST_CASE_P(
+    TokenEditTest, TokenEditTest_SetToolTipRole,
+    testing::ValuesIn(TokenEditTest_SetToolTipRole_TestCases()),
+    [](auto const& info) { return info.param.name; });
