@@ -31,7 +31,10 @@ message(STATUS "Test ${target}")
 
 set(sources
     main.cpp
+    TokenEditItemModelTests.cpp
+    TokenEditShowLineEditTests.cpp
     TokenEditTest.cpp
+    TokenEditTest.h
 )
 
 
