@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QAbstractButton>
+#include <QtGui/QPainterPath>
 
 #include <qttokenedit/qttokenedit_api.h>
 
