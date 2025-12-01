@@ -18,7 +18,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
+    <enum>Qt::FocusPolicy::ClickFocus</enum>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -34,7 +34,7 @@
     <string>&amp;About ...</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::AboutRole</enum>
+    <enum>QAction::MenuRole::AboutRole</enum>
    </property>
   </action>
   <action name="quitAction">
@@ -45,7 +45,7 @@
     <string>&amp;Quit</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::QuitRole</enum>
+    <enum>QAction::MenuRole::QuitRole</enum>
    </property>
   </action>
  </widget>
@@ -67,21 +67,8 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>aboutAction</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>on_about()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
+ <slots>
+  <slot>on_about()</slot>
+ </slots>
 </ui>

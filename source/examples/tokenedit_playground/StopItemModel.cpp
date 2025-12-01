@@ -2,6 +2,7 @@
 
 #include <unordered_set>
 
+#include <QBinaryJson>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QMimeData>
@@ -27,7 +28,7 @@ QMimeData* StopItemModel::mimeData(QModelIndexList const& indexes) const {
                  [=](auto rows) { return _stops.at(rows); });
 
   auto jsonData =
-      QJsonDocument{QJsonArray::fromStringList(stopList)}.toBinaryData();
+      QBinaryJson::toBinaryData(QJsonDocument{QJsonArray::fromStringList(stopList)});
 
   auto mimeData = new QMimeData{};
   mimeData->setData("application/json", jsonData);
@@ -70,7 +71,7 @@ bool StopItemModel::dropMimeData(QMimeData const* data, Qt::DropAction action,
 
   QByteArray encodedData = data->data("application/json");
 
-  auto json = QJsonDocument::fromBinaryData(encodedData);
+  auto json = QBinaryJson::fromBinaryData(encodedData);
 
   if (!json.isArray()) {
     return false;

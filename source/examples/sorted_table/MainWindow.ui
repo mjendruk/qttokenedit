@@ -37,7 +37,7 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="sizeConstraint">
-        <enum>QLayout::SetMinimumSize</enum>
+        <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
        </property>
        <item>
         <layout class="QFormLayout" name="formLayout_2"/>
@@ -56,7 +56,7 @@
      <x>0</x>
      <y>0</y>
      <width>689</width>
-     <height>22</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu">
@@ -83,7 +83,7 @@
     <string>&amp;About ...</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::AboutRole</enum>
+    <enum>QAction::MenuRole::AboutRole</enum>
    </property>
   </action>
   <action name="quitAction">
@@ -94,7 +94,7 @@
     <string>&amp;Quit</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::QuitRole</enum>
+    <enum>QAction::MenuRole::QuitRole</enum>
    </property>
   </action>
  </widget>
@@ -116,21 +116,8 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>aboutAction</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>on_about()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
+ <slots>
+  <slot>on_about()</slot>
+ </slots>
 </ui>

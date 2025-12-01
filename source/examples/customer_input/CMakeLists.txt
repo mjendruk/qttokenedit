@@ -3,9 +3,10 @@
 # External dependencies
 # 
 
-find_package(Qt5Core    5.9)
-find_package(Qt5Gui     5.9)
-find_package(Qt5Widgets 5.9)
+find_package(Qt6Core    6.9)
+find_package(Qt6Gui     6.9)
+find_package(Qt6Widgets 6.9)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
 
 # Enable automoc
 set(CMAKE_AUTOMOC ON)
@@ -25,8 +26,8 @@ set_policy(CMP0020 NEW)
 set(target customer_input)
 
 # Exit here if required dependencies are not met
-if (NOT Qt5Core_FOUND)
-    message(STATUS "Example ${target} skipped: Qt5 not found")
+if (NOT Qt6Core_FOUND)
+    message(STATUS "Example ${target} skipped: Qt6 not found")
     return()
 else()
     message(STATUS "Example ${target}")
@@ -96,9 +97,10 @@ target_include_directories(${target}
 target_link_libraries(${target}
     PRIVATE
     ${DEFAULT_LIBRARIES}
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Widgets
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::Core5Compat
     ${META_PROJECT_NAME}::qttokenedit
 )
 

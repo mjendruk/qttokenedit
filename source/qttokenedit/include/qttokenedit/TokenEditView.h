@@ -54,6 +54,8 @@ class QTTOKENEDIT_API TokenEditView : public QWidget {
   int ySpacing() const;
   int margin() const;
 
+  int heightForWidth(int width) const override;
+
   int lineCount() const;
   int lineCountForWidth(int width) const;
 
@@ -74,6 +76,7 @@ class QTTOKENEDIT_API TokenEditView : public QWidget {
  private:
   QVector<Token*> _tokens;
   FlexLayout* _layout;
+  Token* _dummyToken;
 
   QWidget* _finalWidget;
   QWidget* _defaultFinalWidget;

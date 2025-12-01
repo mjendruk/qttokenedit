@@ -5,10 +5,10 @@
 
 find_package(${META_PROJECT_NAME} REQUIRED HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../../../")
 
-find_package(Qt5Core 5.9)
-find_package(Qt5Gui 5.9)
-find_package(Qt5Widgets 5.9)
-find_package(Qt5Test 5.9)
+find_package(Qt6Core 6.9)
+find_package(Qt6Gui 6.9)
+find_package(Qt6Widgets 6.9)
+find_package(Qt6Test 6.9)
 
 # Enable automoc
 set(CMAKE_AUTOMOC ON)
@@ -84,10 +84,10 @@ target_link_libraries(${target}
     ${DEFAULT_LIBRARIES}
     ${META_PROJECT_NAME}::qttokenedit
     gmock-dev
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Widgets
-    Qt5::Test
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::Test
 )
 
 

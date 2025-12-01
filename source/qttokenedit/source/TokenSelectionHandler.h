@@ -16,7 +16,6 @@ class TokenSelectionHandler : public AbstractTokenSelectionHandler {
 
  public:
   TokenSelectionHandler(TokenEdit* tokenEdit);
-  ~TokenSelectionHandler();
 
   void select(Token const* token, Qt::MouseButtons buttons,
               Qt::KeyboardModifiers modifiers) override;

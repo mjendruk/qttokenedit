@@ -2,6 +2,7 @@
 
 #include <unordered_set>
 
+#include <QBinaryJson>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -30,7 +31,7 @@ QMimeData* SelectedCustomersModel::mimeData(
                    {QStringLiteral("email"), _emails.at(row)}});
   }
 
-  auto jsonData = QJsonDocument{customers}.toBinaryData();
+  auto jsonData = QBinaryJson::toBinaryData(QJsonDocument{customers});
 
   auto mimeData = new QMimeData{};
   mimeData->setData(_mimeType, jsonData);
@@ -75,7 +76,7 @@ bool SelectedCustomersModel::dropMimeData(QMimeData const* data,
 
   QByteArray encodedData = data->data(_mimeType);
 
-  auto json = QJsonDocument::fromBinaryData(encodedData);
+  auto json = QBinaryJson::fromBinaryData(encodedData);
 
   if (!json.isArray()) {
     return false;

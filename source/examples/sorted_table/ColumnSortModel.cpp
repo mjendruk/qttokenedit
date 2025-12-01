@@ -2,6 +2,7 @@
 
 #include <unordered_set>
 
+#include <QBinaryJson>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QMimeData>
@@ -32,8 +33,7 @@ QMimeData* ColumnSortModel::mimeData(QModelIndexList const& indexes) const {
                  std::back_inserter(selectedIndexes),
                  [=](auto index) { return _selectedColumns.at(index.row()); });
 
-  auto jsonData = QJsonDocument{QJsonArray::fromVariantList(selectedIndexes)}
-                      .toBinaryData();
+  auto jsonData = QBinaryJson::toBinaryData(QJsonDocument{QJsonArray::fromVariantList(selectedIndexes)});
 
   auto mimeData = new QMimeData{};
   mimeData->setData(_mimeType, jsonData);
@@ -77,7 +77,7 @@ bool ColumnSortModel::dropMimeData(QMimeData const* data, Qt::DropAction action,
 
   QByteArray encodedData = data->data(_mimeType);
 
-  auto json = QJsonDocument::fromBinaryData(encodedData);
+  auto json = QBinaryJson::fromBinaryData(encodedData);
 
   if (!json.isArray()) {
     return false;

@@ -17,6 +17,7 @@
 MainWindow::MainWindow() : m_ui(new Ui::MainWindow) {
   // Setup UI
   m_ui->setupUi(this);
+  connect(m_ui->aboutAction, &QAction::triggered, this, &MainWindow::on_about);
 
   auto model = new CsvItemModel{"data/customer-table.csv"};
   

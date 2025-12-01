@@ -13,8 +13,11 @@ namespace mjendruk {
 TokenEditView::TokenEditView(QWidget* parent)
     : QWidget{parent},
       _layout{new FlexLayout{margin(), xSpacing(), ySpacing(), this}},
+      _dummyToken{new Token{this}},
       _finalWidget{nullptr},
       _defaultFinalWidget{nullptr} {
+  _dummyToken->hide();
+
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setFocusPolicy(Qt::NoFocus);
 }
@@ -148,6 +151,18 @@ int TokenEditView::ySpacing() const {
 }
 
 int TokenEditView::margin() const { return ySpacing(); }
+
+int TokenEditView::heightForWidth(int width) const
+{
+  if (lineCount() == 0) {
+    // The flex layout will only give us the margins, because there's nothing in it.
+    int marginsHeight = QWidget::heightForWidth(width);
+    int dummyTokenHeight = _dummyToken->sizeHint().height();
+    return marginsHeight + dummyTokenHeight;
+  }
+
+  return QWidget::heightForWidth(width);
+}
 
 int TokenEditView::lineCount() const {
   return _layout->lineCountForWidth(width());

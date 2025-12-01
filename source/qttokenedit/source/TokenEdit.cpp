@@ -155,6 +155,7 @@ TokenEdit::TokenEdit(QWidget* parent)
   connect(_lineEdit, &TokenLineEdit::backspaceAtBeginning, [=]() {
     if (_model && !_view->isEmpty() && removable()) {
       this->remove(_view->count() - 1, UpdateFocus::No);
+      _lineEdit->setFocus();
     }
   });
 
@@ -164,6 +165,7 @@ TokenEdit::TokenEdit(QWidget* parent)
 }
 
 TokenEdit::~TokenEdit() {
+  removeEventFilter(_selectionHandler);
   disconnect(qApp, &QApplication::focusChanged, this,
              &TokenEdit::onFocusChanged);
 }
@@ -172,7 +174,9 @@ int TokenEdit::maxLineCount() const { return _maxLineCount; }
 
 void TokenEdit::setMaxLineCount(int count) {
   _maxLineCount = count;
-  _activeMode->invalidate();
+  if (_activeMode != nullptr) {
+    _activeMode->invalidate();
+  }
   updateHeight();
 }
 
@@ -217,7 +221,9 @@ void TokenEdit::setRemovable(bool enable) {
 
   emit removableStateChanged(enable);
 
-  _activeMode->invalidate();
+  if (_activeMode != nullptr) {
+    _activeMode->invalidate();
+  }
   updateHeight();
 }
 
@@ -500,7 +506,7 @@ void TokenEdit::setNextActiveMode(TokenEditMode* mode) {
 }
 
 void TokenEdit::updateActiveMode() {
-  if (_nextActiveMode && !_modeChangedBlocked) {
+  if (!_modeChangedBlocked) {
     setActiveMode(_nextActiveMode);
     _nextActiveMode = nullptr;
   }
@@ -532,10 +538,6 @@ void TokenEdit::updateHeight() {
 }
 
 void TokenEdit::updateDefaultFinalWidget() {
-  if (!_model) {
-    return;
-  }
-
   auto finalWidget = static_cast<QWidget*>(_placeholder);
 
   if (_showLineEdit == ShowLineEdit::Always) {
